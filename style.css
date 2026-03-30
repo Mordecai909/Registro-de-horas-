@@ -1,16 +1,16 @@
-/* Modern Purple Theme Design Tokens */
+/* Modern Light Purple Theme Design Tokens */
 :root {
-    --bg-main: #2e1065;
-    --card-bg: rgba(76, 29, 149, 0.3);
-    --primary-text: #F8FAFC;
-    --secondary-text: #c4b5fd;
-    --accent: #c084fc;
-    --success: #34d399;
-    --danger: #fb7185;
+    --bg-main: #faf5ff; /* fuchsia-50 */
+    --card-bg: rgba(255, 255, 255, 0.7);
+    --primary-text: #4c1d95; /* violet-900 */
+    --secondary-text: #7c3aed; /* violet-600 */
+    --accent: #9333ea; /* purple-600 */
+    --success: #10b981; /* emerald-500 */
+    --danger: #ef4444; /* red-500 */
 }
 
 body {
-    background: linear-gradient(135deg, #1e0036 0%, #17002b 100%);
+    background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
     background-attachment: fixed;
     color: var(--primary-text);
     font-family: 'Inter', sans-serif;
@@ -22,16 +22,17 @@ body {
 .glass-card {
     background: var(--card-bg);
     backdrop-filter: blur(20px);
-    border: 1px solid rgba(192, 132, 252, 0.15);
+    border: 1px solid rgba(168, 85, 247, 0.2);
     border-radius: 1.25rem;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 10px 30px -5px rgba(107, 33, 168, 0.05);
 }
 
 .glass-card:hover {
     transform: translateY(-4px);
-    background: rgba(91, 33, 182, 0.5);
-    border-color: rgba(192, 132, 252, 0.4);
-    box-shadow: 0 20px 40px -10px rgba(46, 16, 101, 0.6);
+    background: rgba(255, 255, 255, 0.9);
+    border-color: rgba(168, 85, 247, 0.4);
+    box-shadow: 0 20px 40px -10px rgba(107, 33, 168, 0.15);
 }
 
 .timer-display {
@@ -52,10 +53,15 @@ body {
 
 /* Form Styling */
 input, select {
-    background: rgba(46, 16, 101, 0.6) !important;
-    border: 1px solid rgba(192, 132, 252, 0.2) !important;
-    color: #F8FAFC !important;
+    background: rgba(255, 255, 255, 0.8) !important;
+    border: 1px solid rgba(168, 85, 247, 0.3) !important;
+    color: #4c1d95 !important;
     border-radius: 0.75rem !important;
+}
+input:focus, select:focus {
+    outline: none !important;
+    border-color: rgba(168, 85, 247, 0.8) !important;
+    box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2) !important;
 }
 
 input:focus {
