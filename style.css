@@ -1,0 +1,117 @@
+/* Modern Dark Theme Design Tokens */
+:root {
+    --bg-main: #000000;
+    --card-bg: rgba(18, 18, 18, 0.8);
+    --primary-text: #F8FAFC;
+    --secondary-text: #64748B;
+    --accent: #A855F7;
+    --success: #10B981;
+    --danger: #EF4444;
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--primary-text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* Glassmorphism */
+.glass-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 1.25rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+    transform: translateY(-4px);
+    background: rgba(25, 25, 25, 0.9);
+    border-color: rgba(168, 85, 247, 0.4);
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.8);
+}
+
+.timer-display {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.05em;
+    text-shadow: 0 0 30px rgba(168, 85, 247, 0.3);
+}
+
+/* Animations */
+.animate-pulse-subtle {
+    animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse-subtle {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.02); }
+}
+
+/* Form Styling */
+input, select {
+    background: rgba(10, 10, 10, 0.8) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    color: #F8FAFC !important;
+    border-radius: 0.75rem !important;
+}
+
+input:focus {
+    outline: none !important;
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2) !important;
+}
+
+/* Make clock and calendar icons more visible */
+::-webkit-calendar-picker-indicator {
+    filter: invert(1) brightness(0.9) sepia(100%) saturate(500%) hue-rotate(250deg);
+    cursor: pointer;
+    padding: 2px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+::-webkit-calendar-picker-indicator:hover {
+    background-color: rgba(168, 85, 247, 0.1);
+    transform: scale(1.1);
+}
+
+.dashboard-icon {
+    opacity: 0.15;
+    transition: all 0.3s ease;
+}
+
+.glass-card:hover .dashboard-icon {
+    opacity: 0.4;
+    transform: scale(1.1) rotate(-5deg);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-main);
+}
+
+::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+}
+
+/* Table Enhancements */
+.table-row-hover:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+@media print {
+    body { background: white; color: black; }
+    .glass-card { border: 1px solid #ddd; background: none; }
+    header, #btn-timer-toggle, #btn-timer-reset, #entry-form, .actions-cell { display: none !important; }
+}
