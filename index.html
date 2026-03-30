@@ -17,10 +17,10 @@
                 extend: {
                     colors: {
                         primary: '#F8FAFC',
-                        accent: '#A855F7',
-                        bgMain: '#000000',
-                        success: '#10B981',
-                        danger: '#EF4444',
+                        accent: '#c084fc',
+                        bgMain: '#2e1065',
+                        success: '#34d399',
+                        danger: '#fb7185',
                     }
                 }
             }
@@ -33,15 +33,15 @@
 <body class="bg-bgMain text-primary min-h-screen">
 
     <!-- Header -->
-    <header class="w-full py-6 px-6 bg-black/80 backdrop-blur-xl border-b border-white/5 sticky top-0 z-50">
+    <header class="w-full py-6 px-6 bg-violet-950/80 backdrop-blur-xl border-b border-violet-400/20 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-display font-extrabold tracking-tight">
-                Time<span class="text-accent underline decoration-purple-500/30 underline-offset-4">Tracker</span>
+            <h1 class="text-2xl font-display font-extrabold tracking-tight drop-shadow-lg text-white">
+                Time<span class="text-accent underline decoration-violet-400/40 underline-offset-4">Tracker</span>
             </h1>
             <div class="flex items-center gap-4">
                 <div class="flex flex-col items-end">
-                    <span class="text-sm font-semibold text-slate-100" id="current-date-display">Carregando...</span>
-                    <span class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Uso Pessoal</span>
+                    <span class="text-sm font-semibold text-violet-100" id="current-date-display">Carregando...</span>
+                    <span class="text-[10px] uppercase tracking-widest text-violet-300 font-bold">Uso Pessoal</span>
                 </div>
                 <div class="h-10 w-10 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent shadow-accent-glow">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -61,8 +61,8 @@
                 <div class="absolute -top-4 -right-4 p-8 dashboard-icon text-accent">
                     <svg class="w-20 h-20" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"/></svg>
                 </div>
-                <p class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Meu Dia</p>
-                <h3 class="text-3xl font-display font-extrabold text-slate-100" id="card-day">00:00h</h3>
+                <p class="text-xs font-bold uppercase tracking-wider text-violet-300 mb-1">Meu Dia</p>
+                <h3 class="text-3xl font-display font-extrabold text-white" id="card-day">00:00h</h3>
                 <div class="mt-2 flex items-center text-[10px] text-success font-bold uppercase tracking-widest">
                     <span class="w-2 h-2 rounded-full bg-success mr-2 animate-pulse"></span>
                     Sincronizado
@@ -74,9 +74,9 @@
                 <div class="absolute -top-4 -right-4 p-8 dashboard-icon text-purple-400">
                     <svg class="w-20 h-20" fill="currentColor" viewBox="0 0 20 20"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM14 11a1 1 0 011 1v1h1a1 1 0 110 2h-1v1a1 1 0 11-2 0v-1h-1a1 1 0 110-2h1v-1a1 1 0 011-1z"/></svg>
                 </div>
-                <p class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Minha Semana</p>
-                <h3 class="text-3xl font-display font-extrabold text-slate-100" id="card-week">00:00h</h3>
-                <div class="mt-2 text-[10px] text-slate-500 font-bold uppercase tracking-widest">Meta 15:00h</div>
+                <p class="text-xs font-bold uppercase tracking-wider text-violet-300 mb-1">Minha Semana</p>
+                <h3 class="text-3xl font-display font-extrabold text-white" id="card-week">00:00h</h3>
+                <div class="mt-2 text-[10px] text-violet-400 font-bold uppercase tracking-widest">Meta 15:00h</div>
             </div>
 
             <!-- Total Mês -->
@@ -84,9 +84,9 @@
                 <div class="absolute -top-4 -right-4 p-8 dashboard-icon text-indigo-500">
                     <svg class="w-20 h-20" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/></svg>
                 </div>
-                <span class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Meu Mês</span>
-                <h3 class="text-3xl font-display font-extrabold text-slate-100" id="card-month">00:00h</h3>
-                <div class="mt-2 text-[10px] text-slate-400 font-bold uppercase tracking-widest">Progresso 85%</div>
+                <span class="text-xs font-bold uppercase tracking-wider text-violet-300 mb-1">Meu Mês</span>
+                <h3 class="text-3xl font-display font-extrabold text-white" id="card-month">00:00h</h3>
+                <div class="mt-2 text-[10px] text-violet-400 font-bold uppercase tracking-widest">Progresso 85%</div>
             </div>
 
             <!-- AI Insights -->
@@ -101,16 +101,16 @@
                     </span>
                     <p class="text-[10px] font-black uppercase tracking-widest text-accent">Lembrete</p>
                 </div>
-                <p class="text-sm italic text-slate-300 relative z-10">"Lembre-se de fazer pausas regulares. A consistência vale mais do que a exaustão."</p>
+                <p id="motivational-quote" class="text-sm italic text-violet-200 relative z-10 transition-opacity duration-500">"Lembre-se de fazer pausas regulares. A consistência vale mais do que a exaustão."</p>
             </div>
         </section>
 
         <!-- Left Column: Controls -->
         <section class="lg:col-span-4 space-y-8">
             <!-- Active Timer -->
-            <div class="glass-card p-8 text-center border border-white/5">
-                <h4 class="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mb-8">Timer Ativo</h4>
-                <div class="timer-display text-6xl font-display font-extrabold text-slate-100 mb-10" id="timer-text">
+            <div class="glass-card p-8 text-center border border-violet-400/20">
+                <h4 class="text-[10px] font-black text-violet-300 uppercase tracking-[0.3em] mb-8">Timer Ativo</h4>
+                <div class="timer-display text-4xl sm:text-6xl font-display font-extrabold text-white mb-10" id="timer-text">
                     00:00:00
                 </div>
                 <div class="flex gap-4">
@@ -121,15 +121,15 @@
                     <button id="btn-timer-save" onclick="saveTimerToForm()" title="Transferir tempo para o formulário" class="p-4 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 rounded-2xl transition-all border border-emerald-500/20">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     </button>
-                    <button id="btn-timer-reset" onclick="resetTimer()" title="Zerar timer" class="p-4 bg-slate-800 hover:bg-slate-700 text-slate-400 rounded-2xl transition-all border border-white/5">
+                    <button id="btn-timer-reset" onclick="resetTimer()" title="Zerar timer" class="p-4 bg-violet-900/60 hover:bg-violet-800/80 text-violet-300 rounded-2xl transition-all border border-violet-400/20">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
                     </button>
                 </div>
             </div>
 
             <!-- Manual Form -->
-            <div class="glass-card p-6 border border-white/5">
-                <h4 class="text-sm font-bold text-slate-100 mb-6 flex items-center gap-2">
+            <div class="glass-card p-6 border border-violet-400/20">
+                <h4 class="text-sm font-bold text-white mb-6 flex items-center gap-2">
                     <div class="p-1.5 bg-success/10 rounded-lg text-success">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
                     </div>
@@ -138,16 +138,16 @@
                 <form id="entry-form" class="space-y-4" onsubmit="saveEntry(event)">
                     <div class="space-y-3">
                         <div>
-                            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Data</label>
-                            <input type="date" id="form-date" required class="w-full px-4 py-3 text-sm">
+                            <label class="block text-[10px] font-black text-violet-300 uppercase tracking-widest mb-1.5 ml-1">Data</label>
+                            <input type="date" id="form-date" required class="w-full px-4 py-3 text-sm text-violet-100">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Descrição</label>
-                            <input type="text" id="form-desc" placeholder="Ex: Leitura, Estudos, Projetos..." required class="w-full px-4 py-3 text-sm">
+                            <label class="block text-[10px] font-black text-violet-300 uppercase tracking-widest mb-1.5 ml-1">Descrição</label>
+                            <input type="text" id="form-desc" placeholder="Ex: Leitura, Estudos, Projetos..." required class="w-full px-4 py-3 text-sm text-violet-100">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Tempo Dedicado (HH:MM)</label>
-                            <input type="time" id="form-total" required class="w-full px-4 py-3 text-sm">
+                            <label class="block text-[10px] font-black text-violet-300 uppercase tracking-widest mb-1.5 ml-1">Tempo Dedicado (HH:MM)</label>
+                            <input type="time" id="form-total" required class="w-full px-4 py-3 text-sm text-violet-100">
                         </div>
                     </div>
                     <button type="submit" class="w-full py-4 bg-success/90 hover:bg-success text-white rounded-xl font-bold shadow-lg shadow-success/10 transition-all mt-6 border-b-4 border-success-700">
@@ -160,39 +160,39 @@
         <!-- Right Column: List -->
         <section class="lg:col-span-8 space-y-6">
             <!-- Filters -->
-            <div class="glass-card p-4 flex flex-col md:flex-row items-center gap-4 justify-between border border-white/5">
+            <div class="glass-card p-4 flex flex-col md:flex-row items-center gap-4 justify-between border border-violet-400/20">
                 <div class="relative w-full md:w-80">
-                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500">
+                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-violet-300">
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                     </span>
-                    <input type="text" id="search-input" placeholder="Pesquisar registros..." class="w-full pl-10 pr-4 py-2.5 text-xs">
+                    <input type="text" id="search-input" placeholder="Pesquisar registros..." class="w-full pl-10 pr-4 py-2.5 text-xs text-violet-100 placeholder-violet-400/50">
                 </div>
                 
                 <div class="flex gap-2 w-full md:w-auto">
-                    <button onclick="exportCSV()" class="flex-1 md:flex-none px-4 py-2.5 bg-slate-800 text-slate-300 rounded-xl text-xs font-bold hover:bg-slate-700 transition-all flex items-center justify-center gap-2 border border-white/5">
-                        <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                    <button onclick="exportCSV()" class="flex-1 md:flex-none px-4 py-2.5 bg-violet-900/60 text-violet-200 rounded-xl text-xs font-bold hover:bg-violet-800/80 transition-all flex items-center justify-center gap-2 border border-violet-400/20">
+                        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
                         CSV
                     </button>
-                    <button onclick="exportPDF()" class="flex-1 md:flex-none px-4 py-2.5 bg-slate-800 text-slate-300 rounded-xl text-xs font-bold hover:bg-slate-700 transition-all flex items-center justify-center gap-2 border border-white/5">
-                        <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                    <button onclick="exportPDF()" class="flex-1 md:flex-none px-4 py-2.5 bg-violet-900/60 text-violet-200 rounded-xl text-xs font-bold hover:bg-violet-800/80 transition-all flex items-center justify-center gap-2 border border-violet-400/20">
+                        <svg class="w-4 h-4 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                         PDF
                     </button>
                 </div>
             </div>
 
             <!-- Table Container -->
-            <div class="glass-card overflow-hidden border border-white/5 shadow-2l">
+            <div class="glass-card overflow-hidden border border-violet-400/20 shadow-2xl shadow-violet-900/10">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="bg-white/5 uppercase tracking-widest text-[10px]">
-                                <th class="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Data</th>
-                                <th class="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Atividade</th>
-                                <th class="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-right">Tempo Dedicado</th>
-                                <th class="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-center">Ações</th>
+                            <tr class="bg-violet-900/30 uppercase tracking-widest text-[10px]">
+                                <th class="px-6 py-4 text-[10px] font-black text-violet-300 uppercase tracking-[0.2em]">Data</th>
+                                <th class="px-6 py-4 text-[10px] font-black text-violet-300 uppercase tracking-[0.2em]">Atividade</th>
+                                <th class="px-6 py-4 text-[10px] font-black text-violet-300 uppercase tracking-[0.2em] text-right">Tempo Dedicado</th>
+                                <th class="px-6 py-4 text-[10px] font-black text-violet-300 uppercase tracking-[0.2em] text-center">Ações</th>
                             </tr>
                         </thead>
-                        <tbody id="activity-list" class="divide-y divide-white/5">
+                        <tbody id="activity-list" class="divide-y divide-violet-400/10">
                             <!-- JS Injection -->
                         </tbody>
                     </table>
