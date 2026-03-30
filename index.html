@@ -1,26 +1,29 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="dark">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Horas - Pessoal</title>
-    
-    <!-- External Libraries -->
+    <title>TimeTracker Cyber</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@700;800&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
     
-    <!-- TailWind Theme Config -->
+    <!-- Configuração do Tailwind -->
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
-                        primary: '#4c1d95',
-                        accent: '#9333ea',
-                        bgMain: '#faf5ff',
-                        success: '#10b981',
-                        danger: '#ef4444',
+                        primary: '#e9d5ff',
+                        accent: '#c084fc',
+                        success: '#34d399',
+                        danger: '#fb7185',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
                     }
                 }
             }
@@ -30,23 +33,21 @@
     <!-- Custom Style -->
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-bgMain text-primary min-h-screen">
+<body class="text-primary min-h-screen relative z-0">
 
     <!-- Header -->
-    <header class="w-full py-6 px-6 bg-white/80 backdrop-blur-xl border-b border-purple-200 sticky top-0 z-50">
+    <header class="w-full py-6 px-6 bg-[rgba(15,0,28,0.6)] backdrop-blur-xl border-b border-violet-500/20 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-display font-extrabold tracking-tight text-violet-900">
-                Time<span class="text-accent underline decoration-purple-300 underline-offset-4">Tracker</span>
+            <h1 class="text-2xl font-display font-extrabold tracking-tight text-white shadow-neon">
+                Time<span class="text-accent underline decoration-violet-500/40 underline-offset-4">Tracker</span>
             </h1>
             <div class="flex items-center gap-4">
                 <div class="flex flex-col items-end">
-                    <span class="text-sm font-semibold text-violet-800" id="current-date-display">Carregando...</span>
-                    <span class="text-[10px] uppercase tracking-widest text-purple-600 font-bold">Uso Pessoal</span>
+                    <span class="text-sm font-semibold text-violet-200" id="current-date-display">Carregando...</span>
+                    <span class="text-[10px] uppercase tracking-widest text-violet-400 font-bold">Residência Cibernética</span>
                 </div>
-                <div class="h-10 w-10 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent shadow-accent-glow">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                <div class="h-10 w-10 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent shadow-[0_0_15px_rgba(192,132,252,0.3)]">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                 </div>
             </div>
         </div>
@@ -56,102 +57,102 @@
         
         <!-- Dashboard Stats -->
         <section class="lg:col-span-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <!-- Total Dia -->
+            <!-- Total Dia (Microchip node) -->
             <div class="glass-card p-6 relative overflow-hidden group">
-                <div class="absolute -top-4 -right-4 p-8 dashboard-icon text-accent">
-                    <svg class="w-20 h-20" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"/></svg>
+                <div class="absolute -top-4 -right-2 p-6 dashboard-icon text-accent opacity-20">
+                    <svg class="w-24 h-24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" /></svg>
                 </div>
-                <p class="text-xs font-bold uppercase tracking-wider text-purple-600 mb-1">Meu Dia</p>
-                <h3 class="text-3xl font-display font-extrabold text-violet-900" id="card-day">00:00h</h3>
+                <p class="text-xs font-bold uppercase tracking-wider text-violet-400 mb-1">Upload Diário</p>
+                <h3 class="text-3xl font-display font-extrabold text-white" id="card-day">00:00h</h3>
                 <div class="mt-2 flex items-center text-[10px] text-success font-bold uppercase tracking-widest">
-                    <span class="w-2 h-2 rounded-full bg-success mr-2 animate-pulse"></span>
+                    <span class="w-2 h-2 rounded-full bg-success mr-2 shadow-[0_0_8px_#34d399] animate-pulse"></span>
                     Sincronizado
                 </div>
             </div>
 
-            <!-- Total Semana -->
+            <!-- Total Semana (Network connections) -->
             <div class="glass-card p-6 relative overflow-hidden group">
-                <div class="absolute -top-4 -right-4 p-8 dashboard-icon text-purple-400">
-                    <svg class="w-20 h-20" fill="currentColor" viewBox="0 0 20 20"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM14 11a1 1 0 011 1v1h1a1 1 0 110 2h-1v1a1 1 0 11-2 0v-1h-1a1 1 0 110-2h1v-1a1 1 0 011-1z"/></svg>
+                <div class="absolute -top-4 -right-2 p-6 dashboard-icon text-fuchsia-400 opacity-20">
+                    <svg class="w-24 h-24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" /></svg>
                 </div>
-                <p class="text-xs font-bold uppercase tracking-wider text-purple-600 mb-1">Minha Semana</p>
-                <h3 class="text-3xl font-display font-extrabold text-violet-900" id="card-week">00:00h</h3>
-                <div class="mt-2 text-[10px] text-purple-500 font-bold uppercase tracking-widest">Meta 15:00h</div>
+                <p class="text-xs font-bold uppercase tracking-wider text-violet-400 mb-1">Tráfego Semanal</p>
+                <h3 class="text-3xl font-display font-extrabold text-white" id="card-week">00:00h</h3>
+                <div class="mt-2 text-[10px] text-violet-300 font-bold uppercase tracking-widest">Alvo 15:00h</div>
             </div>
 
-            <!-- Total Mês -->
+            <!-- Total Mês (Processor core) -->
             <div class="glass-card p-6 relative overflow-hidden group">
-                <div class="absolute -top-4 -right-4 p-8 dashboard-icon text-indigo-500">
-                    <svg class="w-20 h-20" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/></svg>
+                <div class="absolute -top-4 -right-2 p-6 dashboard-icon text-indigo-400 opacity-20">
+                    <svg class="w-24 h-24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 2l8 4.5v9L12 20l-8-4.5v-9L12 2zM12 12l4-2.5v-5M12 12l-4-2.5v-5M12 12v6" /></svg>
                 </div>
-                <span class="text-xs font-bold uppercase tracking-wider text-purple-600 mb-1">Meu Mês</span>
-                <h3 class="text-3xl font-display font-extrabold text-violet-900" id="card-month">00:00h</h3>
-                <div class="mt-2 text-[10px] text-purple-500 font-bold uppercase tracking-widest">Progresso 85%</div>
+                <span class="text-xs font-bold uppercase tracking-wider text-violet-400 mb-1">Cota Mensal</span>
+                <h3 class="text-3xl font-display font-extrabold text-white" id="card-month">00:00h</h3>
+                <div class="mt-2 text-[10px] text-violet-300 font-bold uppercase tracking-widest">Processamento 85%</div>
             </div>
 
             <!-- AI Insights -->
-            <div class="glass-card p-6 bg-accent/5 border border-purple-500/10 flex flex-col justify-center">
-                <div class="absolute -top-4 -right-4 p-8 dashboard-icon text-fuchsia-500">
+            <div class="glass-card p-6 bg-[rgba(192,132,252,0.05)] border border-violet-500/20 flex flex-col justify-center">
+                <div class="absolute -top-4 -right-4 p-8 dashboard-icon text-violet-500 opacity-20">
                     <svg class="w-20 h-20" fill="currentColor" viewBox="0 0 20 20"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM11 3a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5a2 2 0 012-2h2zM3 15a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2zM17.914 12.235l-3.328-3.328c-.1-.1-.235-.175-.382-.217l-.54-.153.153.54c.042.147.117.282.217.382l3.328 3.328a.5.5 0 10.707-.707l-.155.155z"/></svg>
                 </div>
                 <div class="flex items-center gap-2 mb-2">
                     <span class="relative flex h-2 w-2">
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-accent shadow-[0_0_8px_#c084fc]"></span>
                     </span>
-                    <p class="text-[10px] font-black uppercase tracking-widest text-accent">Lembrete</p>
+                    <p class="text-[10px] font-black uppercase tracking-widest text-accent">Terminal Log</p>
                 </div>
-                <p id="motivational-quote" class="text-sm italic text-violet-700 font-medium relative z-10 transition-opacity duration-500">"Lembre-se de fazer pausas regulares. A consistência vale mais do que a exaustão."</p>
+                <p id="motivational-quote" class="text-sm italic text-violet-200 relative z-10 transition-opacity duration-500">"Sincronização de rotinas completa..."</p>
             </div>
         </section>
 
         <!-- Left Column: Controls -->
         <section class="lg:col-span-4 space-y-8">
             <!-- Active Timer -->
-            <div class="glass-card p-8 text-center border border-purple-200">
-                <h4 class="text-[10px] font-black text-purple-600 uppercase tracking-[0.3em] mb-8">Timer Ativo</h4>
-                <div class="timer-display text-4xl sm:text-6xl font-display font-extrabold text-violet-900 mb-10" id="timer-text">
+            <div class="glass-card p-8 text-center border border-violet-500/20 relative">
+                <h4 class="text-[10px] font-black text-violet-400 uppercase tracking-[0.3em] mb-8">Processo Ativo</h4>
+                <div class="timer-display text-4xl sm:text-6xl font-display font-extrabold text-white mb-10" id="timer-text" style="text-shadow: 0 0 30px rgba(192,132,252,0.5);">
                     00:00:00
                 </div>
                 <div class="flex gap-4">
-                    <button id="btn-timer-toggle" onclick="toggleTimer()" class="flex-1 py-4 bg-accent hover:bg-purple-700 text-white rounded-2xl font-bold shadow-lg shadow-purple-500/20 transition-all flex items-center justify-center gap-2 group">
+                    <button id="btn-timer-toggle" onclick="toggleTimer()" class="flex-1 py-4 bg-accent hover:bg-[rgba(168,85,247,0.8)] text-white rounded-2xl font-bold border border-violet-400/50 shadow-[0_0_20px_rgba(192,132,252,0.3)] hover:shadow-[0_0_30px_rgba(192,132,252,0.6)] transition-all flex items-center justify-center gap-2 group">
                         <svg id="timer-icon" class="w-5 h-5 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/></svg>
                         <span id="timer-btn-label">Iniciar</span>
                     </button>
-                    <button id="btn-timer-save" onclick="saveTimerToForm()" title="Transferir tempo para o formulário" class="p-4 bg-emerald-100 hover:bg-emerald-200 text-emerald-600 rounded-2xl transition-all border border-emerald-200">
+                    <button id="btn-timer-save" onclick="saveTimerToForm()" title="Transferir tempo para o formulário" class="p-4 bg-[rgba(16,185,129,0.1)] hover:bg-[rgba(16,185,129,0.2)] text-emerald-400 rounded-2xl transition-all border border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.1)] hover:shadow-[0_0_15px_rgba(16,185,129,0.3)]">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     </button>
-                    <button id="btn-timer-reset" onclick="resetTimer()" title="Zerar timer" class="p-4 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-2xl transition-all border border-purple-200">
+                    <button id="btn-timer-reset" onclick="resetTimer()" title="Zerar timer" class="p-4 bg-[rgba(239,68,68,0.1)] hover:bg-[rgba(239,68,68,0.2)] text-rose-400 rounded-2xl transition-all border border-rose-500/20 shadow-[0_0_10px_rgba(239,68,68,0.1)] hover:shadow-[0_0_15px_rgba(239,68,68,0.3)]">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
                     </button>
                 </div>
             </div>
 
             <!-- Manual Form -->
-            <div class="glass-card p-6 border border-purple-200">
-                <h4 class="text-sm font-bold text-violet-900 mb-6 flex items-center gap-2">
-                    <div class="p-1.5 bg-success/10 rounded-lg text-success">
+            <div class="glass-card p-6 border border-violet-500/20">
+                <h4 class="text-sm font-bold text-white mb-6 flex items-center gap-2">
+                    <div class="p-1.5 bg-[rgba(192,132,252,0.15)] rounded-lg text-accent">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
                     </div>
-                    Nova Entrada
+                    Injetar Dados
                 </h4>
                 <form id="entry-form" class="space-y-4" onsubmit="saveEntry(event)">
                     <div class="space-y-3">
                         <div>
-                            <label class="block text-[10px] font-black text-purple-600 uppercase tracking-widest mb-1.5 ml-1">Data</label>
-                            <input type="date" id="form-date" required class="w-full px-4 py-3 text-sm text-violet-900 bg-white">
+                            <label class="block text-[10px] font-black text-violet-400 uppercase tracking-widest mb-1.5 ml-1">Carimbo de Data</label>
+                            <input type="date" id="form-date" required class="w-full px-4 py-3 text-sm">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-black text-purple-600 uppercase tracking-widest mb-1.5 ml-1">Descrição</label>
-                            <input type="text" id="form-desc" placeholder="Ex: Leitura, Estudos, Projetos..." required class="w-full px-4 py-3 text-sm text-violet-900 bg-white placeholder-purple-300">
+                            <label class="block text-[10px] font-black text-violet-400 uppercase tracking-widest mb-1.5 ml-1">Pacote de Tarefas</label>
+                            <input type="text" id="form-desc" placeholder="Ex: Compilação, Análise..." required class="w-full px-4 py-3 text-sm placeholder-violet-300/30">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-black text-purple-600 uppercase tracking-widest mb-1.5 ml-1">Tempo Dedicado (HH:MM)</label>
-                            <input type="time" id="form-total" required class="w-full px-4 py-3 text-sm text-violet-900 bg-white">
+                            <label class="block text-[10px] font-black text-violet-400 uppercase tracking-widest mb-1.5 ml-1">Ciclo de Relógio (HH:MM)</label>
+                            <input type="time" id="form-total" required class="w-full px-4 py-3 text-sm">
                         </div>
                     </div>
-                    <button type="submit" class="w-full py-4 bg-success/90 hover:bg-success text-white rounded-xl font-bold shadow-lg shadow-success/10 transition-all mt-6 border-b-4 border-success-700">
-                        Salvar Registro
+                    <button type="submit" class="w-full py-4 bg-success/90 hover:bg-success text-[#0f001c] rounded-xl font-bold shadow-[0_0_15px_rgba(52,211,153,0.3)] hover:shadow-[0_0_25px_rgba(52,211,153,0.6)] transition-all mt-6 border-b-4 border-emerald-600">
+                        Gravar no Storage
                     </button>
                 </form>
             </div>
@@ -160,39 +161,39 @@
         <!-- Right Column: List -->
         <section class="lg:col-span-8 space-y-6">
             <!-- Filters -->
-            <div class="glass-card p-4 flex flex-col md:flex-row items-center gap-4 justify-between border border-purple-200">
+            <div class="glass-card p-4 flex flex-col md:flex-row items-center gap-4 justify-between border border-violet-500/20">
                 <div class="relative w-full md:w-80">
-                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-purple-400">
+                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-violet-400">
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                     </span>
-                    <input type="text" id="search-input" placeholder="Pesquisar registros..." class="w-full pl-10 pr-4 py-2.5 text-xs text-violet-900 placeholder-purple-400 bg-white">
+                    <input type="text" id="search-input" placeholder="Analisar blocos..." class="w-full pl-10 pr-4 py-2.5 text-xs placeholder-violet-300/30 bg-[rgba(15,0,28,0.4)] border border-violet-500/30 text-white rounded-xl focus:outline-none focus:border-accent">
                 </div>
                 
                 <div class="flex gap-2 w-full md:w-auto">
-                    <button onclick="exportCSV()" class="group flex-1 md:flex-none px-4 py-2.5 bg-white text-purple-700 rounded-xl text-xs font-bold hover:bg-emerald-500 hover:text-white hover:border-emerald-500 transition-all flex items-center justify-center gap-2 border border-purple-200">
-                        <svg class="w-4 h-4 text-emerald-500 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                        CSV
+                    <button onclick="exportCSV()" class="group flex-1 md:flex-none px-4 py-2.5 bg-[rgba(255,255,255,0.05)] text-white rounded-xl text-xs font-bold hover:bg-emerald-500 hover:text-[#0f001c] hover:border-emerald-500 transition-all flex items-center justify-center gap-2 border border-violet-500/20 shadow-[0_0_10px_rgba(16,185,129,0.05)] hover:shadow-[0_0_20px_rgba(16,185,129,0.5)]">
+                        <svg class="w-4 h-4 text-emerald-400 group-hover:text-[#0f001c] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                        Export.CSV
                     </button>
-                    <button onclick="exportPDF()" class="group flex-1 md:flex-none px-4 py-2.5 bg-white text-purple-700 rounded-xl text-xs font-bold hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all flex items-center justify-center gap-2 border border-purple-200">
-                        <svg class="w-4 h-4 text-rose-500 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                        PDF
+                    <button onclick="exportPDF()" class="group flex-1 md:flex-none px-4 py-2.5 bg-[rgba(255,255,255,0.05)] text-white rounded-xl text-xs font-bold hover:bg-rose-500 hover:text-[#0f001c] hover:border-rose-500 transition-all flex items-center justify-center gap-2 border border-violet-500/20 shadow-[0_0_10px_rgba(244,63,94,0.05)] hover:shadow-[0_0_20px_rgba(244,63,94,0.5)]">
+                        <svg class="w-4 h-4 text-rose-400 group-hover:text-[#0f001c] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                        Export.PDF
                     </button>
                 </div>
             </div>
 
             <!-- Table Container -->
-            <div class="glass-card overflow-hidden border border-purple-200 shadow-xl shadow-purple-900/5">
+            <div class="glass-card overflow-hidden border border-violet-500/20">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="bg-purple-50 uppercase tracking-widest text-[10px]">
-                                <th class="px-6 py-4 text-[10px] font-black text-purple-600 uppercase tracking-[0.2em]">Data</th>
-                                <th class="px-6 py-4 text-[10px] font-black text-purple-600 uppercase tracking-[0.2em]">Atividade</th>
-                                <th class="px-6 py-4 text-[10px] font-black text-purple-600 uppercase tracking-[0.2em] text-right">Tempo Dedicado</th>
-                                <th class="px-6 py-4 text-[10px] font-black text-purple-600 uppercase tracking-[0.2em] text-center">Ações</th>
+                            <tr class="bg-[rgba(15,0,28,0.5)] uppercase tracking-widest text-[10px] border-b border-violet-500/20">
+                                <th class="px-6 py-4 text-[10px] font-black text-violet-400 uppercase tracking-[0.2em]">Carimbo</th>
+                                <th class="px-6 py-4 text-[10px] font-black text-violet-400 uppercase tracking-[0.2em]">Carga</th>
+                                <th class="px-6 py-4 text-[10px] font-black text-violet-400 uppercase tracking-[0.2em] text-right">Ciclos</th>
+                                <th class="px-6 py-4 text-[10px] font-black text-violet-400 uppercase tracking-[0.2em] text-center">Ações</th>
                             </tr>
                         </thead>
-                        <tbody id="activity-list" class="divide-y divide-purple-100">
+                        <tbody id="activity-list" class="divide-y divide-violet-500/10">
                             <!-- JS Injection -->
                         </tbody>
                     </table>

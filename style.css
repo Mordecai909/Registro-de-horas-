@@ -1,38 +1,54 @@
-/* Modern Light Purple Theme Design Tokens */
+/* Modern Cyber Circuit Theme Design Tokens */
 :root {
-    --bg-main: #faf5ff; /* fuchsia-50 */
-    --card-bg: rgba(255, 255, 255, 0.7);
-    --primary-text: #4c1d95; /* violet-900 */
-    --secondary-text: #7c3aed; /* violet-600 */
-    --accent: #9333ea; /* purple-600 */
-    --success: #10b981; /* emerald-500 */
-    --danger: #ef4444; /* red-500 */
+    --bg-main: #0f001c;
+    --card-bg: rgba(22, 5, 43, 0.65);
+    --primary-text: #e9d5ff; /* purple-200 */
+    --secondary-text: #c084fc; /* purple-400 */
+    --accent: #c084fc; /* neon purple */
+    --success: #34d399; 
+    --danger: #fb7185; 
 }
 
 body {
-    background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+    background-image: url('./assets/circuit_bg.png');
+    background-size: cover;
+    background-position: center;
     background-attachment: fixed;
     color: var(--primary-text);
     font-family: 'Inter', sans-serif;
     min-height: 100vh;
     overflow-x: hidden;
+    position: relative;
+    z-index: 0;
 }
 
-/* Glassmorphism */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 0, 28, 0.82);
+    backdrop-filter: blur(8px);
+    z-index: -1;
+}
+
+/* Glassmorphism Cyber */
 .glass-card {
     background: var(--card-bg);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(168, 85, 247, 0.2);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(192, 132, 252, 0.2);
     border-radius: 1.25rem;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 10px 30px -5px rgba(107, 33, 168, 0.05);
+    box-shadow: inset 0 0 20px rgba(192, 132, 252, 0.03), 0 10px 30px -5px rgba(0, 0, 0, 0.5);
 }
 
 .glass-card:hover {
-    transform: translateY(-4px);
-    background: rgba(255, 255, 255, 0.9);
-    border-color: rgba(168, 85, 247, 0.4);
-    box-shadow: 0 20px 40px -10px rgba(107, 33, 168, 0.15);
+    transform: translateY(-2px);
+    background: rgba(40, 10, 75, 0.75);
+    border-color: rgba(192, 132, 252, 0.5);
+    box-shadow: inset 0 0 20px rgba(192, 132, 252, 0.08), 0 20px 40px -10px rgba(15, 0, 28, 0.8);
 }
 
 .timer-display {
@@ -53,21 +69,17 @@ body {
 
 /* Form Styling */
 input, select {
-    background: rgba(255, 255, 255, 0.8) !important;
-    border: 1px solid rgba(168, 85, 247, 0.3) !important;
-    color: #4c1d95 !important;
+    background: rgba(15, 0, 28, 0.6) !important;
+    border: 1px solid rgba(192, 132, 252, 0.25) !important;
+    color: #f3e8ff !important;
     border-radius: 0.75rem !important;
-}
-input:focus, select:focus {
-    outline: none !important;
-    border-color: rgba(168, 85, 247, 0.8) !important;
-    box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2) !important;
+    transition: all 0.2s ease;
 }
 
-input:focus {
+input:focus, select:focus {
     outline: none !important;
     border-color: var(--accent) !important;
-    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2) !important;
+    box-shadow: 0 0 0 3px rgba(192, 132, 252, 0.2), inset 0 0 10px rgba(192, 132, 252, 0.1) !important;
 }
 
 /* Make clock and calendar icons more visible */
