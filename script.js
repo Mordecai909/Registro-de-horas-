@@ -183,7 +183,7 @@ function editEntry(id) {
     if (!entry) return;
 
     document.getElementById('form-date').value = entry.date;
-    document.getElementById('form-category').value = entry.category || 'Trabalho';
+    document.getElementById('form-category').value = entry.category || 'Atividades internas';
     document.getElementById('form-desc').value = entry.desc;
     if (entry.start) document.getElementById('form-start').value = entry.start;
     if (entry.end) document.getElementById('form-end').value = entry.end;
@@ -243,14 +243,17 @@ function renderEntries(filteredEntries = entries) {
 
 function getCategoryBadge(category) {
     const config = {
-        'Trabalho': 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-[0_0_5px_rgba(52,211,153,0.2)]',
-        'Estudo': 'bg-fuchsia-500/10 text-fuchsia-400 border-fuchsia-500/20 shadow-[0_0_5px_rgba(217,70,239,0.2)]',
-        'Projetos': 'bg-blue-500/10 text-blue-400 border-blue-500/20 shadow-[0_0_5px_rgba(59,130,246,0.2)]',
-        'Lazer': 'bg-amber-500/10 text-amber-400 border-amber-500/20 shadow-[0_0_5px_rgba(245,158,11,0.2)]'
+        'Instalação': 'bg-blue-500/10 text-blue-400 border-blue-500/20 shadow-[0_0_5px_rgba(59,130,246,0.2)]',
+        'Toner': 'bg-amber-500/10 text-amber-400 border-amber-500/20 shadow-[0_0_5px_rgba(245,158,11,0.2)]',
+        'Impressora': 'bg-fuchsia-500/10 text-fuchsia-400 border-fuchsia-500/20 shadow-[0_0_5px_rgba(217,70,239,0.2)]',
+        'Ramal': 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20 shadow-[0_0_5px_rgba(6,182,212,0.2)]',
+        'Rollout': 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20 shadow-[0_0_5px_rgba(99,102,241,0.2)]',
+        'Atividades internas': 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-[0_0_5px_rgba(16,185,129,0.2)]',
+        'Suporte': 'bg-rose-500/10 text-rose-400 border-rose-500/20 shadow-[0_0_5px_rgba(244,63,94,0.2)]'
     };
     const style = config[category] || 'bg-violet-500/10 text-violet-400 border-violet-500/20';
     return `<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider border ${style}">
-        ${category || 'Sistema'}
+        ${category || 'Geral'}
     </span>`;
 }
 
@@ -359,8 +362,8 @@ function renderQuickFills() {
     const patterns = {};
     entries.forEach(e => {
         if (!e.start || !e.end) return; // Ignore legacy entries without specific times
-        const key = `${e.category || 'Trabalho'}|${e.desc}|${e.start}|${e.end}`;
-        if (!patterns[key]) patterns[key] = { desc: e.desc, start: e.start, end: e.end, category: e.category || 'Trabalho', count: 0 };
+        const key = `${e.category || 'Atividades internas'}|${e.desc}|${e.start}|${e.end}`;
+        if (!patterns[key]) patterns[key] = { desc: e.desc, start: e.start, end: e.end, category: e.category || 'Atividades internas', count: 0 };
         patterns[key].count++;
     });
 
@@ -369,7 +372,7 @@ function renderQuickFills() {
     
     // Default fallback if no valid matches are found
     if (sorted.length === 0) {
-        sorted = [{ desc: 'Atividade Interna', start: '07:00', end: '13:00', category: 'Trabalho' }];
+        sorted = [{ desc: 'Manutenção Padrão', start: '07:00', end: '13:00', category: 'Atividades internas' }];
     }
 
     container.innerHTML = '';
