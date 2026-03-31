@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderEntries();
     setDefaultDate();
     setupSearch();
+    renderQuickFills();
     
     // Resume timer if it was running (optional - requires start timestamp)
     if (secondsElapsed > 0) {
@@ -168,6 +169,7 @@ function saveEntry(e) {
 
     persist();
     renderEntries();
+    renderQuickFills();
     e.target.reset();
     setDefaultDate();
 }
@@ -191,6 +193,7 @@ function deleteEntry(id) {
         entries = entries.filter(e => e.id !== id);
         persist();
         renderEntries();
+        renderQuickFills();
     }
 }
 
@@ -327,4 +330,52 @@ function initQuotesCarousel() {
         }, 500); // Espera o fade out
         
     }, 8000); // Troca a mensagem a cada 8 segundos
+}
+
+// Quick Fills Logic
+function renderQuickFills() {
+    const container = document.getElementById('quick-fill-container');
+    if (!container) return;
+    
+    // Group combinations
+    const patterns = {};
+    entries.forEach(e => {
+        if (!e.start || !e.end) return; // Ignore legacy entries without specific times
+        const key = `${e.desc}|${e.start}|${e.end}`;
+        if (!patterns[key]) patterns[key] = { desc: e.desc, start: e.start, end: e.end, count: 0 };
+        patterns[key].count++;
+    });
+
+    // Sort by frequency
+    let sorted = Object.values(patterns).sort((a, b) => b.count - a.count).slice(0, 3);
+    
+    // Default fallback if no valid matches are found
+    if (sorted.length === 0) {
+        sorted = [{ desc: 'Atividade Interna', start: '07:00', end: '13:00' }];
+    }
+
+    container.innerHTML = '';
+    
+    sorted.forEach(preset => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'text-[10px] sm:text-xs font-bold uppercase tracking-wider px-3 py-2 rounded-xl bg-[rgba(192,132,252,0.1)] text-accent border border-accent/20 hover:bg-accent hover:text-white transition-all shadow-[0_0_10px_rgba(192,132,252,0.05)] hover:shadow-[0_0_15px_rgba(192,132,252,0.4)] flex items-center gap-1.5 focus:outline-none';
+        btn.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg> ${preset.desc} (${preset.start}-${preset.end})`;
+        
+        btn.onclick = () => {
+            document.getElementById('form-desc').value = preset.desc;
+            document.getElementById('form-start').value = preset.start;
+            document.getElementById('form-end').value = preset.end;
+            // Optionally flash input fields to show change
+            const inputs = ['form-desc', 'form-start', 'form-end'].map(id => document.getElementById(id));
+            inputs.forEach(input => {
+                input.classList.add('bg-accent/20', 'border-accent');
+                setTimeout(() => input.classList.remove('bg-accent/20', 'border-accent'), 300);
+            });
+        };
+        
+        container.appendChild(btn);
+    });
+    
+    container.classList.remove('hidden');
 }
