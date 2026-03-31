@@ -5,9 +5,9 @@
 
 // State Management
 let entries = JSON.parse(localStorage.getItem('timeEntries')) || [
-    { id: 1, date: '2024-05-20', desc: 'Estudos de Programação', total: '02:00' },
-    { id: 2, date: '2024-05-20', desc: 'Leitura', total: '00:30' },
-    { id: 3, date: '2024-05-19', desc: 'Projetos Pessoais', total: '04:00' }
+    { id: 1, date: '2024-05-20', desc: 'Estudos de Programação', start: '19:00', end: '21:00', total: '02:00', category: 'Estudo' },
+    { id: 2, date: '2024-05-20', desc: 'Leitura', start: '21:00', end: '21:30', total: '00:30', category: 'Lazer' },
+    { id: 3, date: '2024-05-19', desc: 'Projetos Pessoais', start: '14:00', end: '18:00', total: '04:00', category: 'Projetos' }
 ];
 
 let timerRunning = false;
@@ -129,12 +129,14 @@ function formatTime(sec) {
 function saveEntry(e) {
     e.preventDefault();
     const dateInput = document.getElementById('form-date');
+    const categoryInput = document.getElementById('form-category');
     const descInput = document.getElementById('form-desc');
     const startInput = document.getElementById('form-start');
     const endInput = document.getElementById('form-end');
 
     const startVal = startInput.value;
     const endVal = endInput.value;
+    const catVal = categoryInput.value;
 
     let startMin = timeToMin(startVal);
     let endMin = timeToMin(endVal);
@@ -146,7 +148,8 @@ function saveEntry(e) {
         // Update
         const index = entries.findIndex(ent => ent.id === editId);
         entries[index] = { ...entries[index], 
-            date: dateInput.value, 
+            date: dateInput.value,
+            category: catVal,
             desc: descInput.value, 
             start: startVal,
             end: endVal,
@@ -159,6 +162,7 @@ function saveEntry(e) {
         const newEntry = {
             id: Date.now(),
             date: dateInput.value,
+            category: catVal,
             desc: descInput.value,
             start: startVal,
             end: endVal,
@@ -179,6 +183,7 @@ function editEntry(id) {
     if (!entry) return;
 
     document.getElementById('form-date').value = entry.date;
+    document.getElementById('form-category').value = entry.category || 'Trabalho';
     document.getElementById('form-desc').value = entry.desc;
     if (entry.start) document.getElementById('form-start').value = entry.start;
     if (entry.end) document.getElementById('form-end').value = entry.end;
@@ -213,8 +218,8 @@ function renderEntries(filteredEntries = entries) {
         row.innerHTML = `
             <td class="px-6 py-5 whitespace-nowrap text-sm font-medium text-violet-300">${formatDateBR(entry.date)}</td>
             <td class="px-6 py-5">
-                <div class="text-sm font-bold text-white">${entry.desc}</div>
-                <div class="text-xs text-violet-400">Processo Rotineiro</div>
+                <div class="text-sm font-bold text-white mb-1.5">${entry.desc}</div>
+                ${getCategoryBadge(entry.category)}
             </td>
             <td class="px-6 py-5 whitespace-nowrap text-right">
                 <span class="text-sm font-bold text-accent drop-shadow-[0_0_8px_rgba(192,132,252,0.5)]">${entry.total}h</span>
@@ -234,6 +239,19 @@ function renderEntries(filteredEntries = entries) {
     });
 
     updateDashboard();
+}
+
+function getCategoryBadge(category) {
+    const config = {
+        'Trabalho': 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-[0_0_5px_rgba(52,211,153,0.2)]',
+        'Estudo': 'bg-fuchsia-500/10 text-fuchsia-400 border-fuchsia-500/20 shadow-[0_0_5px_rgba(217,70,239,0.2)]',
+        'Projetos': 'bg-blue-500/10 text-blue-400 border-blue-500/20 shadow-[0_0_5px_rgba(59,130,246,0.2)]',
+        'Lazer': 'bg-amber-500/10 text-amber-400 border-amber-500/20 shadow-[0_0_5px_rgba(245,158,11,0.2)]'
+    };
+    const style = config[category] || 'bg-violet-500/10 text-violet-400 border-violet-500/20';
+    return `<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider border ${style}">
+        ${category || 'Sistema'}
+    </span>`;
 }
 
 function setupSearch() {
@@ -341,8 +359,8 @@ function renderQuickFills() {
     const patterns = {};
     entries.forEach(e => {
         if (!e.start || !e.end) return; // Ignore legacy entries without specific times
-        const key = `${e.desc}|${e.start}|${e.end}`;
-        if (!patterns[key]) patterns[key] = { desc: e.desc, start: e.start, end: e.end, count: 0 };
+        const key = `${e.category || 'Trabalho'}|${e.desc}|${e.start}|${e.end}`;
+        if (!patterns[key]) patterns[key] = { desc: e.desc, start: e.start, end: e.end, category: e.category || 'Trabalho', count: 0 };
         patterns[key].count++;
     });
 
@@ -351,7 +369,7 @@ function renderQuickFills() {
     
     // Default fallback if no valid matches are found
     if (sorted.length === 0) {
-        sorted = [{ desc: 'Atividade Interna', start: '07:00', end: '13:00' }];
+        sorted = [{ desc: 'Atividade Interna', start: '07:00', end: '13:00', category: 'Trabalho' }];
     }
 
     container.innerHTML = '';
@@ -363,11 +381,12 @@ function renderQuickFills() {
         btn.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg> ${preset.desc} (${preset.start}-${preset.end})`;
         
         btn.onclick = () => {
+            document.getElementById('form-category').value = preset.category;
             document.getElementById('form-desc').value = preset.desc;
             document.getElementById('form-start').value = preset.start;
             document.getElementById('form-end').value = preset.end;
             // Optionally flash input fields to show change
-            const inputs = ['form-desc', 'form-start', 'form-end'].map(id => document.getElementById(id));
+            const inputs = ['form-category', 'form-desc', 'form-start', 'form-end'].map(id => document.getElementById(id));
             inputs.forEach(input => {
                 input.classList.add('bg-accent/20', 'border-accent');
                 setTimeout(() => input.classList.remove('bg-accent/20', 'border-accent'), 300);

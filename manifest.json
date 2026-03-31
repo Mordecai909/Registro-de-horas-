@@ -1,0 +1,17 @@
+{
+  "name": "TimeTracker Cyber",
+  "short_name": "TimeTracker",
+  "description": "Aplicativo de registro de horas cibernético",
+  "start_url": "/Registro-de-horas-/",
+  "display": "standalone",
+  "background_color": "#0f001c",
+  "theme_color": "#c084fc",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ]
+}
