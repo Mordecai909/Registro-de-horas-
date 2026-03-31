@@ -96,9 +96,17 @@ function stopTimer() {
 
 function saveTimerToForm() {
     if (secondsElapsed === 0) return;
-    const h = Math.floor(secondsElapsed / 3600).toString().padStart(2, '0');
-    const m = Math.floor((secondsElapsed % 3600) / 60).toString().padStart(2, '0');
-    document.getElementById('form-total').value = `${h}:${m}`;
+    
+    const now = new Date();
+    const endH = now.getHours().toString().padStart(2, '0');
+    const endM = now.getMinutes().toString().padStart(2, '0');
+    
+    const startNow = new Date(now.getTime() - secondsElapsed * 1000);
+    const startH = startNow.getHours().toString().padStart(2, '0');
+    const startM = startNow.getMinutes().toString().padStart(2, '0');
+    
+    document.getElementById('form-start').value = `${startH}:${startM}`;
+    document.getElementById('form-end').value = `${endH}:${endM}`;
     document.getElementById('entry-form').scrollIntoView({ behavior: 'smooth' });
 }
 
@@ -121,9 +129,17 @@ function saveEntry(e) {
     e.preventDefault();
     const dateInput = document.getElementById('form-date');
     const descInput = document.getElementById('form-desc');
-    const totalInput = document.getElementById('form-total');
+    const startInput = document.getElementById('form-start');
+    const endInput = document.getElementById('form-end');
 
-    const total = totalInput.value;
+    const startVal = startInput.value;
+    const endVal = endInput.value;
+
+    let startMin = timeToMin(startVal);
+    let endMin = timeToMin(endVal);
+    let diff = endMin - startMin;
+    if (diff < 0) diff += 24 * 60;
+    const total = minToTime(diff);
 
     if (editId) {
         // Update
@@ -131,17 +147,21 @@ function saveEntry(e) {
         entries[index] = { ...entries[index], 
             date: dateInput.value, 
             desc: descInput.value, 
-            total 
+            start: startVal,
+            end: endVal,
+            total: total
         };
         editId = null;
-        document.querySelector('button[type="submit"]').innerText = 'Salvar Registro';
+        document.querySelector('button[type="submit"]').innerText = 'Gravar no Storage';
     } else {
         // Create
         const newEntry = {
             id: Date.now(),
             date: dateInput.value,
             desc: descInput.value,
-            total
+            start: startVal,
+            end: endVal,
+            total: total
         };
         entries.unshift(newEntry);
     }
@@ -158,10 +178,11 @@ function editEntry(id) {
 
     document.getElementById('form-date').value = entry.date;
     document.getElementById('form-desc').value = entry.desc;
-    document.getElementById('form-total').value = entry.total;
+    if (entry.start) document.getElementById('form-start').value = entry.start;
+    if (entry.end) document.getElementById('form-end').value = entry.end;
     
     editId = id;
-    document.querySelector('button[type="submit"]').innerText = 'Atualizar Registro';
+    document.querySelector('button[type="submit"]').innerText = 'Atualizar Storage';
     document.getElementById('entry-form').scrollIntoView({ behavior: 'smooth' });
 }
 
