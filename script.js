@@ -25,6 +25,7 @@ let timerRunning = false;
 let timerInterval;
 let secondsElapsed = parseInt(localStorage.getItem('timerSeconds')) || 0;
 let editId = null;
+let hourlyRate = parseFloat(localStorage.getItem('hourlyRate')) || 9.67;
 
 
 // Initialization
@@ -310,18 +311,17 @@ function updateDashboard() {
     const now = new Date();
     const todayStr = now.toISOString().split('T')[0];
     const currentYear  = now.getFullYear();
-    const currentMonth = now.getMonth(); // 0-indexed
-    const HOURLY_RATE  = 9.67;
+    const currentMonth = now.getMonth();
 
     // Day Total
     const dayTotal = entries
         .filter(e => e.date === todayStr)
         .reduce((sum, e) => sum + timeToMin(e.total), 0);
 
-    // Week Total (all entries)
+    // Week Total
     const weekTotal = entries.reduce((sum, e) => sum + timeToMin(e.total), 0);
 
-    // Month Total — only entries in the current month/year
+    // Month Total — only current month/year
     const monthTotalMin = entries
         .filter(e => {
             const d = new Date(e.date + 'T00:00:00');
@@ -329,18 +329,59 @@ function updateDashboard() {
         })
         .reduce((sum, e) => sum + timeToMin(e.total), 0);
 
-    const monthHours = monthTotalMin / 60;
-    const salary     = monthHours * HOURLY_RATE;
-    const salaryStr  = salary.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-    const hoursLabel = `${minToTime(monthTotalMin)}h trabalhadas`;
+    const salary    = (monthTotalMin / 60) * hourlyRate;
+    const salaryStr = salary.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
     document.getElementById('card-day').innerText   = minToTime(dayTotal)  + 'h';
     document.getElementById('card-week').innerText  = minToTime(weekTotal) + 'h';
     document.getElementById('card-month').innerText = salaryStr;
+
     const hoursEl = document.getElementById('card-month-hours');
-    if (hoursEl) hoursEl.innerText = hoursLabel;
+    if (hoursEl) hoursEl.innerText = `${minToTime(monthTotalMin)}h trabalhadas`;
+
+    // Update rate display
+    const rateDisp = document.getElementById('rate-display');
+    if (rateDisp) rateDisp.innerText = `R$ ${hourlyRate.toFixed(2).replace('.', ',')} / hora`;
 }
 
+// Hourly Rate Edit
+function startEditRate() {
+    const display  = document.getElementById('rate-display');
+    const icon     = document.getElementById('rate-edit-icon');
+    const form     = document.getElementById('rate-edit-form');
+    const input    = document.getElementById('rate-input');
+    if (!display || !form || !input) return;
+
+    display.classList.add('hidden');
+    icon.classList.add('hidden');
+    form.classList.remove('hidden');
+    input.value = hourlyRate.toFixed(2);
+    // small delay so the blur from the click doesn't immediately fire saveRate
+    setTimeout(() => input.focus(), 50);
+}
+
+function saveRate(e) {
+    if (e) e.preventDefault();
+    const input = document.getElementById('rate-input');
+    if (!input) return;
+    const val = parseFloat(input.value);
+    if (!isNaN(val) && val > 0) {
+        hourlyRate = val;
+        localStorage.setItem('hourlyRate', hourlyRate);
+    }
+    cancelEditRate();
+    updateDashboard();
+}
+
+function cancelEditRate() {
+    const display = document.getElementById('rate-display');
+    const icon    = document.getElementById('rate-edit-icon');
+    const form    = document.getElementById('rate-edit-form');
+    if (!display || !form) return;
+    display.classList.remove('hidden');
+    icon.classList.remove('hidden');
+    form.classList.add('hidden');
+}
 
 function timeToMin(timeStr) {
     const [h, m] = timeStr.split(':').map(Number);
