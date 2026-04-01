@@ -10,32 +10,32 @@ let entries = JSON.parse(localStorage.getItem('timeEntries')) || [
     { id: 3, date: '2024-05-19', desc: 'Projetos Pessoais', start: '14:00', end: '18:00', total: '04:00', category: 'Projetos' }
 ];
 
+// Default categories
+const defaultCategories = [
+    { id: 'cat-1', name: '🏢 Atividades internas', color: '#34d399' },
+    { id: 'cat-2', name: '🛠️ Instalação',          color: '#3b82f6' },
+    { id: 'cat-3', name: '⬛ Toner',               color: '#f59e0b' },
+    { id: 'cat-4', name: '🖨️ Impressora',          color: '#d946ef' },
+    { id: 'cat-5', name: '📞 Ramal',               color: '#06b6d4' },
+    { id: 'cat-6', name: '🚀 Rollout',             color: '#6366f1' },
+    { id: 'cat-7', name: '🎧 Suporte',             color: '#fb7185' }
+];
+let categories = JSON.parse(localStorage.getItem('timeCategories')) || defaultCategories;
 let timerRunning = false;
 let timerInterval;
 let secondsElapsed = parseInt(localStorage.getItem('timerSeconds')) || 0;
 let editId = null;
 
-const motivationalQuotes = [
-    "\"Lembre-se de fazer pausas regulares. A consistência vale mais do que a exaustão.\"",
-    "\"Não se trata de ter tempo, mas sim de criar tempo para o que importa.\"",
-    "\"Fazer um pouco todos a cada dia é mais efetivo do que exaustão em um dia.\"",
-    "\"A jornada é tão importante quanto o destino. Celebre as pequenas vitórias.\"",
-    "\"Organização não é sobre perfeição, é sobre consistência e eficiência.\"",
-    "\"Um passo de cada vez. Mantenha o foco no momento presente.\"",
-    "\"O tempo de descanso não é tempo perdido; é recarga para a próxima etapa.\""
-];
-let currentQuoteIndex = 0;
 
 // Initialization
 document.addEventListener('DOMContentLoaded', () => {
     updateCurrentDate();
-    initQuotesCarousel();
+    renderCategoryManager();
     renderEntries();
     setDefaultDate();
     setupSearch();
     renderQuickFills();
     
-    // Resume timer if it was running (optional - requires start timestamp)
     if (secondsElapsed > 0) {
         document.getElementById('timer-text').innerText = formatTime(secondsElapsed);
     }
@@ -241,19 +241,15 @@ function renderEntries(filteredEntries = entries) {
     updateDashboard();
 }
 
-function getCategoryBadge(category) {
-    const config = {
-        'Instalação': 'bg-blue-500/10 text-blue-400 border-blue-500/20 shadow-[0_0_5px_rgba(59,130,246,0.2)]',
-        'Toner': 'bg-amber-500/10 text-amber-400 border-amber-500/20 shadow-[0_0_5px_rgba(245,158,11,0.2)]',
-        'Impressora': 'bg-fuchsia-500/10 text-fuchsia-400 border-fuchsia-500/20 shadow-[0_0_5px_rgba(217,70,239,0.2)]',
-        'Ramal': 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20 shadow-[0_0_5px_rgba(6,182,212,0.2)]',
-        'Rollout': 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20 shadow-[0_0_5px_rgba(99,102,241,0.2)]',
-        'Atividades internas': 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-[0_0_5px_rgba(16,185,129,0.2)]',
-        'Suporte': 'bg-rose-500/10 text-rose-400 border-rose-500/20 shadow-[0_0_5px_rgba(244,63,94,0.2)]'
-    };
-    const style = config[category] || 'bg-violet-500/10 text-violet-400 border-violet-500/20';
-    return `<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider border ${style}">
-        ${category || 'Geral'}
+function getCategoryBadge(categoryName) {
+    const cat = categories.find(c => c.name === categoryName);
+    const color = cat ? cat.color : '#c084fc';
+    const r = parseInt(color.slice(1,3), 16);
+    const g = parseInt(color.slice(3,5), 16);
+    const b = parseInt(color.slice(5,7), 16);
+    return `<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider border"
+        style="background:rgba(${r},${g},${b},0.12);color:rgb(${r},${g},${b});border-color:rgba(${r},${g},${b},0.3);box-shadow:0 0 6px rgba(${r},${g},${b},0.25);">
+        ${categoryName || 'Geral'}
     </span>`;
 }
 
@@ -337,21 +333,66 @@ function minToTime(min) {
     return `${h}:${m}`;
 }
 
-function initQuotesCarousel() {
-    const quoteEl = document.getElementById('motivational-quote');
-    if (!quoteEl) return;
-    
-    setInterval(() => {
-        quoteEl.style.opacity = 0;
-        
-        setTimeout(() => {
-            currentQuoteIndex = (currentQuoteIndex + 1) % motivationalQuotes.length;
-            quoteEl.innerText = motivationalQuotes[currentQuoteIndex];
-            quoteEl.style.opacity = 1;
-        }, 500); // Espera o fade out
-        
-    }, 8000); // Troca a mensagem a cada 8 segundos
+// Category Manager
+function renderCategoryManager() {
+    const container = document.getElementById('category-list-container');
+    const select = document.getElementById('form-category');
+    if (!container || !select) return;
+
+    // Render tags in the top card
+    container.innerHTML = '';
+    categories.forEach(cat => {
+        const r = parseInt(cat.color.slice(1,3), 16);
+        const g = parseInt(cat.color.slice(3,5), 16);
+        const b = parseInt(cat.color.slice(5,7), 16);
+        const tag = document.createElement('div');
+        tag.className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border group cursor-default';
+        tag.style.cssText = `background:rgba(${r},${g},${b},0.12);color:rgb(${r},${g},${b});border-color:rgba(${r},${g},${b},0.35);`;
+        tag.innerHTML = `
+            <span class="leading-none">${cat.name}</span>
+            <button type="button" onclick="deleteCategory('${cat.id}')"
+                class="opacity-0 group-hover:opacity-100 transition-opacity ml-0.5 hover:text-white leading-none"
+                title="Remover">&times;</button>
+        `;
+        container.appendChild(tag);
+    });
+
+    // Populate select
+    select.innerHTML = '';
+    categories.forEach(cat => {
+        const opt = document.createElement('option');
+        opt.value = cat.name;
+        opt.textContent = cat.name;
+        select.appendChild(opt);
+    });
 }
+
+function addCategory(e) {
+    e.preventDefault();
+    const nameInput = document.getElementById('cat-name');
+    const colorInput = document.getElementById('cat-color');
+    const name = nameInput.value.trim();
+    if (!name) return;
+    const exists = categories.some(c => c.name.toLowerCase() === name.toLowerCase());
+    if (exists) { nameInput.focus(); return; }
+
+    const newCat = { id: 'cat-' + Date.now(), name, color: colorInput.value };
+    categories.push(newCat);
+    localStorage.setItem('timeCategories', JSON.stringify(categories));
+    renderCategoryManager();
+    e.target.reset();
+    colorInput.value = '#c084fc';
+}
+
+function deleteCategory(id) {
+    if (categories.length <= 1) return; // keep at least one
+    categories = categories.filter(c => c.id !== id);
+    localStorage.setItem('timeCategories', JSON.stringify(categories));
+    renderCategoryManager();
+}
+
+function initQuotesCarousel() {} // removed
+
 
 // Quick Fills Logic
 function renderQuickFills() {

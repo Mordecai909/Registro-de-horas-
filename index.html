@@ -94,19 +94,33 @@
                 <div class="mt-2 text-[10px] text-violet-300 font-bold uppercase tracking-widest">Processamento 85%</div>
             </div>
 
-            <!-- AI Insights -->
-            <div class="glass-card p-6 bg-[rgba(192,132,252,0.05)] border border-violet-500/20 flex flex-col justify-center">
-                <div class="absolute -top-4 -right-4 p-8 dashboard-icon text-violet-500 opacity-20">
-                    <svg class="w-20 h-20" fill="currentColor" viewBox="0 0 20 20"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM11 3a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5a2 2 0 012-2h2zM3 15a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2zM17.914 12.235l-3.328-3.328c-.1-.1-.235-.175-.382-.217l-.54-.153.153.54c.042.147.117.282.217.382l3.328 3.328a.5.5 0 10.707-.707l-.155.155z"/></svg>
+            <!-- Tags & Categories Card -->
+            <div class="glass-card p-5 border border-violet-500/20">
+                <h4 class="text-sm font-bold text-white mb-4 flex items-center gap-2">
+                    <div class="p-1.5 bg-[rgba(192,132,252,0.15)] rounded-lg text-accent">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
+                    </div>
+                    Tags &amp; Categorias
+                </h4>
+
+                <!-- Category List -->
+                <div id="category-list-container" class="flex flex-wrap gap-2 mb-4 min-h-[2rem]">
+                    <!-- JS Injection -->
                 </div>
-                <div class="flex items-center gap-2 mb-2">
-                    <span class="relative flex h-2 w-2">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2 w-2 bg-accent shadow-[0_0_8px_#c084fc]"></span>
-                    </span>
-                    <p class="text-[10px] font-black uppercase tracking-widest text-accent">Terminal Log</p>
-                </div>
-                <p id="motivational-quote" class="text-sm italic text-violet-200 relative z-10 transition-opacity duration-500">"Sincronização de rotinas completa..."</p>
+
+                <!-- Add Category mini-form -->
+                <form id="category-form" onsubmit="addCategory(event)" class="flex gap-2 items-center mt-2">
+                    <input type="text" id="cat-name" placeholder="Nova categoria..." required
+                        class="flex-1 px-3 py-2 text-xs placeholder-violet-300/30 bg-[rgba(15,0,28,0.4)] border border-violet-500/30 text-white rounded-lg focus:outline-none focus:border-accent">
+                    <!-- Color Picker via label nativo -->
+                    <label for="cat-color" class="w-9 h-9 flex-shrink-0 rounded-lg overflow-hidden border border-violet-500/40 hover:border-accent cursor-pointer transition-all" style="display:block;">
+                        <input type="color" id="cat-color" value="#c084fc" style="display:block;width:100%;height:100%;border:none;padding:0;cursor:pointer;">
+                    </label>
+                    <button type="submit"
+                        class="px-3 py-2 bg-accent/20 hover:bg-accent text-accent hover:text-white rounded-lg transition-all border border-accent/30 flex items-center justify-center">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                    </button>
+                </form>
             </div>
         </section>
 
@@ -149,13 +163,7 @@
                         <div>
                             <label class="block text-[10px] font-black text-violet-400 uppercase tracking-widest mb-1.5 ml-1">Categoria</label>
                             <select id="form-category" required class="w-full px-4 py-3 text-sm bg-[rgba(15,0,28,0.4)] border border-violet-500/30 text-white rounded-xl focus:outline-none focus:border-accent appearance-none">
-                                <option value="Atividades internas">🏢 Atividades internas</option>
-                                <option value="Instalação">🛠️ Instalação</option>
-                                <option value="Toner">⬛ Toner</option>
-                                <option value="Impressora">🖨️ Impressora</option>
-                                <option value="Ramal">📞 Ramal</option>
-                                <option value="Rollout">🚀 Rollout</option>
-                                <option value="Suporte">🎧 Suporte</option>
+                                <!-- Preenchido dinamicamente via JS -->
                             </select>
                         </div>
                         <div>
