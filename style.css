@@ -10,7 +10,7 @@
 }
 
 body {
-    background-image: url('./assets/circuit_bg.png');
+    background-image: url('./assets/circuit_bg_blurred.png');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
@@ -29,8 +29,7 @@ body::before {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(15, 0, 28, 0.82);
-    backdrop-filter: blur(8px);
+    background: rgba(15, 0, 28, 0.45);
     z-index: -1;
 }
 
