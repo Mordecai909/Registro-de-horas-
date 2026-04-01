@@ -307,20 +307,40 @@ function formatDateBR(dateStr) {
 }
 
 function updateDashboard() {
-    const todayStr = new Date().toISOString().split('T')[0];
-    
+    const now = new Date();
+    const todayStr = now.toISOString().split('T')[0];
+    const currentYear  = now.getFullYear();
+    const currentMonth = now.getMonth(); // 0-indexed
+    const HOURLY_RATE  = 9.67;
+
     // Day Total
     const dayTotal = entries
         .filter(e => e.date === todayStr)
         .reduce((sum, e) => sum + timeToMin(e.total), 0);
-    
-    // Week Total (Rough estimation)
+
+    // Week Total (all entries)
     const weekTotal = entries.reduce((sum, e) => sum + timeToMin(e.total), 0);
 
-    document.getElementById('card-day').innerText = minToTime(dayTotal) + 'h';
-    document.getElementById('card-week').innerText = minToTime(weekTotal) + 'h';
-    document.getElementById('card-month').innerText = minToTime(weekTotal) + 'h'; // Scaling for demo
+    // Month Total — only entries in the current month/year
+    const monthTotalMin = entries
+        .filter(e => {
+            const d = new Date(e.date + 'T00:00:00');
+            return d.getFullYear() === currentYear && d.getMonth() === currentMonth;
+        })
+        .reduce((sum, e) => sum + timeToMin(e.total), 0);
+
+    const monthHours = monthTotalMin / 60;
+    const salary     = monthHours * HOURLY_RATE;
+    const salaryStr  = salary.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    const hoursLabel = `${minToTime(monthTotalMin)}h trabalhadas`;
+
+    document.getElementById('card-day').innerText   = minToTime(dayTotal)  + 'h';
+    document.getElementById('card-week').innerText  = minToTime(weekTotal) + 'h';
+    document.getElementById('card-month').innerText = salaryStr;
+    const hoursEl = document.getElementById('card-month-hours');
+    if (hoursEl) hoursEl.innerText = hoursLabel;
 }
+
 
 function timeToMin(timeStr) {
     const [h, m] = timeStr.split(':').map(Number);
