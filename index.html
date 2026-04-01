@@ -95,7 +95,7 @@
             </div>
 
             <!-- Tags & Categories Card -->
-            <div class="glass-card p-5 border border-violet-500/20">
+            <div class="glass-card p-5 pb-7 border border-violet-500/20">
                 <h4 class="text-sm font-bold text-white mb-4 flex items-center gap-2">
                     <div class="p-1.5 bg-[rgba(192,132,252,0.15)] rounded-lg text-accent">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
@@ -109,16 +109,16 @@
                 </div>
 
                 <!-- Add Category mini-form -->
-                <form id="category-form" onsubmit="addCategory(event)" class="flex gap-2 items-center mt-2">
+                <form id="category-form" onsubmit="addCategory(event)" class="flex gap-1.5 items-center mt-2">
                     <input type="text" id="cat-name" placeholder="Nova categoria..." required
-                        class="flex-1 px-3 py-2 text-xs placeholder-violet-300/30 bg-[rgba(15,0,28,0.4)] border border-violet-500/30 text-white rounded-lg focus:outline-none focus:border-accent">
+                        class="flex-1 px-2.5 py-1.5 text-xs placeholder-violet-300/30 bg-[rgba(15,0,28,0.4)] border border-violet-500/30 text-white rounded-lg focus:outline-none focus:border-accent">
                     <!-- Color Picker via label nativo -->
-                    <label for="cat-color" class="w-9 h-9 flex-shrink-0 rounded-lg overflow-hidden border border-violet-500/40 hover:border-accent cursor-pointer transition-all" style="display:block;">
+                    <label for="cat-color" class="w-7 h-7 flex-shrink-0 rounded-md overflow-hidden border border-violet-500/40 hover:border-accent cursor-pointer transition-all" style="display:block;">
                         <input type="color" id="cat-color" value="#c084fc" style="display:block;width:100%;height:100%;border:none;padding:0;cursor:pointer;">
                     </label>
                     <button type="submit"
-                        class="px-3 py-2 bg-accent/20 hover:bg-accent text-accent hover:text-white rounded-lg transition-all border border-accent/30 flex items-center justify-center">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                        class="w-7 h-7 flex-shrink-0 bg-accent/20 hover:bg-accent text-accent hover:text-white rounded-md transition-all border border-accent/30 flex items-center justify-center">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" /></svg>
                     </button>
                 </form>
             </div>
