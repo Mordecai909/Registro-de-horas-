@@ -692,3 +692,70 @@ function renderQuickFills() {
     
     container.classList.remove('hidden');
 }
+
+// ── Sidebar & UI Navigation ──
+function toggleSidebar(show) {
+    const menu = document.getElementById('sidebar-menu');
+    const overlay = document.getElementById('sidebar-overlay');
+    if (!menu || !overlay) return;
+    
+    if (show) {
+        menu.classList.add('sidebar-open');
+        overlay.classList.add('overlay-visible');
+        document.body.style.overflow = 'hidden';
+    } else {
+        menu.classList.remove('sidebar-open');
+        overlay.classList.remove('overlay-visible');
+        document.body.style.overflow = '';
+    }
+}
+
+// ── Theme Management ──
+const themes = [
+    { name: 'Violet', accent: '#c084fc', glow: 'rgba(192, 132, 252, 0.5)' },
+    { name: 'Cyan', accent: '#22d3ee', glow: 'rgba(34, 211, 238, 0.5)' },
+    { name: 'Emerald', accent: '#34d399', glow: 'rgba(52, 211, 153, 0.5)' },
+    { name: 'Rose', accent: '#fb7185', glow: 'rgba(251, 113, 133, 0.5)' },
+    { name: 'Amber', accent: '#fbbf24', glow: 'rgba(251, 191, 36, 0.5)' }
+];
+let currentThemeIdx = 0;
+
+function changeTheme() {
+    currentThemeIdx = (currentThemeIdx + 1) % themes.length;
+    const theme = themes[currentThemeIdx];
+    
+    document.documentElement.style.setProperty('--accent', theme.accent);
+    document.documentElement.style.setProperty('--accent-glow', theme.glow);
+    
+    // Feedback in sidebar
+    const sidebar = document.getElementById('sidebar-menu');
+    if (sidebar) sidebar.style.borderColor = theme.accent + '33';
+}
+
+// ── Maintenance ──
+function confirmClearStorage() {
+    if (confirm('⚠️ ATENÇÃO: Isso apagará TODOS os seus registros permanentemente. Deseja continuar?')) {
+        localStorage.clear();
+        window.location.reload();
+    }
+}
+
+// ── PWA Installation ──
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    const installBtn = document.getElementById('pwa-install-btn');
+    if (installBtn) installBtn.classList.remove('hidden');
+});
+
+async function installApp() {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+        const installBtn = document.getElementById('pwa-install-btn');
+        if (installBtn) installBtn.classList.add('hidden');
+    }
+    deferredPrompt = null;
+}

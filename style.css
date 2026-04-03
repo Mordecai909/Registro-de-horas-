@@ -7,6 +7,33 @@
     --accent: #c084fc; /* neon purple */
     --success: #34d399; 
     --danger: #fb7185; 
+    
+    /* Theme transitions */
+    --accent-glow: rgba(192, 132, 252, 0.5);
+}
+
+/* Sidebar States */
+#sidebar-menu.sidebar-open {
+    transform: translateX(0);
+}
+
+#sidebar-overlay.overlay-visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Custom Scrollbar for Sidebar */
+#sidebar-menu::-webkit-scrollbar {
+    width: 4px;
+}
+
+#sidebar-menu::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#sidebar-menu::-webkit-scrollbar-thumb {
+    background: rgba(192, 132, 252, 0.2);
+    border-radius: 10px;
 }
 
 body {
