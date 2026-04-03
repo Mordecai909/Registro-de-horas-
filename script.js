@@ -25,6 +25,7 @@ let timerRunning = false;
 let timerInterval;
 let secondsElapsed = parseInt(localStorage.getItem('timerSeconds')) || 0;
 let editId = null;
+let categoryChart = null; // ApexChart instance
 
 // Pomodoro state
 let pomodoroMode = false;
@@ -43,6 +44,9 @@ document.addEventListener('DOMContentLoaded', () => {
     setupKeyboardShortcuts();
     // Initialize pill indicator position after layout is rendered
     requestAnimationFrame(initPillIndicator);
+    
+    // Initialize Chart
+    initCategoryChart();
 
     if (secondsElapsed > 0) {
         document.getElementById('timer-text').innerText = formatTime(secondsElapsed);
@@ -488,6 +492,18 @@ function formatDateBR(dateStr) {
     return `${d}/${m}/${y}`;
 }
 
+function timeToMin(timeStr) {
+    if (!timeStr) return 0;
+    const [h, m] = timeStr.split(':').map(Number);
+    return (h * 60) + (m || 0);
+}
+
+function minToTime(min) {
+    const h = Math.floor(min / 60).toString().padStart(2, '0');
+    const m = (min % 60).toString().padStart(2, '0');
+    return `${h}:${m}`;
+}
+
 function updateDashboard() {
     const now = new Date();
     const todayStr = now.toISOString().split('T')[0];
@@ -514,73 +530,136 @@ function updateDashboard() {
     document.getElementById('card-week').innerText  = minToTime(weekTotal) + 'h';
     document.getElementById('card-month').innerText = minToTime(monthTotalMin) + 'h';
 
-    renderCategoryChart(currentYear, currentMonth);
+    updateCategoryChart(currentYear, currentMonth);
 }
 
+function initCategoryChart() {
+    const options = {
+        series: [],
+        chart: {
+            type: 'donut',
+            height: 320,
+            background: 'transparent',
+            animations: {
+                enabled: true,
+                easing: 'easeinout',
+                speed: 800,
+            },
+            dropShadow: {
+                enabled: true,
+                blur: 10,
+                color: 'var(--accent)',
+                opacity: 0.35
+            }
+        },
+        stroke: {
+            show: false,
+            width: 0
+        },
+        plotOptions: {
+            pie: {
+                donut: {
+                    size: '75%',
+                    background: 'transparent',
+                    labels: {
+                        show: true,
+                        name: {
+                            show: true,
+                            fontSize: '12px',
+                            fontFamily: 'Outfit',
+                            fontWeight: 900,
+                            color: 'var(--accent)',
+                            offsetY: -10
+                        },
+                        value: {
+                            show: true,
+                            fontSize: '24px',
+                            fontFamily: 'Outfit',
+                            fontWeight: 700,
+                            color: '#fff',
+                            offsetY: 10,
+                            formatter: (val) => minToTime(val) + 'h'
+                        },
+                        total: {
+                            show: true,
+                            label: 'TOTAL',
+                            color: 'var(--accent)',
+                            fontSize: '10px',
+                            fontWeight: 900,
+                            formatter: function (w) {
+                                return minToTime(w.globals.seriesTotals.reduce((a, b) => a + b, 0)) + 'h';
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        dataLabels: { enabled: false },
+        legend: { show: false },
+        colors: [],
+        tooltip: {
+            enabled: true,
+            theme: 'dark',
+            fillSeriesColor: false,
+            y: {
+                formatter: (val) => `${minToTime(val)}h exploradas`
+            }
+        },
+        noData: {
+            text: 'SEM DADOS NO CICLO',
+            align: 'center',
+            verticalAlign: 'middle',
+            style: {
+                color: 'var(--accent)',
+                fontSize: '10px',
+                fontFamily: 'Outfit',
+            }
+        },
+        labels: []
+    };
 
-
-function timeToMin(timeStr) {
-    const [h, m] = timeStr.split(':').map(Number);
-    return (h * 60) + m;
+    const container = document.getElementById('sidebar-donut-chart');
+    if (container) {
+        categoryChart = new ApexCharts(container, options);
+        categoryChart.render();
+    }
 }
 
-function minToTime(min) {
-    const h = Math.floor(min / 60).toString().padStart(2, '0');
-    const m = (min % 60).toString().padStart(2, '0');
-    return `${h}:${m}`;
-}
+function updateCategoryChart(year, month) {
+    if (!categoryChart) return;
 
-// Category Distribution Chart
-function renderCategoryChart(year, month) {
-    const container = document.getElementById('category-chart');
-    if (!container) return;
-
-    // Filter entries for current month
     const monthEntries = entries.filter(e => {
         const d = new Date(e.date + 'T00:00:00');
         return d.getFullYear() === year && d.getMonth() === month;
     });
 
-    if (monthEntries.length === 0) {
-        container.innerHTML = `<p class="text-xs text-accent/50 font-bold uppercase tracking-widest text-center py-4">Nenhum registro no mês atual</p>`;
-        return;
-    }
-
-    // Group by category
     const catMap = {};
     monthEntries.forEach(e => {
         const key = e.category || 'Geral';
         catMap[key] = (catMap[key] || 0) + timeToMin(e.total);
     });
 
-    // Sort descending
-    const sorted = Object.entries(catMap).sort((a, b) => b[1] - a[1]);
-    const maxMin = sorted[0][1];
-
-    container.innerHTML = '';
-    sorted.forEach(([name, mins]) => {
-        const pct     = Math.round((mins / maxMin) * 100);
-        const cat     = categories.find(c => c.name === name);
-        const color   = cat ? cat.color : '#c084fc';
-        const r = parseInt(color.slice(1,3), 16);
-        const g = parseInt(color.slice(3,5), 16);
-        const b = parseInt(color.slice(5,7), 16);
-        const hLabel  = minToTime(mins) + 'h';
-        const pctLabel = pct + '%';
-
-        const row = document.createElement('div');
-        row.className = 'flex items-center gap-3 group';
-        row.innerHTML = `
-            <span class="text-[11px] font-bold w-40 shrink-0 truncate" style="color:rgb(${r},${g},${b})">${name}</span>
-            <div class="flex-1 h-5 bg-[rgba(15,0,28,0.4)] rounded-full overflow-hidden border border-accent/10">
-                <div class="h-full rounded-full transition-all duration-700"
-                    style="width:${pct}%;background:rgba(${r},${g},${b},0.7);box-shadow:0 0 8px rgba(${r},${g},${b},0.4);"></div>
-            </div>
-            <span class="text-[11px] font-black tabular-nums w-14 text-right" style="color:rgb(${r},${g},${b})">${hLabel}</span>
-            <span class="text-[10px] font-bold text-accent/50 w-8 text-right">${pctLabel}</span>
-        `;
-        container.appendChild(row);
+    const series = Object.values(catMap);
+    const labels = Object.keys(catMap);
+    const colors = labels.map(name => {
+        const cat = categories.find(c => c.name === name);
+        return cat ? cat.color : 'var(--accent)';
     });
+
+    categoryChart.updateOptions({
+        series: series,
+        labels: labels,
+        colors: colors,
+        chart: {
+            dropShadow: { color: colors[0] || 'var(--accent)' }
+        }
+    });
+
+    // Also update the old chart container if it exists (legacy support)
+    const oldContainer = document.getElementById('category-chart');
+    if (oldContainer) {
+        oldContainer.innerHTML = `<p class="text-[10px] text-accent/40 font-black uppercase tracking-widest text-center py-2">Dados migrados para o painel lateral</p>`;
+    }
 }
 
 // Category Manager
@@ -710,6 +789,20 @@ function toggleSidebar(show) {
     }
 }
 
+// ── Right Sidebar controls ──
+function toggleRightSidebar(lock) {
+    const sidebar = document.getElementById('right-sidebar');
+    if (!sidebar) return;
+    
+    if (lock) {
+        sidebar.classList.add('sidebar-lock');
+        sidebar.classList.add('sidebar-open'); // For mobile
+    } else {
+        sidebar.classList.remove('sidebar-lock');
+        sidebar.classList.remove('sidebar-open');
+    }
+}
+
 // ── Theme Management ──
 const themes = [
     { name: 'Violet', accent: '#c084fc', glow: 'rgba(192, 132, 252, 0.5)', cardBg: 'rgba(22, 5, 43, 0.65)', cardHoverBg: 'rgba(40, 10, 75, 0.75)' },
@@ -748,6 +841,15 @@ function changeTheme() {
     if (sidebar) {
         sidebar.style.borderColor = theme.accent + '33';
         sidebar.style.backgroundColor = theme.cardBg;
+    }
+
+    // Refresh Chart to apply new CSS variables / colors if needed
+    if (categoryChart) {
+        categoryChart.updateOptions({
+            chart: {
+                dropShadow: { color: theme.accent }
+            }
+        });
     }
 }
 

@@ -11,6 +11,7 @@
     /* Theme transitions */
     --accent-glow: rgba(192, 132, 252, 0.5);
     --card-hover-bg: rgba(40, 10, 75, 0.75);
+    --btn-shadow: 0 4px 14px 0 rgba(192, 132, 252, 0.39);
 }
 
 /* Sidebar States */
@@ -21,6 +22,22 @@
 #sidebar-overlay.overlay-visible {
     opacity: 1;
     pointer-events: auto;
+}
+
+/* Right Sidebar Behavior */
+#right-sidebar.sidebar-lock {
+    transform: translateX(0) !important;
+}
+
+@media (max-width: 1024px) {
+    #right-sidebar {
+        transform: translateX(100%) !important;
+        width: 100% !important;
+        max-width: 400px;
+    }
+    #right-sidebar.sidebar-open {
+        transform: translateX(0) !important;
+    }
 }
 
 /* Custom Scrollbar for Sidebar */
@@ -49,7 +66,7 @@ body::before {
     content: '';
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background-image: url('./assets/circuit_bg_blurred.png');
+    background-image: url('./assets/cyber_motherboard_bg.jpg');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
@@ -87,6 +104,35 @@ body::after {
     font-variant-numeric: tabular-nums;
     letter-spacing: -0.05em;
     text-shadow: 0 0 30px var(--accent-glow);
+}
+
+/* Weighty Buttons Interaction */
+.btn-weight, 
+button[type="submit"], 
+.glass-card button {
+    position: relative;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.btn-weight:active,
+button[type="submit"]:active,
+.glass-card button:active {
+    transform: translateY(1px) scale(0.98);
+    filter: brightness(0.9);
+    box-shadow: 0 2px 8px -2px var(--accent-glow) !important;
+}
+
+/* ApexCharts Overrides for High-Tech look */
+.apexcharts-canvas {
+    filter: drop-shadow(0 0 10px var(--accent-glow));
+}
+
+.apexcharts-tooltip {
+    background: rgba(15, 0, 28, 0.95) !important;
+    backdrop-filter: blur(8px) !important;
+    border: 1px solid var(--accent) !important;
+    color: white !important;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5) !important;
 }
 
 /* Animations */
