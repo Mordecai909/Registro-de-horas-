@@ -103,13 +103,13 @@
 
 .bg-grid {
     position: absolute;
-    inset: -100px; /* Overbleed for parallax */
+    inset: -100px;
     background-image: 
-        radial-gradient(var(--accent) 1px, transparent 1px);
-    background-size: 48px 48px;
-    opacity: 0.05;
-    mask-image: radial-gradient(ellipse at center, black, transparent 80%);
-    transform: translateY(calc(var(--scroll-y, 0px) * -0.2));
+        linear-gradient(rgba(192, 132, 252, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(192, 132, 252, 0.05) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(ellipse at center, black, transparent 85%);
+    transform: translateY(calc(var(--scroll-y, 0px) * -0.15));
     will-change: transform;
 }
 
@@ -142,22 +142,81 @@ body {
     background: #000000;
 }
 
-/* Glassmorphism Cyber */
+/* Cyber-Circuit Card Elements */
 .glass-card {
+    position: relative;
     background: var(--card-bg);
-    backdrop-filter: blur(16px);
-    border: 1px solid var(--accent-glow);
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(192, 132, 252, 0.1);
     border-radius: 1.25rem;
-    overflow: hidden;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: inset 0 0 20px rgba(192, 132, 252, 0.03), 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    box-shadow: 
+        0 8px 32px 0 rgba(0, 0, 0, 0.4),
+        inset 0 0 1px 1px rgba(255, 255, 255, 0.05);
+}
+
+/* Circuit Corners Motif */
+.glass-card::before,
+.glass-card::after {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    pointer-events: none;
+    opacity: 0.3;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.glass-card::before {
+    top: 12px; left: 12px;
+    border-top: 2px solid var(--accent);
+    border-left: 2px solid var(--accent);
+}
+
+.glass-card::after {
+    bottom: 12px; right: 12px;
+    border-bottom: 2px solid var(--accent);
+    border-right: 2px solid var(--accent);
+}
+
+.glass-card:hover::before,
+.glass-card:hover::after {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+/* Neon Glow Separator (Laser Line) */
+.neon-divider {
+    height: 1px;
+    width: 100%;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        var(--accent-glow) 20%, 
+        var(--accent) 50%, 
+        var(--accent-glow) 80%, 
+        transparent 100%
+    );
+    opacity: 0.4;
+    margin: 1.5rem 0;
+    position: relative;
+}
+
+.neon-divider::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: inherit;
+    filter: blur(4px);
+    opacity: 0.5;
 }
 
 .glass-card:hover {
-    transform: translateY(-2px);
+    transform: translateY(-4px) scale(1.005);
     background: var(--card-hover-bg);
-    border-color: var(--accent);
-    box-shadow: inset 0 0 20px var(--accent-glow), 0 20px 40px -10px rgba(15, 0, 28, 0.8);
+    border-color: rgba(192, 132, 252, 0.4);
+    box-shadow: 
+        0 12px 48px -12px rgba(0, 0, 0, 0.7),
+        inset 0 0 30px 2px rgba(192, 132, 252, 0.1);
 }
 
 .timer-display {
@@ -166,21 +225,37 @@ body {
     text-shadow: 0 0 30px var(--accent-glow);
 }
 
-/* Weighty Buttons Interaction */
+/* 3D Weighty Buttons Interaction */
 .btn-weight, 
-button[type="submit"], 
+button[type="submit"],
 .glass-card button {
     position: relative;
-    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border-bottom-width: 4px !important;
+    transition: all 0.15s cubic-bezier(0.2, 0.8, 0.2, 1.2);
+}
+
+.btn-weight:hover,
+button[type="submit"]:hover,
+.glass-card button:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.1);
 }
 
 .btn-weight:active,
 button[type="submit"]:active,
 .glass-card button:active {
-    transform: translateY(1px) scale(0.98);
+    transform: translateY(4px) scale(0.98);
+    border-bottom-width: 0px !important;
     filter: brightness(0.9);
-    box-shadow: 0 2px 8px -2px var(--accent-glow) !important;
+    box-shadow: none !important;
 }
+
+/* 3D Color Variants (Depth Shadows) */
+.btn-3d-purple { border-bottom-color: #9333ea !important; } /* purple-600 */
+.btn-3d-emerald { border-bottom-color: #059669 !important; } /* emerald-600 */
+.btn-3d-rose { border-bottom-color: #e11d48 !important; } /* rose-600 */
+.btn-3d-orange { border-bottom-color: #ea580c !important; } /* orange-600 */
+.btn-3d-accent { border-bottom-color: rgba(192, 132, 252, 0.5) !important; }
 
 /* ApexCharts Overrides for High-Tech look */
 .apexcharts-canvas {
@@ -207,11 +282,11 @@ button[type="submit"]:active,
 
 /* Form Styling */
 input, select {
-    background: rgba(15, 0, 28, 0.6) !important;
-    border: 1px solid var(--accent-glow) !important;
+    background: rgba(15, 0, 28, 0.4) !important;
+    border: 1px solid rgba(192, 132, 252, 0.2) !important;
     color: #f3e8ff !important;
-    border-radius: 0.75rem !important;
-    transition: all 0.2s ease;
+    border-radius: 0.8rem !important;
+    transition: all 0.3s ease;
 }
 
 input:focus, select:focus {
@@ -268,7 +343,16 @@ input:focus, select:focus {
 
 /* Table Enhancements */
 .table-row-hover:hover {
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(192, 132, 252, 0.03);
+}
+
+#activity-list tr {
+    border-bottom: 1px solid rgba(192, 132, 252, 0.05);
+    transition: background 0.3s ease;
+}
+
+#activity-list tr:last-child {
+    border-bottom: none;
 }
 
 @media print {
