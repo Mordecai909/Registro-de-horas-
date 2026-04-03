@@ -48,6 +48,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize Chart
     initCategoryChart();
 
+    // Parallax logic
+    window.addEventListener('scroll', () => {
+        const scroll = window.scrollY;
+        document.body.style.setProperty('--scroll-y', `${scroll * 0.1}px`);
+    });
+
     if (secondsElapsed > 0) {
         document.getElementById('timer-text').innerText = formatTime(secondsElapsed);
     }
@@ -841,6 +847,13 @@ function changeTheme() {
     if (sidebar) {
         sidebar.style.borderColor = theme.accent + '33';
         sidebar.style.backgroundColor = theme.cardBg;
+    }
+    
+    // Update Right Sidebar as well
+    const rightSidebar = document.getElementById('right-sidebar');
+    if (rightSidebar) {
+        rightSidebar.style.borderColor = theme.accent + '33';
+        rightSidebar.style.backgroundColor = theme.cardBg;
     }
 
     // Refresh Chart to apply new CSS variables / colors if needed

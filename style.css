@@ -65,13 +65,14 @@ body {
 body::before {
     content: '';
     position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
+    top: -10vh; left: 0; right: 0; bottom: -10vh;
     background-image: url('./assets/cyber_motherboard_bg.jpg');
     background-size: cover;
     background-position: center;
-    background-attachment: fixed;
     filter: grayscale(100%) brightness(0.6) contrast(1.1); /* Increased brightness */
     z-index: -1;
+    will-change: transform;
+    transform: translateY(calc(-1 * var(--scroll-y, 0px)));
 }
 
 body::after {
