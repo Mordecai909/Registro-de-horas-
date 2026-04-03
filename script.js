@@ -723,13 +723,30 @@ let currentThemeIdx = 0;
 function changeTheme() {
     currentThemeIdx = (currentThemeIdx + 1) % themes.length;
     const theme = themes[currentThemeIdx];
+    const nextTheme = themes[(currentThemeIdx + 1) % themes.length];
     
     document.documentElement.style.setProperty('--accent', theme.accent);
     document.documentElement.style.setProperty('--accent-glow', theme.glow);
     
-    // Feedback in sidebar
+    // Update theme button icon container
+    const iconContainer = document.getElementById('theme-icon-container');
+    const themeBtn = document.getElementById('theme-switch-btn');
+    if (iconContainer) {
+        iconContainer.style.backgroundColor = theme.accent + '33'; // 20% opacity
+        iconContainer.style.borderColor = theme.accent + '4d';     // 30% opacity
+        iconContainer.style.boxShadow = `0 0 15px ${theme.glow}`;
+    }
+    
+    // Update Sidebar border for feedback
     const sidebar = document.getElementById('sidebar-menu');
     if (sidebar) sidebar.style.borderColor = theme.accent + '33';
+
+    // Update text hint for next theme
+    const themeText = themeBtn.querySelector('span') || themeBtn.childNodes[themeBtn.childNodes.length - 1];
+    if (themeText) {
+        // Just keep the main label but we could add (Next: Cyan) if we wanted
+        // themeText.textContent = `Trocar Tema (${theme.name})`;
+    }
 }
 
 // ── Maintenance ──
