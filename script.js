@@ -48,10 +48,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize Chart
     initCategoryChart();
 
-    // Parallax logic
+    // Parallax & Background logic
     window.addEventListener('scroll', () => {
         const scroll = window.scrollY;
-        document.body.style.setProperty('--scroll-y', `${scroll * 0.1}px`);
+        const root = document.documentElement;
+        root.style.setProperty('--scroll-y', `${scroll}px`);
+        root.style.setProperty('--scroll-y-slow', `${scroll * 0.05}px`);
+        root.style.setProperty('--scroll-y-med', `${scroll * 0.1}px`);
+        root.style.setProperty('--scroll-y-fast', `${scroll * 0.15}px`);
     });
 
     if (secondsElapsed > 0) {
@@ -624,7 +628,7 @@ function initCategoryChart() {
         labels: []
     };
 
-    const container = document.getElementById('sidebar-donut-chart');
+    const container = document.getElementById('category-chart');
     if (container) {
         categoryChart = new ApexCharts(container, options);
         categoryChart.render();
@@ -660,12 +664,6 @@ function updateCategoryChart(year, month) {
             dropShadow: { color: colors[0] || 'var(--accent)' }
         }
     });
-
-    // Also update the old chart container if it exists (legacy support)
-    const oldContainer = document.getElementById('category-chart');
-    if (oldContainer) {
-        oldContainer.innerHTML = `<p class="text-[10px] text-accent/40 font-black uppercase tracking-widest text-center py-2">Dados migrados para o painel lateral</p>`;
-    }
 }
 
 // Category Manager
@@ -811,23 +809,29 @@ function toggleRightSidebar(lock) {
 
 // ── Theme Management ──
 const themes = [
-    { name: 'Violet', accent: '#c084fc', glow: 'rgba(192, 132, 252, 0.5)', cardBg: 'rgba(22, 5, 43, 0.65)', cardHoverBg: 'rgba(40, 10, 75, 0.75)' },
-    { name: 'Cyan', accent: '#22d3ee', glow: 'rgba(34, 211, 238, 0.5)', cardBg: 'rgba(5, 25, 40, 0.7)', cardHoverBg: 'rgba(10, 50, 75, 0.75)' },
-    { name: 'Emerald', accent: '#34d399', glow: 'rgba(52, 211, 153, 0.5)', cardBg: 'rgba(5, 35, 20, 0.7)', cardHoverBg: 'rgba(10, 75, 50, 0.75)' },
-    { name: 'Rose', accent: '#fb7185', glow: 'rgba(251, 113, 133, 0.5)', cardBg: 'rgba(35, 5, 15, 0.7)', cardHoverBg: 'rgba(75, 10, 30, 0.75)' },
-    { name: 'Amber', accent: '#fbbf24', glow: 'rgba(251, 191, 36, 0.5)', cardBg: 'rgba(35, 25, 5, 0.7)', cardHoverBg: 'rgba(75, 55, 10, 0.75)' }
+    { name: 'Violet',  accent: '#c084fc', secondary: '#818cf8', glow: 'rgba(192, 132, 252, 0.5)', cardBg: 'rgba(22, 5, 43, 0.65)', cardHoverBg: 'rgba(40, 10, 75, 0.75)' },
+    { name: 'Cyan',    accent: '#22d3ee', secondary: '#0ea5e9', glow: 'rgba(34, 211, 238, 0.5)', cardBg: 'rgba(5, 25, 40, 0.7)',   cardHoverBg: 'rgba(10, 50, 75, 0.75)' },
+    { name: 'Emerald', accent: '#34d399', secondary: '#10b981', glow: 'rgba(52, 211, 153, 0.5)', cardBg: 'rgba(5, 35, 20, 0.7)',   cardHoverBg: 'rgba(10, 75, 50, 0.75)' },
+    { name: 'Rose',    accent: '#fb7185', secondary: '#e11d48', glow: 'rgba(251, 113, 133, 0.5)', cardBg: 'rgba(35, 5, 15, 0.7)',   cardHoverBg: 'rgba(75, 10, 30, 0.75)' },
+    { name: 'Amber',   accent: '#fbbf24', secondary: '#f59e0b', glow: 'rgba(251, 191, 36, 0.5)', cardBg: 'rgba(35, 25, 5, 0.7)',   cardHoverBg: 'rgba(75, 55, 10, 0.75)' }
 ];
 let currentThemeIdx = 0;
 
 function changeTheme() {
     currentThemeIdx = (currentThemeIdx + 1) % themes.length;
     const theme = themes[currentThemeIdx];
-    const nextTheme = themes[(currentThemeIdx + 1) % themes.length];
     
-    document.documentElement.style.setProperty('--accent', theme.accent);
-    document.documentElement.style.setProperty('--accent-glow', theme.glow);
-    document.documentElement.style.setProperty('--card-bg', theme.cardBg);
-    document.documentElement.style.setProperty('--card-hover-bg', theme.cardHoverBg);
+    const root = document.documentElement;
+    root.style.setProperty('--accent', theme.accent);
+    root.style.setProperty('--secondary-accent', theme.secondary);
+    root.style.setProperty('--accent-glow', theme.glow);
+    root.style.setProperty('--card-bg', theme.cardBg);
+    root.style.setProperty('--card-hover-bg', theme.cardHoverBg);
+    
+    // Update background blobs for "Cyber-Pulse" effect
+    root.style.setProperty('--blob-1-bg', theme.accent);
+    root.style.setProperty('--blob-2-bg', theme.secondary);
+    root.style.setProperty('--blob-3-bg', theme.accent);
     
     // Update PWA meta theme color
     const metaTheme = document.querySelector('meta[name="theme-color"]');
@@ -835,36 +839,40 @@ function changeTheme() {
     
     // Update theme button icon container
     const iconContainer = document.getElementById('theme-icon-container');
-    const themeBtn = document.getElementById('theme-switch-btn');
     if (iconContainer) {
-        iconContainer.style.backgroundColor = theme.accent + '33'; // 20% opacity
-        iconContainer.style.borderColor = theme.accent + '4d';     // 30% opacity
+        iconContainer.style.backgroundColor = theme.accent + '33';
+        iconContainer.style.borderColor = theme.accent + '4d';
         iconContainer.style.boxShadow = `0 0 15px ${theme.glow}`;
     }
     
-    // Update Sidebar border for feedback
+    // Update UI Elements
     const sidebar = document.getElementById('sidebar-menu');
-    if (sidebar) {
-        sidebar.style.borderColor = theme.accent + '33';
-        sidebar.style.backgroundColor = theme.cardBg;
-    }
-    
-    // Update Right Sidebar as well
     const rightSidebar = document.getElementById('right-sidebar');
-    if (rightSidebar) {
-        rightSidebar.style.borderColor = theme.accent + '33';
-        rightSidebar.style.backgroundColor = theme.cardBg;
-    }
+    [sidebar, rightSidebar].forEach(el => {
+        if (el) {
+            el.style.borderColor = theme.accent + '33';
+            el.style.backgroundColor = theme.cardBg;
+        }
+    });
 
-    // Refresh Chart to apply new CSS variables / colors if needed
     if (categoryChart) {
         categoryChart.updateOptions({
-            chart: {
-                dropShadow: { color: theme.accent }
-            }
+            chart: { dropShadow: { color: theme.accent } }
         });
     }
 }
+
+// ── Interactive Background (Mouse Parallax) ──
+document.addEventListener('mousemove', (e) => {
+    const x = (e.clientX / window.innerWidth) - 0.5;
+    const y = (e.clientY / window.innerHeight) - 0.5;
+    
+    const blobs = document.querySelectorAll('.blob');
+    blobs.forEach((blob, index) => {
+        const factor = (index + 1) * 20;
+        blob.style.transform = `translate(${x * factor}px, ${y * factor}px)`;
+    });
+});
 
 // ── Maintenance ──
 function confirmClearStorage() {

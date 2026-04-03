@@ -40,7 +40,16 @@
     <!-- Custom Style -->
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="text-primary min-h-screen relative z-0">
+<body class="bg-black text-primary min-h-screen relative z-0">
+    <!-- Cyber-Pulse Dynamic Background -->
+    <div class="cyber-pulse-bg">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+        <div class="bg-grid"></div>
+        <div class="bg-noise"></div>
+    </div>
+
     <!-- Sidebar Overlay -->
     <div id="sidebar-overlay" onclick="toggleSidebar(false)" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] opacity-0 pointer-events-none transition-opacity duration-300"></div>
 
@@ -151,13 +160,7 @@
                     </form>
                 </div>
                 
-                <!-- Quick Distribution Info -->
-                <div class="pt-8 mt-4 border-t border-accent/10">
-                    <h4 class="text-[10px] font-black text-accent uppercase tracking-[0.25em] mb-4">Análise em Tempo Real</h4>
-                    <div id="sidebar-donut-chart" class="min-h-[250px]">
-                        <!-- ApexCharts Injection -->
-                    </div>
-                </div>
+                <!-- Quick Distribution Info (Removed as per user request to move back to main card) -->
             </div>
         </div>
     </aside>
@@ -350,8 +353,8 @@
                     </h4>
                     <span class="text-[10px] font-bold text-accent uppercase tracking-widest">Mês atual</span>
                 </div>
-                <div id="category-chart" class="space-y-3">
-                    <!-- JS Injection -->
+                <div id="category-chart" class="min-h-[350px] flex items-center justify-center">
+                    <!-- ApexCharts Injection -->
                 </div>
             </div>
         </section>
@@ -405,15 +408,6 @@
         // Initialize Chart
         initCategoryChart();
 
-        // Parallax logic
-        window.addEventListener('scroll', () => {
-            const scroll = window.scrollY;
-            const bg = document.querySelector('body');
-            if (bg) {
-                bg.style.setProperty('--scroll-y', `${scroll * 0.15}px`);
-            }
-        });
-
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js').then((reg) => {
@@ -427,5 +421,12 @@
 
     <!-- Core Logic -->
     <script src="script.js?v=2"></script>
+
+    <!-- Native Noise Filter -->
+    <svg style="display: none;">
+        <filter id="noiseFilter">
+            <feTurbulence type="fractalNoise" baseFrequency="0.6" numOctaves="3" stitchTiles="stitch" />
+        </filter>
+    </svg>
 </body>
 </html>

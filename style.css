@@ -12,6 +12,11 @@
     --accent-glow: rgba(192, 132, 252, 0.5);
     --card-hover-bg: rgba(40, 10, 75, 0.75);
     --btn-shadow: 0 4px 14px 0 rgba(192, 132, 252, 0.39);
+    
+    /* Background blob colors - Updated via JS */
+    --blob-1-bg: var(--accent);
+    --blob-2-bg: var(--secondary-accent, var(--accent));
+    --blob-3-bg: var(--accent);
 }
 
 /* Sidebar States */
@@ -54,33 +59,87 @@
     border-radius: 10px;
 }
 
+/* Cyber-Pulse Dynamic Background Engine */
+.cyber-pulse-bg {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    width: 100%; height: 100%;
+    background: radial-gradient(circle at 50% 50%, #0d001a, #000000 70%);
+    overflow: hidden;
+    z-index: -10;
+}
+
+.blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(140px); /* Massive, soft aura */
+    opacity: 0.25;
+    mix-blend-mode: screen;
+    will-change: transform;
+    transition: background 0.8s ease;
+}
+
+.blob-1 {
+    width: 100vh; height: 100vh;
+    top: -20%; left: -20%;
+    background: var(--blob-1-bg);
+    animation: drift 25s infinite alternate ease-in-out;
+}
+
+.blob-2 {
+    width: 80vh; height: 80vh;
+    bottom: -10%; right: -10%;
+    background: var(--blob-2-bg);
+    animation: drift 30s infinite alternate-reverse ease-in-out;
+}
+
+.blob-3 {
+    width: 60vh; height: 60vh;
+    top: 40%; left: 30%;
+    background: var(--blob-3-bg);
+    opacity: 0.15;
+    animation: breathe 15s infinite alternate ease-in-out;
+}
+
+.bg-grid {
+    position: absolute;
+    inset: -100px; /* Overbleed for parallax */
+    background-image: 
+        radial-gradient(var(--accent) 1px, transparent 1px);
+    background-size: 48px 48px;
+    opacity: 0.05;
+    mask-image: radial-gradient(ellipse at center, black, transparent 80%);
+    transform: translateY(calc(var(--scroll-y, 0px) * -0.2));
+    will-change: transform;
+}
+
+.bg-noise {
+    position: absolute;
+    inset: 0;
+    /* Local SVG Filter fallback + SVG Filter usage */
+    background: transparent;
+    filter: url(#noiseFilter) contrast(120%) brightness(100%);
+    mix-blend-mode: overlay;
+    opacity: 0.08; /* Slightly more subtle local noise */
+    pointer-events: none;
+}
+
+@keyframes drift {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(15%, 5%) scale(1.2); }
+}
+
+@keyframes breathe {
+    0% { transform: scale(0.8); opacity: 0.1; }
+    100% { transform: scale(1.2); opacity: 0.2; }
+}
+
 body {
     color: var(--primary-text);
     font-family: 'Inter', sans-serif;
     min-height: 100vh;
     overflow-x: hidden;
-    background: #000000; /* Absolute black base for neutrality */
-}
-
-body::before {
-    content: '';
-    position: fixed;
-    top: -10vh; left: 0; right: 0; bottom: -10vh;
-    background-image: url('./assets/cyber_motherboard_bg.jpg');
-    background-size: cover;
-    background-position: center;
-    filter: grayscale(100%) brightness(0.6) contrast(1.1); /* Increased brightness */
-    z-index: -1;
-    will-change: transform;
-    transform: translateY(calc(-1 * var(--scroll-y, 0px)));
-}
-
-body::after {
-    content: '';
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.45); /* Reduced opacity for better visibility */
-    z-index: -1;
+    background: #000000;
 }
 
 /* Glassmorphism Cyber */
@@ -188,6 +247,7 @@ input:focus, select:focus {
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
     width: 6px;
+    height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -195,12 +255,15 @@ input:focus, select:focus {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: rgba(168, 85, 247, 0.3);
+    background: var(--accent-glow);
     border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: rgba(168, 85, 247, 0.6);
+    background: var(--accent);
+    box-shadow: 0 0 10px var(--accent-glow);
 }
 
 /* Table Enhancements */
