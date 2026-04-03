@@ -231,31 +231,60 @@ button[type="submit"],
 .glass-card button {
     position: relative;
     border-bottom-width: 4px !important;
-    transition: all 0.15s cubic-bezier(0.2, 0.8, 0.2, 1.2);
+    transition: all 0.2s cubic-bezier(0.1, 0.7, 0.1, 1);
+    overflow: hidden;
+    isolation: isolate;
 }
 
 .btn-weight:hover,
 button[type="submit"]:hover,
 .glass-card button:hover {
-    transform: translateY(-1px);
-    filter: brightness(1.1);
+    transform: translateY(-2px);
+    filter: brightness(1.15);
 }
 
 .btn-weight:active,
 button[type="submit"]:active,
 .glass-card button:active {
     transform: translateY(4px) scale(0.98);
-    border-bottom-width: 0px !important;
+    border-bottom-width: 1px !important; /* Keep a tiny bit of depth when pressed */
     filter: brightness(0.9);
     box-shadow: none !important;
 }
 
-/* 3D Color Variants (Depth Shadows) */
-.btn-3d-purple { border-bottom-color: #9333ea !important; } /* purple-600 */
-.btn-3d-emerald { border-bottom-color: #059669 !important; } /* emerald-600 */
-.btn-3d-rose { border-bottom-color: #e11d48 !important; } /* rose-600 */
-.btn-3d-orange { border-bottom-color: #ea580c !important; } /* orange-600 */
-.btn-3d-accent { border-bottom-color: rgba(192, 132, 252, 0.5) !important; }
+/* Fluid Fill Bottom-to-Top Animation */
+.btn-weight::after,
+button[type="submit"]::after,
+.glass-card button::after {
+    content: "";
+    position: absolute;
+    bottom: 0; left: 0; width: 100%; height: 0;
+    z-index: -1;
+    transition: height 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+    opacity: 0.8;
+}
+
+.btn-weight:hover::after,
+button[type="submit"]:hover::after,
+.glass-card button:hover::after {
+    height: 100%;
+}
+
+/* 3D Color Variants (Depth Shadows & Fill Colors) */
+.btn-3d-purple  { border-bottom-color: #9333ea !important; }
+.btn-3d-purple::after  { background: #9333ea; }
+
+.btn-3d-emerald { border-bottom-color: #059669 !important; }
+.btn-3d-emerald::after { background: #059669; }
+
+.btn-3d-rose    { border-bottom-color: #e11d48 !important; }
+.btn-3d-rose::after    { background: #e11d48; }
+
+.btn-3d-orange  { border-bottom-color: #ea580c !important; }
+.btn-3d-orange::after  { background: #ea580c; }
+
+.btn-3d-accent  { border-bottom-color: rgba(192, 132, 252, 0.5) !important; }
+.btn-3d-accent::after  { background: var(--accent); }
 
 /* ApexCharts Overrides for High-Tech look */
 .apexcharts-canvas {
