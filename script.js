@@ -26,6 +26,10 @@ let timerInterval;
 let secondsElapsed = parseInt(localStorage.getItem('timerSeconds')) || 0;
 let editId = null;
 
+// Pomodoro state
+let pomodoroMode = false;
+let pomodoroDuration = 1500; // 25 min default
+
 
 
 // Initialization
@@ -36,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setDefaultDate();
     setupSearch();
     renderQuickFills();
+    setupKeyboardShortcuts();
     
     if (secondsElapsed > 0) {
         document.getElementById('timer-text').innerText = formatTime(secondsElapsed);
@@ -56,25 +61,53 @@ function setDefaultDate() {
 
 // Timer Logic
 function toggleTimer() {
-    const btnLabel = document.getElementById('timer-btn-label');
-    const btnIcon = document.getElementById('timer-icon');
-    const timerEl = document.getElementById('timer-text');
+    const btnLabel  = document.getElementById('timer-btn-label');
+    const btnIcon   = document.getElementById('timer-icon');
+    const timerEl   = document.getElementById('timer-text');
     const btnToggle = document.getElementById('btn-timer-toggle');
+    const banner    = document.getElementById('pomodoro-banner');
 
     if (!timerRunning) {
-        // Start
+        // — Start —
         timerRunning = true;
-        btnLabel.innerText = 'Parar';
-        btnToggle.classList.replace('bg-accent', 'bg-danger');
-        btnToggle.classList.replace('hover:bg-purple-600', 'hover:bg-red-600');
-        btnIcon.innerHTML = `<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1V8a1 1 0 00-1-1H8z" clip-rule="evenodd"/>`;
-        timerEl.classList.add('animate-pulse-subtle', 'text-accent');
+        if (banner) banner.classList.add('hidden');
 
-        timerInterval = setInterval(() => {
-            secondsElapsed++;
-            timerEl.innerText = formatTime(secondsElapsed);
-            localStorage.setItem('timerSeconds', secondsElapsed);
-        }, 1000);
+        // Button label / icon
+        btnLabel.innerText = 'Parar';
+        btnIcon.innerHTML  = `<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1V8a1 1 0 00-1-1H8z" clip-rule="evenodd"/>`;
+
+        if (pomodoroMode) {
+            // Pomodoro: orange style
+            btnToggle.style.cssText = 'background:#f97316;border-color:#fb923c;box-shadow:0 0 20px rgba(249,115,22,0.5);';
+            timerEl.style.textShadow = '0 0 30px rgba(249,115,22,0.7)';
+            timerEl.style.color = '#fb923c';
+            // Init countdown from duration if fresh
+            if (secondsElapsed === 0) secondsElapsed = pomodoroDuration;
+
+            timerInterval = setInterval(() => {
+                secondsElapsed--;
+                timerEl.innerText = formatTime(secondsElapsed);
+                localStorage.setItem('timerSeconds', secondsElapsed);
+                if (secondsElapsed <= 0) {
+                    stopTimer();
+                    playPomodoroBeep();
+                    if (banner) banner.classList.remove('hidden');
+                }
+            }, 1000);
+        } else {
+            // Free mode: purple style
+            btnToggle.style.cssText = '';
+            btnToggle.classList.add('bg-danger');
+            timerEl.classList.add('animate-pulse-subtle');
+            timerEl.style.color = '';
+            timerEl.style.textShadow = '0 0 30px rgba(192,132,252,0.5)';
+
+            timerInterval = setInterval(() => {
+                secondsElapsed++;
+                timerEl.innerText = formatTime(secondsElapsed);
+                localStorage.setItem('timerSeconds', secondsElapsed);
+            }, 1000);
+        }
     } else {
         stopTimer();
     }
@@ -83,32 +116,124 @@ function toggleTimer() {
 function stopTimer() {
     clearInterval(timerInterval);
     timerRunning = false;
-    
-    const btnLabel = document.getElementById('timer-btn-label');
-    const btnIcon = document.getElementById('timer-icon');
-    const timerEl = document.getElementById('timer-text');
+
+    const btnLabel  = document.getElementById('timer-btn-label');
+    const btnIcon   = document.getElementById('timer-icon');
+    const timerEl   = document.getElementById('timer-text');
     const btnToggle = document.getElementById('btn-timer-toggle');
 
     btnLabel.innerText = 'Iniciar';
-    btnToggle.classList.replace('bg-danger', 'bg-accent');
-    btnToggle.classList.replace('hover:bg-red-600', 'hover:bg-purple-600');
-    btnIcon.innerHTML = `<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/>`;
-    timerEl.classList.remove('animate-pulse-subtle', 'text-accent');
+    btnIcon.innerHTML  = `<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/>`;
+
+    // Reset button style
+    btnToggle.style.cssText = '';
+    btnToggle.classList.remove('bg-danger');
+    timerEl.classList.remove('animate-pulse-subtle');
+
+    if (!pomodoroMode) {
+        timerEl.style.color = '';
+        timerEl.style.textShadow = '0 0 30px rgba(192,132,252,0.5)';
+    }
+}
+
+function setTimerMode(mode) {
+    if (timerRunning) stopTimer();
+    secondsElapsed = 0;
+    localStorage.removeItem('timerSeconds');
+
+    const timerEl   = document.getElementById('timer-text');
+    const label     = document.getElementById('timer-mode-label');
+    const config    = document.getElementById('pomodoro-config');
+    const btnFree   = document.getElementById('mode-free');
+    const btnPomo   = document.getElementById('mode-pomodoro');
+    const banner    = document.getElementById('pomodoro-banner');
+
+    if (banner) banner.classList.add('hidden');
+    pomodoroMode = (mode === 'pomodoro');
+
+    if (pomodoroMode) {
+        // Activate Pomodoro UI
+        btnPomo.classList.add('bg-orange-500', 'text-white', 'shadow-[0_0_12px_rgba(249,115,22,0.5)]');
+        btnPomo.classList.remove('text-violet-400');
+        btnFree.classList.remove('bg-accent', 'text-white', 'shadow-[0_0_12px_rgba(192,132,252,0.4)]');
+        btnFree.classList.add('text-violet-400');
+        config.classList.remove('hidden');
+        label.innerText = '🍅 Modo Pomodoro';
+        timerEl.style.color = '#fb923c';
+        timerEl.style.textShadow = '0 0 30px rgba(249,115,22,0.5)';
+        timerEl.innerText = formatTime(pomodoroDuration);
+    } else {
+        // Activate Free mode UI
+        btnFree.classList.add('bg-accent', 'text-white', 'shadow-[0_0_12px_rgba(192,132,252,0.4)]');
+        btnFree.classList.remove('text-violet-400');
+        btnPomo.classList.remove('bg-orange-500', 'text-white', 'shadow-[0_0_12px_rgba(249,115,22,0.5)]');
+        btnPomo.classList.add('text-violet-400');
+        config.classList.add('hidden');
+        label.innerText = 'Processo Ativo';
+        timerEl.style.color = '';
+        timerEl.style.textShadow = '0 0 30px rgba(192,132,252,0.5)';
+        timerEl.innerText = '00:00:00';
+    }
+}
+
+function updatePomodoroDuration() {
+    const sel = document.getElementById('pomodoro-duration');
+    pomodoroDuration = parseInt(sel.value);
+    if (!timerRunning) {
+        secondsElapsed = 0;
+        document.getElementById('timer-text').innerText = formatTime(pomodoroDuration);
+    }
+}
+
+function playPomodoroBeep() {
+    try {
+        const ctx  = new (window.AudioContext || window.webkitAudioContext)();
+        const osc  = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type      = 'sine';
+        osc.frequency.setValueAtTime(880, ctx.currentTime);
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.5);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 1.5);
+    } catch(e) { /* AudioContext not available */ }
+}
+
+// Keyboard Shortcuts
+function setupKeyboardShortcuts() {
+    document.addEventListener('keydown', (e) => {
+        const tag = document.activeElement.tagName.toLowerCase();
+        const isTyping = ['input','textarea','select'].includes(tag);
+        if (isTyping) return;
+
+        if (e.code === 'Space') {
+            e.preventDefault();
+            toggleTimer();
+        }
+        if (e.code === 'Enter') {
+            e.preventDefault();
+            const form = document.getElementById('entry-form');
+            if (form) form.requestSubmit();
+        }
+    });
 }
 
 function saveTimerToForm() {
     if (secondsElapsed === 0) return;
-    
-    const now = new Date();
-    const endH = now.getHours().toString().padStart(2, '0');
-    const endM = now.getMinutes().toString().padStart(2, '0');
-    
-    const startNow = new Date(now.getTime() - secondsElapsed * 1000);
+    const elapsed = pomodoroMode ? (pomodoroDuration - secondsElapsed) : secondsElapsed;
+    if (elapsed <= 0) return;
+
+    const now    = new Date();
+    const endH   = now.getHours().toString().padStart(2, '0');
+    const endM   = now.getMinutes().toString().padStart(2, '0');
+    const startNow = new Date(now.getTime() - elapsed * 1000);
     const startH = startNow.getHours().toString().padStart(2, '0');
     const startM = startNow.getMinutes().toString().padStart(2, '0');
-    
+
     document.getElementById('form-start').value = `${startH}:${startM}`;
-    document.getElementById('form-end').value = `${endH}:${endM}`;
+    document.getElementById('form-end').value   = `${endH}:${endM}`;
     document.getElementById('entry-form').scrollIntoView({ behavior: 'smooth' });
 }
 
@@ -116,7 +241,10 @@ function resetTimer() {
     stopTimer();
     secondsElapsed = 0;
     localStorage.removeItem('timerSeconds');
-    document.getElementById('timer-text').innerText = "00:00:00";
+    const timerEl = document.getElementById('timer-text');
+    const banner  = document.getElementById('pomodoro-banner');
+    if (banner) banner.classList.add('hidden');
+    timerEl.innerText = pomodoroMode ? formatTime(pomodoroDuration) : '00:00:00';
 }
 
 function formatTime(sec) {
@@ -125,6 +253,7 @@ function formatTime(sec) {
     const s = (sec % 60).toString().padStart(2, '0');
     return `${h}:${m}:${s}`;
 }
+
 
 // CRUD Logic
 function saveEntry(e) {
@@ -332,6 +461,8 @@ function updateDashboard() {
     document.getElementById('card-day').innerText   = minToTime(dayTotal)  + 'h';
     document.getElementById('card-week').innerText  = minToTime(weekTotal) + 'h';
     document.getElementById('card-month').innerText = minToTime(monthTotalMin) + 'h';
+
+    renderCategoryChart(currentYear, currentMonth);
 }
 
 
@@ -345,6 +476,59 @@ function minToTime(min) {
     const h = Math.floor(min / 60).toString().padStart(2, '0');
     const m = (min % 60).toString().padStart(2, '0');
     return `${h}:${m}`;
+}
+
+// Category Distribution Chart
+function renderCategoryChart(year, month) {
+    const container = document.getElementById('category-chart');
+    if (!container) return;
+
+    // Filter entries for current month
+    const monthEntries = entries.filter(e => {
+        const d = new Date(e.date + 'T00:00:00');
+        return d.getFullYear() === year && d.getMonth() === month;
+    });
+
+    if (monthEntries.length === 0) {
+        container.innerHTML = `<p class="text-xs text-violet-400/50 font-bold uppercase tracking-widest text-center py-4">Nenhum registro no mês atual</p>`;
+        return;
+    }
+
+    // Group by category
+    const catMap = {};
+    monthEntries.forEach(e => {
+        const key = e.category || 'Geral';
+        catMap[key] = (catMap[key] || 0) + timeToMin(e.total);
+    });
+
+    // Sort descending
+    const sorted = Object.entries(catMap).sort((a, b) => b[1] - a[1]);
+    const maxMin = sorted[0][1];
+
+    container.innerHTML = '';
+    sorted.forEach(([name, mins]) => {
+        const pct     = Math.round((mins / maxMin) * 100);
+        const cat     = categories.find(c => c.name === name);
+        const color   = cat ? cat.color : '#c084fc';
+        const r = parseInt(color.slice(1,3), 16);
+        const g = parseInt(color.slice(3,5), 16);
+        const b = parseInt(color.slice(5,7), 16);
+        const hLabel  = minToTime(mins) + 'h';
+        const pctLabel = pct + '%';
+
+        const row = document.createElement('div');
+        row.className = 'flex items-center gap-3 group';
+        row.innerHTML = `
+            <span class="text-[11px] font-bold w-40 shrink-0 truncate" style="color:rgb(${r},${g},${b})">${name}</span>
+            <div class="flex-1 h-5 bg-[rgba(15,0,28,0.4)] rounded-full overflow-hidden border border-violet-500/10">
+                <div class="h-full rounded-full transition-all duration-700"
+                    style="width:${pct}%;background:rgba(${r},${g},${b},0.7);box-shadow:0 0 8px rgba(${r},${g},${b},0.4);"></div>
+            </div>
+            <span class="text-[11px] font-black tabular-nums w-14 text-right" style="color:rgb(${r},${g},${b})">${hLabel}</span>
+            <span class="text-[10px] font-bold text-violet-400/50 w-8 text-right">${pctLabel}</span>
+        `;
+        container.appendChild(row);
+    });
 }
 
 // Category Manager
