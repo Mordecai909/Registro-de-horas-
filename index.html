@@ -61,38 +61,38 @@
         
         <!-- Dashboard Stats -->
         <section class="lg:col-span-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <!-- Total Dia (Microchip node) -->
-            <div class="glass-card p-6 relative overflow-hidden group">
-                <div class="absolute -top-4 -right-2 p-6 dashboard-icon text-accent opacity-20">
+            <!-- Total Dia -->
+            <div class="glass-card p-6 relative overflow-hidden group flex flex-col items-center justify-center text-center gap-2">
+                <div class="absolute -bottom-3 -right-3 dashboard-icon text-accent opacity-15">
                     <svg class="w-24 h-24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" /></svg>
                 </div>
-                <p class="text-xs font-bold uppercase tracking-wider text-violet-400 mb-1">Upload Diário</p>
-                <h3 class="text-3xl font-display font-extrabold text-white" id="card-day">00:00h</h3>
-                <div class="mt-2 flex items-center text-[10px] text-success font-bold uppercase tracking-widest">
-                    <span class="w-2 h-2 rounded-full bg-success mr-2 shadow-[0_0_8px_#34d399] animate-pulse"></span>
+                <p class="text-[11px] font-black uppercase tracking-[0.2em] text-violet-400">Upload Diário</p>
+                <h3 class="text-4xl font-display font-extrabold text-white drop-shadow-[0_0_12px_rgba(192,132,252,0.4)]" id="card-day">00:00h</h3>
+                <div class="flex items-center gap-1.5 text-[10px] text-success font-bold uppercase tracking-widest">
+                    <span class="w-2 h-2 rounded-full bg-success shadow-[0_0_8px_#34d399] animate-pulse"></span>
                     Sincronizado
                 </div>
             </div>
 
-            <!-- Total Semana (Network connections) -->
-            <div class="glass-card p-6 relative overflow-hidden group">
-                <div class="absolute -top-4 -right-2 p-6 dashboard-icon text-fuchsia-400 opacity-20">
+            <!-- Total Semana -->
+            <div class="glass-card p-6 relative overflow-hidden group flex flex-col items-center justify-center text-center gap-2">
+                <div class="absolute -bottom-3 -right-3 dashboard-icon text-fuchsia-400 opacity-15">
                     <svg class="w-24 h-24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" /></svg>
                 </div>
-                <p class="text-xs font-bold uppercase tracking-wider text-violet-400 mb-1">Tráfego Semanal</p>
-                <h3 class="text-3xl font-display font-extrabold text-white" id="card-week">00:00h</h3>
-                <div class="mt-2 text-[10px] text-violet-300 font-bold uppercase tracking-widest">Alvo 15:00h</div>
+                <p class="text-[11px] font-black uppercase tracking-[0.2em] text-violet-400">Tráfego Semanal</p>
+                <h3 class="text-4xl font-display font-extrabold text-white drop-shadow-[0_0_12px_rgba(192,132,252,0.4)]" id="card-week">00:00h</h3>
+                <div class="text-[10px] text-violet-300 font-bold uppercase tracking-widest">Alvo 15:00h</div>
             </div>
 
             <!-- Total do Mês -->
-            <div class="glass-card p-6 relative overflow-hidden group">
-                <div class="absolute -top-4 -right-2 p-6 dashboard-icon text-emerald-400 opacity-20">
+            <div class="glass-card p-6 relative overflow-hidden group flex flex-col items-center justify-center text-center gap-2">
+                <div class="absolute -bottom-3 -right-3 dashboard-icon text-emerald-400 opacity-15">
                     <svg class="w-24 h-24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                 </div>
-                <p class="text-xs font-bold uppercase tracking-wider text-violet-400 mb-1">Total do Mês</p>
-                <h3 class="text-3xl font-display font-extrabold text-emerald-400 drop-shadow-[0_0_10px_rgba(52,211,153,0.5)]" id="card-month">00:00h</h3>
-                <div class="mt-2 flex items-center text-[10px] text-emerald-400/80 font-bold uppercase tracking-widest">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400 mr-2 shadow-[0_0_8px_#34d399]"></span>
+                <p class="text-[11px] font-black uppercase tracking-[0.2em] text-violet-400">Total do Mês</p>
+                <h3 class="text-4xl font-display font-extrabold text-emerald-400 drop-shadow-[0_0_12px_rgba(52,211,153,0.5)]" id="card-month">00:00h</h3>
+                <div class="flex items-center gap-1.5 text-[10px] text-emerald-400/80 font-bold uppercase tracking-widest">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
                     <span id="card-month-label">Horas no mês atual</span>
                 </div>
             </div>
