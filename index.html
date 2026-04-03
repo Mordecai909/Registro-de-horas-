@@ -47,7 +47,7 @@
         <!-- Sidebar Header -->
         <div class="px-8 mb-10 flex items-center justify-between">
             <h2 class="text-xl font-display font-black text-white tracking-tight">
-                MENU<span class="text-accent underline underline-offset-4 decoration-violet-500/40">SISTEMA</span>
+                MENU<span class="text-accent underline underline-offset-4 decoration-accent/40">SISTEMA</span>
             </h2>
             <button onclick="toggleSidebar(false)" class="p-2 text-violet-400 hover:text-white transition-colors">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
@@ -56,22 +56,22 @@
 
         <!-- Sidebar Navigation Items -->
         <div class="flex-1 px-4 space-y-2">
-            <button onclick="toggleSidebar(false)" class="w-full text-left px-4 py-4 rounded-2xl flex items-center gap-4 text-sm font-bold text-violet-100 hover:bg-violet-500/10 hover:text-accent transition-all group border border-transparent hover:border-violet-500/10">
-                <div class="p-2 bg-violet-500/10 rounded-xl group-hover:scale-110 transition-transform">
+            <button onclick="toggleSidebar(false)" class="w-full text-left px-4 py-4 rounded-2xl flex items-center gap-4 text-sm font-bold text-violet-100 hover:bg-accent/10 hover:text-accent transition-all group border border-transparent hover:border-accent/10">
+                <div class="p-2 bg-accent/10 rounded-xl group-hover:scale-110 transition-transform">
                     <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
                 </div>
                 Início / Resumo
             </button>
 
-            <button id="theme-switch-btn" onclick="changeTheme()" class="w-full text-left px-4 py-4 rounded-2xl flex items-center gap-4 text-sm font-bold text-violet-100 hover:bg-violet-500/10 hover:text-accent transition-all group border border-transparent hover:border-violet-500/10">
+            <button id="theme-switch-btn" onclick="changeTheme()" class="w-full text-left px-4 py-4 rounded-2xl flex items-center gap-4 text-sm font-bold text-violet-100 hover:bg-accent/10 hover:text-accent transition-all group border border-transparent hover:border-accent/10">
                 <div id="theme-icon-container" class="p-2 bg-accent/20 rounded-xl group-hover:scale-110 transition-transform border border-accent/20">
                     <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" /></svg>
                 </div>
                 Trocar Tema (Cores)
             </button>
 
-            <button id="pwa-install-btn" onclick="installApp()" class="hidden w-full text-left px-4 py-4 rounded-2xl flex items-center gap-4 text-sm font-bold text-violet-100 hover:bg-violet-500/10 hover:text-accent transition-all group border border-transparent hover:border-violet-500/10">
-                <div class="p-2 bg-violet-500/10 rounded-xl group-hover:scale-110 transition-transform">
+            <button id="pwa-install-btn" onclick="installApp()" class="hidden w-full text-left px-4 py-4 rounded-2xl flex items-center gap-4 text-sm font-bold text-violet-100 hover:bg-accent/10 hover:text-accent transition-all group border border-transparent hover:border-accent/10">
+                <div class="p-2 bg-accent/10 rounded-xl group-hover:scale-110 transition-transform">
                     <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
                 </div>
                 Baixar Aplicativo (PWA)
@@ -86,7 +86,7 @@
         </div>
 
         <!-- Sidebar footer -->
-        <div class="p-8 border-t border-violet-500/10">
+        <div class="p-8 border-t border-accent/10">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-full bg-accent/20 border border-accent/30 flex items-center justify-center text-accent">
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" /></svg>
@@ -100,14 +100,14 @@
     </nav>
 
     <!-- Header -->
-    <header class="w-full py-6 px-6 bg-[rgba(15,0,28,0.6)] backdrop-blur-xl border-b border-violet-500/20 sticky top-0 z-50">
+    <header class="w-full py-6 px-6 bg-[var(--card-bg)] backdrop-blur-xl border-b border-accent/20 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <div class="flex items-center gap-4">
-                <button onclick="toggleSidebar(true)" class="p-2.5 rounded-xl bg-violet-500/10 border border-violet-500/20 text-accent hover:bg-accent hover:text-white transition-all shadow-[0_0_15px_rgba(192,132,252,0.1)] hover:shadow-[0_0_20px_rgba(192,132,252,0.4)]">
+                <button onclick="toggleSidebar(true)" class="p-2.5 rounded-xl bg-accent/10 border border-accent/20 text-accent hover:bg-accent hover:text-white transition-all shadow-[0_0_15px_accent_glow] hover:shadow-[0_0_20px_accent_glow]">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16" /></svg>
                 </button>
                 <h1 class="text-2xl font-display font-extrabold tracking-tight text-white shadow-neon">
-                    Time<span class="text-accent underline decoration-violet-500/40 underline-offset-4">Tracker</span>
+                    Time<span class="text-accent underline decoration-accent/40 underline-offset-4">Tracker</span>
                 </h1>
             </div>
             <div class="flex items-center gap-4">
