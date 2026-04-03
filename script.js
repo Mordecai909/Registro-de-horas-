@@ -197,7 +197,7 @@ function setTimerMode(mode) {
 
         // Button text color  
         btnPomo.style.color = '#fff';
-        btnFree.style.color = 'rgba(192,132,252,0.7)';
+        btnFree.style.color = 'var(--accent)'; 
 
         // Label + timer color
         label.innerText = '🍅 Modo Pomodoro';
@@ -209,7 +209,7 @@ function setTimerMode(mode) {
         // Remove nudge
         nudgeEls.forEach(el => el.classList.remove('timer-nudge-down'));
 
-        // Slide indicator to Free (violet)
+        // Slide indicator to Free
         requestAnimationFrame(() => slideIndicator(btnFree, 'is-free'));
 
         // Hide duration config
@@ -217,13 +217,13 @@ function setTimerMode(mode) {
 
         // Button text color
         btnFree.style.color = '#fff';
-        btnPomo.style.color = 'rgba(167,139,250,0.7)';
+        btnPomo.style.color = 'var(--accent)'; 
 
         // Label + timer color
         label.innerText = 'Processo Ativo';
         label.style.color = '';
         timerEl.style.color = '';
-        timerEl.style.textShadow = '0 0 30px rgba(192,132,252,0.5)';
+        timerEl.style.textShadow = '0 0 30px var(--accent-glow)';
         timerEl.innerText = '00:00:00';
     }
 }

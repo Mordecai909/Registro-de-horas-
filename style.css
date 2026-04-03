@@ -42,7 +42,7 @@ body {
     font-family: 'Inter', sans-serif;
     min-height: 100vh;
     overflow-x: hidden;
-    background: #0f001c; /* Pure dark base */
+    background: #000000; /* Absolute black base for neutrality */
 }
 
 body::before {
