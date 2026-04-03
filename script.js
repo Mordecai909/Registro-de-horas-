@@ -712,11 +712,11 @@ function toggleSidebar(show) {
 
 // ── Theme Management ──
 const themes = [
-    { name: 'Violet', accent: '#c084fc', glow: 'rgba(192, 132, 252, 0.5)', cardBg: 'rgba(22, 5, 43, 0.65)' },
-    { name: 'Cyan', accent: '#22d3ee', glow: 'rgba(34, 211, 238, 0.5)', cardBg: 'rgba(5, 25, 40, 0.7)' },
-    { name: 'Emerald', accent: '#34d399', glow: 'rgba(52, 211, 153, 0.5)', cardBg: 'rgba(5, 35, 20, 0.7)' },
-    { name: 'Rose', accent: '#fb7185', glow: 'rgba(251, 113, 133, 0.5)', cardBg: 'rgba(35, 5, 15, 0.7)' },
-    { name: 'Amber', accent: '#fbbf24', glow: 'rgba(251, 191, 36, 0.5)', cardBg: 'rgba(35, 25, 5, 0.7)' }
+    { name: 'Violet', accent: '#c084fc', glow: 'rgba(192, 132, 252, 0.5)', cardBg: 'rgba(22, 5, 43, 0.65)', cardHoverBg: 'rgba(40, 10, 75, 0.75)' },
+    { name: 'Cyan', accent: '#22d3ee', glow: 'rgba(34, 211, 238, 0.5)', cardBg: 'rgba(5, 25, 40, 0.7)', cardHoverBg: 'rgba(10, 50, 75, 0.75)' },
+    { name: 'Emerald', accent: '#34d399', glow: 'rgba(52, 211, 153, 0.5)', cardBg: 'rgba(5, 35, 20, 0.7)', cardHoverBg: 'rgba(10, 75, 50, 0.75)' },
+    { name: 'Rose', accent: '#fb7185', glow: 'rgba(251, 113, 133, 0.5)', cardBg: 'rgba(35, 5, 15, 0.7)', cardHoverBg: 'rgba(75, 10, 30, 0.75)' },
+    { name: 'Amber', accent: '#fbbf24', glow: 'rgba(251, 191, 36, 0.5)', cardBg: 'rgba(35, 25, 5, 0.7)', cardHoverBg: 'rgba(75, 55, 10, 0.75)' }
 ];
 let currentThemeIdx = 0;
 
@@ -728,6 +728,7 @@ function changeTheme() {
     document.documentElement.style.setProperty('--accent', theme.accent);
     document.documentElement.style.setProperty('--accent-glow', theme.glow);
     document.documentElement.style.setProperty('--card-bg', theme.cardBg);
+    document.documentElement.style.setProperty('--card-hover-bg', theme.cardHoverBg);
     
     // Update PWA meta theme color
     const metaTheme = document.querySelector('meta[name="theme-color"]');
