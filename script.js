@@ -214,8 +214,8 @@ function setTimerMode(mode) {
         btnFree.style.color = 'var(--accent)'; 
 
         // Label + timer color
-        label.innerText = '🍅 Modo Pomodoro';
-        label.style.color = '#fb923c';
+        label.classList.remove('is-free');
+        label.classList.add('is-pomodoro');
         timerEl.style.color = '#fb923c';
         timerEl.style.textShadow = '0 0 30px rgba(249,115,22,0.5)';
         timerEl.innerText = formatTime(pomodoroDuration);
@@ -234,8 +234,8 @@ function setTimerMode(mode) {
         btnPomo.style.color = 'var(--accent)'; 
 
         // Label + timer color
-        label.innerText = 'Processo Ativo';
-        label.style.color = '';
+        label.classList.remove('is-pomodoro');
+        label.classList.add('is-free');
         timerEl.style.color = '';
         timerEl.style.textShadow = '0 0 30px var(--accent-glow)';
         timerEl.innerText = '00:00:00';
@@ -793,17 +793,29 @@ function toggleSidebar(show) {
     }
 }
 
+function closeAllSidebars() {
+    toggleSidebar(false);
+    toggleRightSidebar(false);
+}
+
 // ── Right Sidebar controls ──
 function toggleRightSidebar(lock) {
     const sidebar = document.getElementById('right-sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
     if (!sidebar) return;
     
     if (lock) {
         sidebar.classList.add('sidebar-lock');
         sidebar.classList.add('sidebar-open'); // For mobile
+        if (overlay) overlay.classList.add('overlay-visible');
     } else {
         sidebar.classList.remove('sidebar-lock');
         sidebar.classList.remove('sidebar-open');
+        // Only hide overlay if left sidebar is also closed
+        const leftSidebar = document.getElementById('sidebar-menu');
+        if (overlay && (!leftSidebar || !leftSidebar.classList.contains('sidebar-open'))) {
+            overlay.classList.remove('overlay-visible');
+        }
     }
 }
 

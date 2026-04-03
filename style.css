@@ -486,3 +486,75 @@ input:focus, select:focus {
     transform: scale(1) translateY(0);
     pointer-events: auto;
 }
+
+/* ─── Mode Label Sliding Push Animation ──────────────────── */
+.mode-label-mask {
+    width: 260px; /* Adjusted width for tighter alignment */
+    height: 24px;
+    overflow: hidden;
+    position: relative;
+    /* Edge Blurring via Backdrop Filter Overlays */
+    isolation: isolate;
+}
+
+.mode-label-mask::before,
+.mode-label-mask::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 30px; /* Approximately one letter width */
+    z-index: 10;
+    pointer-events: none;
+}
+
+.mode-label-mask::before {
+    left: 0;
+    background: linear-gradient(to right, var(--bg-main, #0f001c), transparent);
+    backdrop-filter: blur(4px);
+    mask-image: linear-gradient(to right, black, transparent);
+}
+
+.mode-label-mask::after {
+    right: 0;
+    background: linear-gradient(to left, var(--bg-main, #0f001c), transparent);
+    backdrop-filter: blur(4px);
+    mask-image: linear-gradient(to left, black, transparent);
+}
+
+.mode-label-track {
+    display: flex;
+    width: 520px; /* 2x mask width */
+    height: 100%;
+    transition: transform 0.6s cubic-bezier(0.34, 1.3, 0.64, 1);
+}
+
+.mode-text-item {
+    width: 260px; /* Match mask width exactly */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    transition: opacity 0.4s ease, filter 0.4s ease, transform 0.6s ease;
+}
+
+/* Slide Positions */
+.mode-label-track.is-free {
+    transform: translateX(0);
+}
+
+.mode-label-track.is-pomodoro {
+    transform: translateX(-50%);
+}
+
+/* Fade effects for the non-active state */
+.mode-label-track.is-free .item-pomo,
+.mode-label-track.is-pomodoro .item-free {
+    opacity: 0.2;
+    filter: blur(2px);
+}
+
+/* Override existing #timer-mode-label transition to include transform for sliding */
+#timer-mode-label {
+    transition: transform 0.5s cubic-bezier(0.34, 1.25, 0.64, 1) !important;
+}
