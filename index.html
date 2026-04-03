@@ -13,6 +13,8 @@
     
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- ApexCharts -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <!-- Configuração do Tailwind -->
     <script>
         tailwind.config = {
@@ -98,6 +100,64 @@
             </div>
         </div>
     </nav>
+    
+    <!-- Right Sidebar (Expandable Tags & Categories) -->
+    <aside id="right-sidebar" class="fixed top-0 right-0 h-full w-80 z-[70] bg-[rgba(15,0,28,0.95)] backdrop-blur-3xl border-l border-accent/20 translate-x-[calc(100%-12px)] hover:translate-x-0 transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] shadow-[-20px_0_50px_rgba(0,0,0,0.8)] flex flex-col group/sidebar">
+        <!-- Interaction Handle (Visible part) -->
+        <div class="absolute left-0 top-1/2 -translate-y-1/2 w-3 h-24 bg-accent/20 rounded-l-full group-hover/sidebar:bg-accent/40 transition-colors cursor-pointer flex items-center justify-center">
+            <div class="w-1 h-8 bg-accent/40 rounded-full"></div>
+        </div>
+
+        <div class="p-8 flex-1 overflow-y-auto">
+            <div class="flex items-center justify-between mb-8">
+                <h2 class="text-xl font-display font-black text-white tracking-tight flex items-center gap-3">
+                    <div class="p-2 bg-accent/10 rounded-xl text-accent">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
+                    </div>
+                    ESTATÍSTICAS
+                </h2>
+                <button onclick="toggleRightSidebar(false)" class="p-2 text-accent/50 hover:text-white transition-colors lg:hidden">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+
+            <!-- Tags & Categories Card Refactored -->
+            <div class="space-y-6">
+                <div>
+                    <h4 class="text-[10px] font-black text-accent uppercase tracking-[0.25em] mb-4">Tags Ativas</h4>
+                    <div id="category-list-container" class="flex flex-wrap gap-2 min-h-[2rem]">
+                        <!-- JS Injection -->
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-accent/10">
+                    <h4 class="text-[10px] font-black text-accent uppercase tracking-[0.25em] mb-4">Novo Protocolo</h4>
+                    <form id="category-form" onsubmit="addCategory(event)" class="space-y-3">
+                        <div class="flex gap-2">
+                            <input type="text" id="cat-name" placeholder="Nome da tag..." required
+                                class="flex-1 px-4 py-2.5 text-xs placeholder-accent/30 bg-[rgba(15,0,28,0.4)] border border-accent/30 text-white rounded-xl focus:outline-none focus:border-accent">
+                            <label for="cat-color" class="w-10 h-10 flex-shrink-0 rounded-xl overflow-hidden border border-accent/40 hover:border-accent cursor-pointer transition-all">
+                                <input type="color" id="cat-color" value="#c084fc" class="w-[150%] h-[150%] -translate-x-1/4 -translate-y-1/4 border-none p-0 cursor-pointer">
+                            </label>
+                        </div>
+                        <button type="submit"
+                            class="w-full py-2.5 bg-accent/15 hover:bg-accent text-accent hover:text-white rounded-xl text-xs font-bold transition-all border border-accent/30 flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" /></svg>
+                            Adicionar Tag
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Quick Distribution Info -->
+                <div class="pt-8 mt-4 border-t border-accent/10">
+                    <h4 class="text-[10px] font-black text-accent uppercase tracking-[0.25em] mb-4">Análise em Tempo Real</h4>
+                    <div id="sidebar-donut-chart" class="min-h-[250px]">
+                        <!-- ApexCharts Injection -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aside>
 
     <!-- Header -->
     <header class="w-full py-6 px-6 bg-[var(--card-bg)] backdrop-blur-xl border-b border-accent/20 sticky top-0 z-50">
@@ -115,9 +175,9 @@
                     <span class="text-sm font-semibold text-accent/90" id="current-date-display">Carregando...</span>
                     <span class="text-[10px] uppercase tracking-widest text-accent font-bold">Residência Cibernética</span>
                 </div>
-                <div class="h-10 w-10 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent shadow-[0_0_15px_accent_glow]">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                </div>
+                <button onclick="toggleRightSidebar(true)" class="h-10 w-10 btn-weight rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent shadow-[0_0_15px_accent_glow] hover:bg-accent/20 transition-all">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" /></svg>
+                </button>
             </div>
         </div>
     </header>
@@ -125,7 +185,7 @@
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 grid grid-cols-1 lg:grid-cols-12 gap-8">
         
         <!-- Dashboard Stats -->
-        <section class="lg:col-span-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <section class="lg:col-span-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <!-- Total Dia -->
             <div class="glass-card p-6 relative overflow-hidden group flex flex-col items-center text-center gap-3 pt-6">
                 <!-- Icon top center -->
@@ -166,36 +226,6 @@
                     <span class="w-2 h-2 rounded-full bg-accent shadow-[0_0_8px_accent_glow]"></span>
                     <span id="card-month-label">Horas no mês atual</span>
                 </div>
-            </div>
-
-
-            <!-- Tags & Categories Card -->
-            <div class="glass-card p-5 pb-7 border border-accent/20">
-                <h4 class="text-sm font-bold text-white mb-4 flex items-center gap-2">
-                    <div class="p-1.5 bg-accent/10 rounded-lg text-accent">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
-                    </div>
-                    Tags &amp; Categorias
-                </h4>
-
-                <!-- Category List -->
-                <div id="category-list-container" class="flex flex-wrap gap-2 mb-4 min-h-[2rem]">
-                    <!-- JS Injection -->
-                </div>
-
-                <!-- Add Category mini-form -->
-                <form id="category-form" onsubmit="addCategory(event)" class="flex gap-1.5 items-center mt-2">
-                    <input type="text" id="cat-name" placeholder="Nova categoria..." required
-                        class="flex-1 px-2.5 py-1.5 text-xs placeholder-accent/30 bg-[rgba(15,0,28,0.4)] border border-accent/30 text-white rounded-lg focus:outline-none focus:border-accent">
-                    <!-- Color Picker via label nativo -->
-                    <label for="cat-color" class="w-7 h-7 flex-shrink-0 rounded-md overflow-hidden border border-accent/40 hover:border-accent cursor-pointer transition-all" style="display:block;">
-                        <input type="color" id="cat-color" value="#c084fc" style="display:block;width:100%;height:100%;border:none;padding:0;cursor:pointer;">
-                    </label>
-                    <button type="submit"
-                        class="w-7 h-7 flex-shrink-0 bg-accent/20 hover:bg-accent text-accent hover:text-white rounded-md transition-all border border-accent/30 flex items-center justify-center">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" /></svg>
-                    </button>
-                </form>
             </div>
         </section>
 
@@ -240,17 +270,17 @@
 
                 <div class="flex gap-3 w-full timer-buttons-row">
                     <button id="btn-timer-toggle" onclick="toggleTimer()"
-                        class="flex-1 py-5 bg-accent hover:opacity-80 text-white rounded-2xl font-bold text-base border border-accent/50 shadow-[0_0_20px_accent_glow] hover:shadow-[0_0_30px_accent_glow] transition-all flex items-center justify-center gap-2 group relative">
+                        class="btn-weight flex-1 py-5 bg-accent hover:opacity-80 text-[#0f001c] rounded-2xl font-bold text-base border border-accent/50 shadow-[0_0_20px_accent_glow] hover:shadow-[0_0_30px_accent_glow] transition-all flex items-center justify-center gap-2 group relative">
                         <svg id="timer-icon" class="w-5 h-5 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/></svg>
                         <span id="timer-btn-label">Iniciar</span>
                         <span class="absolute bottom-1.5 right-2.5 text-[9px] font-mono opacity-30 leading-none">Space</span>
                     </button>
                     <button id="btn-timer-save" onclick="saveTimerToForm()" title="Transferir tempo para o formulário"
-                        class="py-5 px-6 bg-[rgba(16,185,129,0.1)] hover:bg-[rgba(16,185,129,0.2)] text-emerald-400 rounded-2xl transition-all border border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.1)] hover:shadow-[0_0_15px_rgba(16,185,129,0.3)] flex items-center justify-center">
+                        class="btn-weight py-5 px-6 bg-[rgba(16,185,129,0.1)] hover:bg-[rgba(16,185,129,0.2)] text-emerald-400 rounded-2xl transition-all border border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.1)] hover:shadow-[0_0_15px_rgba(16,185,129,0.3)] flex items-center justify-center">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     </button>
                     <button id="btn-timer-reset" onclick="resetTimer()" title="Zerar timer"
-                        class="py-5 px-6 bg-[rgba(239,68,68,0.1)] hover:bg-[rgba(239,68,68,0.2)] text-rose-400 rounded-2xl transition-all border border-rose-500/20 shadow-[0_0_10px_rgba(239,68,68,0.1)] hover:shadow-[0_0_15px_rgba(239,68,68,0.3)] flex items-center justify-center">
+                        class="btn-weight py-5 px-6 bg-[rgba(239,68,68,0.1)] hover:bg-[rgba(239,68,68,0.2)] text-rose-400 rounded-2xl transition-all border border-rose-500/20 shadow-[0_0_10px_rgba(239,68,68,0.1)] hover:shadow-[0_0_15px_rgba(239,68,68,0.3)] flex items-center justify-center">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
                     </button>
                 </div>
@@ -297,7 +327,7 @@
                         <!-- JS Injection -->
                     </div>
 
-                    <button type="submit" class="w-full py-4 bg-success/90 hover:bg-success text-[#0f001c] rounded-xl font-bold shadow-[0_0_15px_rgba(52,211,153,0.3)] hover:shadow-[0_0_25px_rgba(52,211,153,0.6)] transition-all mt-6 border-b-4 border-emerald-600 relative">
+                    <button type="submit" class="btn-weight w-full py-4 bg-success/90 hover:bg-success text-[#0f001c] rounded-xl font-bold shadow-[0_0_15px_rgba(52,211,153,0.3)] hover:shadow-[0_0_25px_rgba(52,211,153,0.6)] transition-all mt-6 border-b-4 border-emerald-600 relative">
                         Gravar no Storage
                         <span class="absolute bottom-1.5 right-3 text-[9px] font-mono opacity-30 leading-none">Enter</span>
                     </button>
