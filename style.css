@@ -230,8 +230,9 @@ body {
 button[type="submit"],
 .glass-card button {
     position: relative;
-    border-bottom-width: 4px !important;
-    transition: all 0.2s cubic-bezier(0.1, 0.7, 0.1, 1);
+    border-bottom-width: 6px !important;
+    transition: all 0.1s cubic-bezier(0.1, 0.7, 0.1, 1);
+    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.35);
     overflow: hidden;
     isolation: isolate;
 }
@@ -240,15 +241,16 @@ button[type="submit"],
 button[type="submit"]:hover,
 .glass-card button:hover {
     transform: translateY(-2px);
-    filter: brightness(1.15);
+    filter: brightness(1.2);
+    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.5);
 }
 
 .btn-weight:active,
 button[type="submit"]:active,
 .glass-card button:active {
-    transform: translateY(4px) scale(0.98);
-    border-bottom-width: 1px !important; /* Keep a tiny bit of depth when pressed */
-    filter: brightness(0.9);
+    transform: translateY(6px) scale(0.98);
+    border-bottom-width: 0px !important;
+    filter: brightness(0.85);
     box-shadow: none !important;
 }
 
@@ -270,20 +272,20 @@ button[type="submit"]:hover::after,
     height: 100%;
 }
 
-/* 3D Color Variants (Depth Shadows & Fill Colors) */
-.btn-3d-purple  { border-bottom-color: #9333ea !important; }
+/* 3D Color Variants (Saturated Depth Shadows & Fill Colors) */
+.btn-3d-purple  { border-bottom-color: #581c87 !important; } /* purple-900 */
 .btn-3d-purple::after  { background: #9333ea; }
 
-.btn-3d-emerald { border-bottom-color: #059669 !important; }
+.btn-3d-emerald { border-bottom-color: #064e3b !important; } /* emerald-900 */
 .btn-3d-emerald::after { background: #059669; }
 
-.btn-3d-rose    { border-bottom-color: #e11d48 !important; }
+.btn-3d-rose    { border-bottom-color: #881337 !important; } /* rose-900 */
 .btn-3d-rose::after    { background: #e11d48; }
 
-.btn-3d-orange  { border-bottom-color: #ea580c !important; }
+.btn-3d-orange  { border-bottom-color: #7c2d12 !important; } /* orange-900 */
 .btn-3d-orange::after  { background: #ea580c; }
 
-.btn-3d-accent  { border-bottom-color: rgba(192, 132, 252, 0.5) !important; }
+.btn-3d-accent  { border-bottom-color: #4a044e !important; } /* fuchsia-950 */
 .btn-3d-accent::after  { background: var(--accent); }
 
 /* ApexCharts Overrides for High-Tech look */
