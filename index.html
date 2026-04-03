@@ -115,7 +115,7 @@
                     <span class="text-sm font-semibold text-violet-200" id="current-date-display">Carregando...</span>
                     <span class="text-[10px] uppercase tracking-widest text-violet-400 font-bold">Residência Cibernética</span>
                 </div>
-                <div class="h-10 w-10 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent shadow-[0_0_15px_rgba(192,132,252,0.3)]">
+                <div class="h-10 w-10 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent shadow-[0_0_15px_accent_glow]">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                 </div>
             </div>
@@ -129,12 +129,12 @@
             <!-- Total Dia -->
             <div class="glass-card p-6 relative overflow-hidden group flex flex-col items-center text-center gap-3 pt-6">
                 <!-- Icon top center -->
-                <div class="p-3 rounded-2xl bg-[rgba(192,132,252,0.12)] border border-violet-500/20 text-accent shadow-[0_0_16px_rgba(192,132,252,0.2)] group-hover:shadow-[0_0_24px_rgba(192,132,252,0.4)] transition-all">
+                <div class="p-3 rounded-2xl bg-accent/10 border border-accent/20 text-accent shadow-[0_0_16px_accent_glow] group-hover:shadow-[0_0_24px_accent_glow] transition-all">
                     <!-- Clock icon -->
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l2.5 2.5M12 3a9 9 0 100 18A9 9 0 0012 3z"/></svg>
                 </div>
                 <p class="text-[10px] font-black uppercase tracking-[0.25em] text-violet-400">Upload Diário</p>
-                <h3 class="text-4xl font-display font-extrabold text-white drop-shadow-[0_0_12px_rgba(192,132,252,0.4)]" id="card-day">00:00h</h3>
+                <h3 class="text-4xl font-display font-extrabold text-white drop-shadow-[0_0_12px_accent_glow]" id="card-day">00:00h</h3>
                 <div class="flex items-center gap-1.5 text-[10px] text-success font-bold uppercase tracking-widest">
                     <span class="w-2 h-2 rounded-full bg-success shadow-[0_0_8px_#34d399] animate-pulse"></span>
                     Sincronizado
@@ -144,35 +144,35 @@
             <!-- Total Semana -->
             <div class="glass-card p-6 relative overflow-hidden group flex flex-col items-center text-center gap-3 pt-6">
                 <!-- Icon top center -->
-                <div class="p-3 rounded-2xl bg-[rgba(232,121,249,0.12)] border border-fuchsia-500/20 text-fuchsia-400 shadow-[0_0_16px_rgba(232,121,249,0.2)] group-hover:shadow-[0_0_24px_rgba(232,121,249,0.4)] transition-all">
+                <div class="p-3 rounded-2xl bg-accent/10 border border-accent/20 text-accent shadow-[0_0_16px_accent_glow] group-hover:shadow-[0_0_24px_accent_glow] transition-all">
                     <!-- Bar chart / weekly trend -->
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3v18h18M7 16v-4m4 4V8m4 8v-7"/></svg>
                 </div>
                 <p class="text-[10px] font-black uppercase tracking-[0.25em] text-violet-400">Tráfego Semanal</p>
-                <h3 class="text-4xl font-display font-extrabold text-white drop-shadow-[0_0_12px_rgba(232,121,249,0.3)]" id="card-week">00:00h</h3>
+                <h3 class="text-4xl font-display font-extrabold text-white drop-shadow-[0_0_12px_accent_glow]" id="card-week">00:00h</h3>
                 <div class="text-[10px] text-violet-300 font-bold uppercase tracking-widest">Alvo 15:00h</div>
             </div>
 
             <!-- Total do Mês -->
             <div class="glass-card p-6 relative overflow-hidden group flex flex-col items-center text-center gap-3 pt-6">
                 <!-- Icon top center -->
-                <div class="p-3 rounded-2xl bg-[rgba(52,211,153,0.12)] border border-emerald-500/20 text-emerald-400 shadow-[0_0_16px_rgba(52,211,153,0.2)] group-hover:shadow-[0_0_24px_rgba(52,211,153,0.4)] transition-all">
+                <div class="p-3 rounded-2xl bg-accent/10 border border-accent/20 text-accent shadow-[0_0_16px_accent_glow] group-hover:shadow-[0_0_24px_accent_glow] transition-all">
                     <!-- Calendar with clock -->
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3M3 9h18M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2zm9-6a3 3 0 11-6 0 3 3 0 016 0zM14 15h.01"/></svg>
                 </div>
                 <p class="text-[10px] font-black uppercase tracking-[0.25em] text-violet-400">Total do Mês</p>
-                <h3 class="text-4xl font-display font-extrabold text-emerald-400 drop-shadow-[0_0_12px_rgba(52,211,153,0.5)]" id="card-month">00:00h</h3>
-                <div class="flex items-center gap-1.5 text-[10px] text-emerald-400/80 font-bold uppercase tracking-widest">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
+                <h3 class="text-4xl font-display font-extrabold text-white drop-shadow-[0_0_12px_accent_glow]" id="card-month">00:00h</h3>
+                <div class="flex items-center gap-1.5 text-[10px] text-accent font-bold uppercase tracking-widest">
+                    <span class="w-2 h-2 rounded-full bg-accent shadow-[0_0_8px_accent_glow]"></span>
                     <span id="card-month-label">Horas no mês atual</span>
                 </div>
             </div>
 
 
             <!-- Tags & Categories Card -->
-            <div class="glass-card p-5 pb-7 border border-violet-500/20">
+            <div class="glass-card p-5 pb-7 border border-accent/20">
                 <h4 class="text-sm font-bold text-white mb-4 flex items-center gap-2">
-                    <div class="p-1.5 bg-[rgba(192,132,252,0.15)] rounded-lg text-accent">
+                    <div class="p-1.5 bg-accent/10 rounded-lg text-accent">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
                     </div>
                     Tags &amp; Categorias
@@ -186,9 +186,9 @@
                 <!-- Add Category mini-form -->
                 <form id="category-form" onsubmit="addCategory(event)" class="flex gap-1.5 items-center mt-2">
                     <input type="text" id="cat-name" placeholder="Nova categoria..." required
-                        class="flex-1 px-2.5 py-1.5 text-xs placeholder-violet-300/30 bg-[rgba(15,0,28,0.4)] border border-violet-500/30 text-white rounded-lg focus:outline-none focus:border-accent">
+                        class="flex-1 px-2.5 py-1.5 text-xs placeholder-violet-300/30 bg-[rgba(15,0,28,0.4)] border border-accent/30 text-white rounded-lg focus:outline-none focus:border-accent">
                     <!-- Color Picker via label nativo -->
-                    <label for="cat-color" class="w-7 h-7 flex-shrink-0 rounded-md overflow-hidden border border-violet-500/40 hover:border-accent cursor-pointer transition-all" style="display:block;">
+                    <label for="cat-color" class="w-7 h-7 flex-shrink-0 rounded-md overflow-hidden border border-accent/40 hover:border-accent cursor-pointer transition-all" style="display:block;">
                         <input type="color" id="cat-color" value="#c084fc" style="display:block;width:100%;height:100%;border:none;padding:0;cursor:pointer;">
                     </label>
                     <button type="submit"

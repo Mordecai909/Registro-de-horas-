@@ -728,6 +728,10 @@ function changeTheme() {
     document.documentElement.style.setProperty('--accent', theme.accent);
     document.documentElement.style.setProperty('--accent-glow', theme.glow);
     
+    // Update PWA meta theme color
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    if (metaTheme) metaTheme.setAttribute('content', theme.accent);
+    
     // Update theme button icon container
     const iconContainer = document.getElementById('theme-icon-container');
     const themeBtn = document.getElementById('theme-switch-btn');
@@ -740,13 +744,6 @@ function changeTheme() {
     // Update Sidebar border for feedback
     const sidebar = document.getElementById('sidebar-menu');
     if (sidebar) sidebar.style.borderColor = theme.accent + '33';
-
-    // Update text hint for next theme
-    const themeText = themeBtn.querySelector('span') || themeBtn.childNodes[themeBtn.childNodes.length - 1];
-    if (themeText) {
-        // Just keep the main label but we could add (Next: Cyan) if we wanted
-        // themeText.textContent = `Trocar Tema (${theme.name})`;
-    }
 }
 
 // ── Maintenance ──
