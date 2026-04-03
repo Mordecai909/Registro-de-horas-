@@ -84,32 +84,16 @@
                 <div class="mt-2 text-[10px] text-violet-300 font-bold uppercase tracking-widest">Alvo 15:00h</div>
             </div>
 
-            <!-- Salário Estimado -->
+            <!-- Total do Mês -->
             <div class="glass-card p-6 relative overflow-hidden group">
                 <div class="absolute -top-4 -right-2 p-6 dashboard-icon text-emerald-400 opacity-20">
-                    <svg class="w-24 h-24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <svg class="w-24 h-24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                 </div>
-                <p class="text-sm font-bold uppercase tracking-wider text-violet-400 mb-2">Salário do Mês</p>
-                <h3 class="text-3xl font-display font-extrabold text-emerald-400 drop-shadow-[0_0_10px_rgba(52,211,153,0.5)]" id="card-month">R$ 0,00</h3>
-                <div class="mt-3 flex flex-col gap-1.5">
-                    <div class="text-xs text-violet-300 font-bold uppercase tracking-widest" id="card-month-hours">0h trabalhadas</div>
-
-                    <!-- Taxa de hora — clicável para editar -->
-                    <div class="flex items-center gap-1.5 group/rate cursor-pointer" onclick="startEditRate()" title="Clique para editar o valor por hora">
-                        <!-- Modo exibição -->
-                        <span id="rate-display" class="text-xs text-emerald-400/90 font-bold uppercase tracking-widest group-hover/rate:text-emerald-300 transition-colors"></span>
-                        <svg id="rate-edit-icon" class="w-3 h-3 text-emerald-600 group-hover/rate:text-emerald-400 transition-colors flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-                        </svg>
-                        <!-- Modo edição (hidden por padrão) -->
-                        <form id="rate-edit-form" class="hidden flex items-center gap-1" onsubmit="saveRate(event)">
-                            <span class="text-xs text-emerald-400 font-bold">R$</span>
-                            <input type="number" id="rate-input" step="0.01" min="0.01"
-                                class="w-16 text-xs bg-[rgba(15,0,28,0.6)] border border-emerald-500/50 text-emerald-300 rounded px-1.5 py-0.5 focus:outline-none focus:border-emerald-400"
-                                onblur="saveRate(null)" onkeydown="if(event.key==='Escape') cancelEditRate()">
-                            <span class="text-xs text-emerald-400/70 font-bold">/h</span>
-                        </form>
-                    </div>
+                <p class="text-xs font-bold uppercase tracking-wider text-violet-400 mb-1">Total do Mês</p>
+                <h3 class="text-3xl font-display font-extrabold text-emerald-400 drop-shadow-[0_0_10px_rgba(52,211,153,0.5)]" id="card-month">00:00h</h3>
+                <div class="mt-2 flex items-center text-[10px] text-emerald-400/80 font-bold uppercase tracking-widest">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 mr-2 shadow-[0_0_8px_#34d399]"></span>
+                    <span id="card-month-label">Horas no mês atual</span>
                 </div>
             </div>
 
