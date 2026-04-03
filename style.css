@@ -134,3 +134,97 @@ input:focus, select:focus {
     .glass-card { border: 1px solid #ddd; background: none; }
     header, #btn-timer-toggle, #btn-timer-reset, #entry-form, .actions-cell { display: none !important; }
 }
+
+/* ─── Mode Toggle Pill ─────────────────────────────────────── */
+.mode-pill {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: rgba(15, 0, 28, 0.5);
+    border-radius: 1rem;
+    padding: 4px;
+    border: 1px solid rgba(192, 132, 252, 0.2);
+    gap: 4px;
+}
+
+/* Sliding glowing indicator */
+.mode-pill-indicator {
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    border-radius: 0.75rem;
+    transition:
+        left 0.45s cubic-bezier(0.34, 1.2, 0.64, 1),
+        width 0.45s cubic-bezier(0.34, 1.2, 0.64, 1),
+        background 0.45s ease,
+        box-shadow 0.45s ease;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.mode-pill-indicator.is-free {
+    background: #c084fc;
+    box-shadow: 0 0 14px rgba(192, 132, 252, 0.55);
+}
+
+.mode-pill-indicator.is-pomodoro {
+    background: #f97316;
+    box-shadow: 0 0 14px rgba(249, 115, 22, 0.6);
+}
+
+.mode-pill button {
+    position: relative;
+    z-index: 1;
+    border: none;
+    background: transparent;
+    transition: color 0.3s ease, opacity 0.3s ease;
+}
+
+/* ─── Timer text smooth color/shadow ─────────────────────── */
+.timer-display {
+    transition:
+        color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+        text-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+        transform 0.45s cubic-bezier(0.34, 1.1, 0.64, 1);
+}
+
+/* ─── Timer + buttons wrapper nudge ─────────────────────── */
+.timer-content-wrap {
+    display: contents; /* distributes children into parent flex */
+}
+
+.timer-nudge-down {
+    transform: translateY(6px);
+}
+
+/* Applied to timer label, timer text, banner, buttons row */
+#timer-mode-label,
+#timer-text,
+#pomodoro-banner,
+.timer-buttons-row {
+    transition: transform 0.42s cubic-bezier(0.34, 1.1, 0.64, 1);
+}
+
+/* ─── Duration config: reveal from depth ─────────────────── */
+#pomodoro-config {
+    display: flex;          /* always in flex, toggled via opacity/scale */
+    align-items: center;
+    gap: 8px;
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transform: scale(0.88) translateY(-6px);
+    transform-origin: center top;
+    pointer-events: none;
+    transition:
+        max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.38s cubic-bezier(0.4, 0, 0.2, 1),
+        transform 0.42s cubic-bezier(0.34, 1.15, 0.64, 1);
+}
+
+#pomodoro-config.config-visible {
+    max-height: 60px;
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    pointer-events: auto;
+}

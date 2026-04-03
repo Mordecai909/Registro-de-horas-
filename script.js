@@ -41,11 +41,29 @@ document.addEventListener('DOMContentLoaded', () => {
     setupSearch();
     renderQuickFills();
     setupKeyboardShortcuts();
-    
+    // Initialize pill indicator position after layout is rendered
+    requestAnimationFrame(initPillIndicator);
+
     if (secondsElapsed > 0) {
         document.getElementById('timer-text').innerText = formatTime(secondsElapsed);
     }
 });
+
+function initPillIndicator() {
+    const indicator = document.getElementById('mode-indicator');
+    const btnFree   = document.getElementById('mode-free');
+    const pill      = document.getElementById('mode-pill-wrap');
+    if (!indicator || !btnFree || !pill) return;
+    const pillRect = pill.getBoundingClientRect();
+    const btnRect  = btnFree.getBoundingClientRect();
+    // Disable transition briefly so initial position is instant
+    indicator.style.transition = 'none';
+    indicator.style.left  = (btnRect.left - pillRect.left - 4) + 'px';
+    indicator.style.width = btnRect.width + 'px';
+    // Re-enable transition after a frame
+    requestAnimationFrame(() => { indicator.style.transition = ''; });
+}
+
 
 function updateCurrentDate() {
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -147,29 +165,63 @@ function setTimerMode(mode) {
     const btnFree   = document.getElementById('mode-free');
     const btnPomo   = document.getElementById('mode-pomodoro');
     const banner    = document.getElementById('pomodoro-banner');
+    const indicator = document.getElementById('mode-indicator');
+    const buttonsRow = document.querySelector('.timer-buttons-row');
 
     if (banner) banner.classList.add('hidden');
     pomodoroMode = (mode === 'pomodoro');
 
+    // ── Slide the pill indicator to the active button ──
+    function slideIndicator(targetBtn, colorClass) {
+        if (!indicator || !targetBtn) return;
+        const pill = document.getElementById('mode-pill-wrap');
+        const pillRect = pill.getBoundingClientRect();
+        const btnRect  = targetBtn.getBoundingClientRect();
+        indicator.style.left  = (btnRect.left - pillRect.left - 4) + 'px';
+        indicator.style.width = btnRect.width + 'px';
+        indicator.className   = 'mode-pill-indicator ' + colorClass;
+    }
+
+    // Small nudge: timer text + label + buttons shift slightly when config appears
+    const nudgeEls = [timerEl, label, buttonsRow].filter(Boolean);
+
     if (pomodoroMode) {
-        // Activate Pomodoro UI
-        btnPomo.classList.add('bg-orange-500', 'text-white', 'shadow-[0_0_12px_rgba(249,115,22,0.5)]');
-        btnPomo.classList.remove('text-violet-400');
-        btnFree.classList.remove('bg-accent', 'text-white', 'shadow-[0_0_12px_rgba(192,132,252,0.4)]');
-        btnFree.classList.add('text-violet-400');
-        config.classList.remove('hidden');
+        // Nudge down to give room to duration config
+        nudgeEls.forEach(el => el.classList.add('timer-nudge-down'));
+
+        // Slide indicator to Pomodoro (orange)
+        requestAnimationFrame(() => slideIndicator(btnPomo, 'is-pomodoro'));
+
+        // Reveal duration config from depth
+        config.classList.add('config-visible');
+
+        // Button text color  
+        btnPomo.style.color = '#fff';
+        btnFree.style.color = 'rgba(192,132,252,0.7)';
+
+        // Label + timer color
         label.innerText = '🍅 Modo Pomodoro';
+        label.style.color = '#fb923c';
         timerEl.style.color = '#fb923c';
         timerEl.style.textShadow = '0 0 30px rgba(249,115,22,0.5)';
         timerEl.innerText = formatTime(pomodoroDuration);
     } else {
-        // Activate Free mode UI
-        btnFree.classList.add('bg-accent', 'text-white', 'shadow-[0_0_12px_rgba(192,132,252,0.4)]');
-        btnFree.classList.remove('text-violet-400');
-        btnPomo.classList.remove('bg-orange-500', 'text-white', 'shadow-[0_0_12px_rgba(249,115,22,0.5)]');
-        btnPomo.classList.add('text-violet-400');
-        config.classList.add('hidden');
+        // Remove nudge
+        nudgeEls.forEach(el => el.classList.remove('timer-nudge-down'));
+
+        // Slide indicator to Free (violet)
+        requestAnimationFrame(() => slideIndicator(btnFree, 'is-free'));
+
+        // Hide duration config
+        config.classList.remove('config-visible');
+
+        // Button text color
+        btnFree.style.color = '#fff';
+        btnPomo.style.color = 'rgba(167,139,250,0.7)';
+
+        // Label + timer color
         label.innerText = 'Processo Ativo';
+        label.style.color = '';
         timerEl.style.color = '';
         timerEl.style.textShadow = '0 0 30px rgba(192,132,252,0.5)';
         timerEl.innerText = '00:00:00';
