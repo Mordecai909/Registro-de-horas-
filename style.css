@@ -231,6 +231,7 @@ button[type="submit"],
 .glass-card button {
     position: relative;
     border-bottom-width: 6px !important;
+    border-style: solid !important;
     transition: all 0.1s cubic-bezier(0.1, 0.7, 0.1, 1);
     box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.35);
     overflow: hidden;

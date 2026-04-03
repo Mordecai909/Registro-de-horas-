@@ -754,7 +754,7 @@ function renderQuickFills() {
     sorted.forEach(preset => {
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = 'text-[10px] sm:text-xs font-bold uppercase tracking-wider px-3 py-2 rounded-xl bg-[rgba(192,132,252,0.1)] text-accent border border-accent/20 hover:bg-accent hover:text-white transition-all shadow-[0_0_10px_rgba(192,132,252,0.05)] hover:shadow-[0_0_15px_rgba(192,132,252,0.4)] flex items-center gap-1.5 focus:outline-none';
+        btn.className = 'btn-weight btn-3d-accent text-[10px] sm:text-xs font-bold uppercase tracking-wider px-3 py-2 rounded-xl bg-[rgba(192,132,252,0.25)] hover:bg-[rgba(192,132,252,0.4)] text-white transition-all shadow-[0_0_10px_rgba(192,132,252,0.1)] flex items-center gap-1.5 focus:outline-none relative overflow-hidden';
         btn.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg> ${preset.desc} (${preset.start}-${preset.end})`;
         
         btn.onclick = () => {
