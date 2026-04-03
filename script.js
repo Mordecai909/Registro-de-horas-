@@ -398,20 +398,20 @@ function renderEntries(filteredEntries = entries) {
         const row = document.createElement('tr');
         row.className = 'table-row-hover transition-colors group';
         row.innerHTML = `
-            <td class="px-6 py-5 whitespace-nowrap text-sm font-medium text-violet-300">${formatDateBR(entry.date)}</td>
+            <td class="px-6 py-5 whitespace-nowrap text-sm font-medium text-accent/90">${formatDateBR(entry.date)}</td>
             <td class="px-6 py-5">
                 <div class="text-sm font-bold text-white mb-1.5">${entry.desc}</div>
                 ${getCategoryBadge(entry.category)}
             </td>
             <td class="px-6 py-5 whitespace-nowrap text-right">
-                <span class="text-sm font-bold text-accent drop-shadow-[0_0_8px_rgba(192,132,252,0.5)]">${entry.total}h</span>
+                <span class="text-sm font-bold text-accent drop-shadow-[0_0_8px_var(--accent-glow)]">${entry.total}h</span>
             </td>
             <td class="px-6 py-5 whitespace-nowrap text-center actions-cell">
                 <div class="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onclick="editEntry(${entry.id})" class="p-2 text-violet-400 hover:text-accent transition-all hover:drop-shadow-[0_0_8px_rgba(192,132,252,0.8)]">
+                    <button onclick="editEntry(${entry.id})" class="p-2 text-accent/80 hover:text-accent transition-all hover:drop-shadow-[0_0_8px_var(--accent-glow)]">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                     </button>
-                    <button onclick="deleteEntry(${entry.id})" class="p-2 text-violet-400 hover:text-danger transition-all hover:drop-shadow-[0_0_8px_rgba(251,113,133,0.8)]">
+                    <button onclick="deleteEntry(${entry.id})" class="p-2 text-accent/40 hover:text-danger transition-all hover:drop-shadow-[0_0_8px_rgba(251,113,133,0.8)]">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                     </button>
                 </div>
@@ -542,7 +542,7 @@ function renderCategoryChart(year, month) {
     });
 
     if (monthEntries.length === 0) {
-        container.innerHTML = `<p class="text-xs text-violet-400/50 font-bold uppercase tracking-widest text-center py-4">Nenhum registro no mês atual</p>`;
+        container.innerHTML = `<p class="text-xs text-accent/50 font-bold uppercase tracking-widest text-center py-4">Nenhum registro no mês atual</p>`;
         return;
     }
 
@@ -572,12 +572,12 @@ function renderCategoryChart(year, month) {
         row.className = 'flex items-center gap-3 group';
         row.innerHTML = `
             <span class="text-[11px] font-bold w-40 shrink-0 truncate" style="color:rgb(${r},${g},${b})">${name}</span>
-            <div class="flex-1 h-5 bg-[rgba(15,0,28,0.4)] rounded-full overflow-hidden border border-violet-500/10">
+            <div class="flex-1 h-5 bg-[rgba(15,0,28,0.4)] rounded-full overflow-hidden border border-accent/10">
                 <div class="h-full rounded-full transition-all duration-700"
                     style="width:${pct}%;background:rgba(${r},${g},${b},0.7);box-shadow:0 0 8px rgba(${r},${g},${b},0.4);"></div>
             </div>
             <span class="text-[11px] font-black tabular-nums w-14 text-right" style="color:rgb(${r},${g},${b})">${hLabel}</span>
-            <span class="text-[10px] font-bold text-violet-400/50 w-8 text-right">${pctLabel}</span>
+            <span class="text-[10px] font-bold text-accent/50 w-8 text-right">${pctLabel}</span>
         `;
         container.appendChild(row);
     });

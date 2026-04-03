@@ -33,31 +33,35 @@
 }
 
 #sidebar-menu::-webkit-scrollbar-thumb {
-    background: rgba(192, 132, 252, 0.2);
+    background: var(--accent-glow);
     border-radius: 10px;
 }
 
 body {
-    background-image: url('./assets/circuit_bg_blurred.png');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
     color: var(--primary-text);
     font-family: 'Inter', sans-serif;
     min-height: 100vh;
     overflow-x: hidden;
-    position: relative;
-    z-index: 0;
+    background: #0f001c; /* Pure dark base */
 }
 
 body::before {
     content: '';
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(15, 0, 28, 0.45);
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: url('./assets/circuit_bg_blurred.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    filter: grayscale(100%) brightness(0.3) contrast(1.1); /* Dark & Neutral */
+    z-index: -1;
+}
+
+body::after {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(15, 0, 28, 0.4);
     z-index: -1;
 }
 
@@ -98,7 +102,7 @@ body::before {
 /* Form Styling */
 input, select {
     background: rgba(15, 0, 28, 0.6) !important;
-    border: 1px solid rgba(192, 132, 252, 0.25) !important;
+    border: 1px solid var(--accent-glow) !important;
     color: #f3e8ff !important;
     border-radius: 0.75rem !important;
     transition: all 0.2s ease;
@@ -107,7 +111,7 @@ input, select {
 input:focus, select:focus {
     outline: none !important;
     border-color: var(--accent) !important;
-    box-shadow: 0 0 0 3px rgba(192, 132, 252, 0.2), inset 0 0 10px rgba(192, 132, 252, 0.1) !important;
+    box-shadow: 0 0 0 3px var(--accent-glow), inset 0 0 10px var(--accent-glow) !important;
 }
 
 /* Make clock and calendar icons more visible */
