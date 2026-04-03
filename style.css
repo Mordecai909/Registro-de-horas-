@@ -116,7 +116,7 @@ input:focus, select:focus {
 
 /* Make clock and calendar icons more visible */
 ::-webkit-calendar-picker-indicator {
-    filter: invert(1) brightness(0.9) sepia(100%) saturate(500%) hue-rotate(250deg);
+    filter: invert(1) brightness(1); /* Pure neutral white for the theme */
     cursor: pointer;
     padding: 2px;
     border-radius: 4px;
@@ -124,8 +124,8 @@ input:focus, select:focus {
 }
 
 ::-webkit-calendar-picker-indicator:hover {
-    background-color: rgba(168, 85, 247, 0.1);
-    transform: scale(1.1);
+    background-color: var(--accent-glow);
+    transform: scale(1.15);
 }
 
 .dashboard-icon {
@@ -195,8 +195,8 @@ input:focus, select:focus {
 }
 
 .mode-pill-indicator.is-free {
-    background: #c084fc;
-    box-shadow: 0 0 14px rgba(192, 132, 252, 0.55);
+    background: var(--accent);
+    box-shadow: 0 0 14px var(--accent-glow);
 }
 
 .mode-pill-indicator.is-pomodoro {
