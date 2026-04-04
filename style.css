@@ -83,14 +83,12 @@
     width: 100vh; height: 100vh;
     top: -20%; left: -20%;
     background: var(--blob-1-bg);
-    animation: drift 25s infinite alternate ease-in-out;
 }
 
 .blob-2 {
     width: 80vh; height: 80vh;
     bottom: -10%; right: -10%;
     background: var(--blob-2-bg);
-    animation: drift 30s infinite alternate-reverse ease-in-out;
 }
 
 .blob-3 {
@@ -98,7 +96,6 @@
     top: 40%; left: 30%;
     background: var(--blob-3-bg);
     opacity: 0.15;
-    animation: breathe 15s infinite alternate ease-in-out;
 }
 
 .bg-grid {
@@ -109,8 +106,63 @@
         linear-gradient(90deg, rgba(192, 132, 252, 0.05) 1px, transparent 1px);
     background-size: 64px 64px;
     mask-image: radial-gradient(ellipse at center, black, transparent 85%);
-    transform: translateY(calc(var(--scroll-y, 0px) * -0.15));
-    will-change: transform;
+    z-index: 1;
+}
+
+/* New Layer: Circuit Texture */
+.bg-circuit-texture {
+    position: absolute;
+    inset: 0;
+    background-image: url('assets/cyber_motherboard_bg.jpg');
+    background-size: cover;
+    background-position: center;
+    opacity: 0.12;
+    mix-blend-mode: overlay;
+    filter: sepia(100%) hue-rotate(240deg) brightness(0.8) contrast(1.2); /* theme-synced via hue-rotate in JS maybe? */
+    pointer-events: none;
+    z-index: 0;
+    transition: filter 0.8s ease;
+}
+
+/* New Layer: Hexagonal Grid */
+.bg-hex-grid {
+    position: absolute;
+    inset: -100px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100' viewBox='0 0 56 100'%3E%3Cpath d='M28 66L0 50L0 16L28 0L56 16L56 50L28 66L28 100' fill='none' stroke='%23c084fc' stroke-width='1' stroke-opacity='0.1'/%3E%3C/svg%3E");
+    background-size: 56px 100px;
+    mask-image: radial-gradient(circle at center, black 20%, transparent 80%);
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0.4;
+}
+
+/* New Layer: Data Streams */
+.data-streams-container {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.data-streams-orchestrator {
+    width: 100%;
+    height: 100%;
+    opacity: 0.4;
+}
+
+.data-pulse {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 0.5;
+    stroke-linecap: round;
+    stroke-dasharray: 1 10;
+    filter: drop-shadow(0 0 5px var(--accent));
+}
+
+@keyframes data-flow {
+    from { stroke-dashoffset: 100; }
+    to { stroke-dashoffset: 0; }
 }
 
 .bg-noise {
@@ -489,38 +541,15 @@ input:focus, select:focus {
 
 /* ─── Mode Label Sliding Push Animation ──────────────────── */
 .mode-label-mask {
-    width: 260px; /* Adjusted width for tighter alignment */
-    height: 24px;
+    width: 260px;
+    height: 32px;
     overflow: hidden;
     position: relative;
-    /* Edge Blurring via Backdrop Filter Overlays */
+    display: block;
     isolation: isolate;
 }
 
-.mode-label-mask::before,
-.mode-label-mask::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 30px; /* Approximately one letter width */
-    z-index: 10;
-    pointer-events: none;
-}
 
-.mode-label-mask::before {
-    left: 0;
-    background: linear-gradient(to right, var(--bg-main, #0f001c), transparent);
-    backdrop-filter: blur(4px);
-    mask-image: linear-gradient(to right, black, transparent);
-}
-
-.mode-label-mask::after {
-    right: 0;
-    background: linear-gradient(to left, var(--bg-main, #0f001c), transparent);
-    backdrop-filter: blur(4px);
-    mask-image: linear-gradient(to left, black, transparent);
-}
 
 .mode-label-track {
     display: flex;
@@ -557,4 +586,112 @@ input:focus, select:focus {
 /* Override existing #timer-mode-label transition to include transform for sliding */
 #timer-mode-label {
     transition: transform 0.5s cubic-bezier(0.34, 1.25, 0.64, 1) !important;
+}
+
+/* ─── Cyber Terminal & Custom Scrollbar ──────────────────── */
+#cyber-terminal {
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent-glow) transparent;
+}
+
+#cyber-terminal::-webkit-scrollbar {
+    width: 3px;
+}
+
+#cyber-terminal::-webkit-scrollbar-thumb {
+    background: var(--accent-glow);
+    border-radius: 10px;
+}
+
+#cyber-terminal::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.terminal-entry {
+    animation: terminal-entry-fade 0.3s ease-out forwards;
+    border-left: 2px solid transparent;
+    padding-left: 8px;
+    transition: all 0.2s ease;
+}
+
+.terminal-entry:hover {
+    background: rgba(192, 132, 252, 0.05);
+    border-left-color: var(--accent);
+}
+
+@keyframes terminal-entry-fade {
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+/* ─── Scanline Animation ─────────────────────────────────── */
+@keyframes scanline {
+    0% { transform: translateY(-100%); opacity: 0; }
+    50% { opacity: 1; }
+    100% { transform: translateY(500%); opacity: 0; }
+}
+
+.animate-scanline {
+    animation: scanline 4s linear infinite;
+}
+
+/* ─── Cyber Toasts ───────────────────────────────────────── */
+.cyber-toast {
+    background: rgba(15, 0, 28, 0.9);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--accent);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.8),
+        inset 0 0 15px var(--accent-glow);
+    border-radius: 1rem;
+    padding: 1rem 1.5rem;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    pointer-events: auto;
+    animation: toast-slide-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    min-width: 280px;
+    max-width: 380px;
+    position: relative;
+    overflow: hidden;
+}
+
+.cyber-toast::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; width: 4px; height: 100%;
+    background: var(--accent);
+}
+
+.cyber-toast.toast-success { --accent: #34d399; --accent-glow: rgba(52, 211, 153, 0.3); }
+.cyber-toast.toast-error   { --accent: #fb7185; --accent-glow: rgba(251, 113, 133, 0.3); }
+.cyber-toast.toast-warning { --accent: #fbbf24; --accent-glow: rgba(251, 191, 36, 0.3); }
+
+.cyber-toast.toast-exit {
+    animation: toast-slide-out 0.3s ease-in forwards;
+}
+
+@keyframes toast-slide-in {
+    from { opacity: 0; transform: translateX(100%) scale(0.9); }
+    to { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+@keyframes toast-slide-out {
+    from { opacity: 1; transform: translateX(0) scale(1); }
+    to { opacity: 0; transform: translateX(20%) scale(0.9); }
+}
+
+/* ─── Glitch Effect ──────────────────────────────────────── */
+.glitch-text {
+    position: relative;
+    animation: glitch-anim 0.2s ease-in-out infinite alternate;
+}
+
+@keyframes glitch-anim {
+    0% { transform: translate(0); text-shadow: -2px 0 #ff00c1, 2px 0 #00fff9; }
+    50% { transform: translate(-1px, 1px); text-shadow: 2px 0 #ff00c1, -2px 0 #00fff9; }
+    100% { transform: translate(1px, -1px); text-shadow: -2px 0 #ff00c1, 2px 0 #00fff9; }
 }

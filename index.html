@@ -43,6 +43,8 @@
 <body class="bg-black text-primary min-h-screen relative z-0">
     <!-- Cyber-Pulse Dynamic Background -->
     <div class="cyber-pulse-bg">
+        <div class="bg-circuit-texture"></div>
+        <div class="bg-hex-grid"></div>
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
         <div class="blob blob-3"></div>
@@ -161,8 +163,6 @@
                         </button>
                     </form>
                 </div>
-                
-                <!-- Quick Distribution Info (Removed as per user request to move back to main card) -->
             </div>
         </div>
     </aside>
@@ -197,9 +197,7 @@
         <section class="lg:col-span-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <!-- Total Dia -->
             <div class="glass-card p-6 relative overflow-hidden group flex flex-col items-center text-center gap-3 pt-6">
-                <!-- Icon top center -->
                 <div class="p-3 rounded-2xl bg-accent/10 border border-accent/20 text-accent shadow-[0_0_16px_accent_glow] group-hover:shadow-[0_0_24px_accent_glow] transition-all">
-                    <!-- Clock icon -->
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l2.5 2.5M12 3a9 9 0 100 18A9 9 0 0012 3z"/></svg>
                 </div>
                 <p class="text-[10px] font-black uppercase tracking-[0.25em] text-accent">Upload Diário</p>
@@ -208,13 +206,20 @@
                     <span class="w-2 h-2 rounded-full bg-success shadow-[0_0_8px_#34d399] animate-pulse"></span>
                     Sincronizado
                 </div>
+                <div class="w-full mt-2 px-4">
+                    <div class="flex justify-between text-[8px] font-black uppercase tracking-widest text-accent/60 mb-1">
+                        <span>Meta Diária</span>
+                        <span id="goal-percent">0%</span>
+                    </div>
+                    <div class="h-1.5 w-full bg-accent/10 rounded-full overflow-hidden border border-accent/20">
+                        <div id="goal-progress-bar" class="h-full bg-accent shadow-[0_0_10px_var(--accent-glow)] transition-all duration-1000" style="width: 0%"></div>
+                    </div>
+                </div>
             </div>
 
             <!-- Total Semana -->
             <div class="glass-card p-6 relative overflow-hidden group flex flex-col items-center text-center gap-3 pt-6">
-                <!-- Icon top center -->
                 <div class="p-3 rounded-2xl bg-accent/10 border border-accent/20 text-accent shadow-[0_0_16px_accent_glow] group-hover:shadow-[0_0_24px_accent_glow] transition-all">
-                    <!-- Bar chart / weekly trend -->
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3v18h18M7 16v-4m4 4V8m4 8v-7"/></svg>
                 </div>
                 <p class="text-[10px] font-black uppercase tracking-[0.25em] text-accent">Tráfego Semanal</p>
@@ -224,9 +229,7 @@
 
             <!-- Total do Mês -->
             <div class="glass-card p-6 relative overflow-hidden group flex flex-col items-center text-center gap-3 pt-6">
-                <!-- Icon top center -->
                 <div class="p-3 rounded-2xl bg-accent/10 border border-accent/20 text-accent shadow-[0_0_16px_accent_glow] group-hover:shadow-[0_0_24px_accent_glow] transition-all">
-                    <!-- Calendar with clock -->
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3M3 9h18M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2zm9-6a3 3 0 11-6 0 3 3 0 016 0zM14 15h.01"/></svg>
                 </div>
                 <p class="text-[10px] font-black uppercase tracking-[0.25em] text-accent">Total do Mês</p>
@@ -242,7 +245,6 @@
         <section class="lg:col-span-12 grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Active Timer -->
             <div class="glass-card p-8 text-center relative flex flex-col items-center justify-center gap-6">
-                <!-- Mode Toggle Pill with sliding indicator -->
                 <div class="mode-pill" id="mode-pill-wrap">
                     <div class="mode-pill-indicator is-free" id="mode-indicator"></div>
                     <button id="mode-free" onclick="setTimerMode('free')"
@@ -255,7 +257,6 @@
                     </button>
                 </div>
 
-                <!-- Pomodoro duration selector — animates via CSS -->
                 <div id="pomodoro-config">
                     <span class="text-[10px] text-orange-400 font-bold uppercase tracking-widest">Duração:</span>
                     <select id="pomodoro-duration" onchange="updatePomodoroDuration()"
@@ -266,7 +267,7 @@
                     </select>
                 </div>
 
-                <div class="mode-label-mask h-4 flex justify-center items-center overflow-hidden mb-1">
+                <div class="mode-label-mask mx-auto mb-1">
                     <div id="timer-mode-label" class="mode-label-track is-free">
                         <span class="mode-text-item item-free text-[10px] font-black text-accent uppercase tracking-[0.3em] whitespace-nowrap">Processo Ativo</span>
                         <span class="mode-text-item item-pomo text-[10px] font-black text-orange-400 uppercase tracking-[0.3em] whitespace-nowrap">🍅 Modo Pomodoro</span>
@@ -383,10 +384,16 @@
                         <svg class="w-4 h-4 text-emerald-400 group-hover:text-[#0f001c] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
                         Export.CSV
                     </button>
-                    <button onclick="exportPDF()" class="group flex-1 md:flex-none px-4 py-2.5 bg-[rgba(255,255,255,0.05)] text-white rounded-xl text-xs font-bold hover:bg-rose-500 hover:text-[#0f001c] transition-all flex items-center justify-center gap-2 shadow-[0_0_10px_rgba(244,63,94,0.05)] hover:shadow-[0_0_20px_rgba(244,63,94,0.5)] btn-weight btn-3d-rose">
-                        <svg class="w-4 h-4 text-rose-400 group-hover:text-[#0f001c] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                        Export.PDF
+                    <button onclick="exportJSON()" class="group flex-1 md:flex-none px-4 py-2.5 bg-[rgba(255,255,255,0.05)] text-white rounded-xl text-xs font-bold hover:bg-accent hover:text-[#0f001c] transition-all flex items-center justify-center gap-2 shadow-[0_0_10px_var(--accent-glow)] btn-weight btn-3d-purple">
+                        <svg class="w-4 h-4 text-accent group-hover:text-[#0f001c] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg>
+                        Backup.JSON
                     </button>
+                    <button onclick="importJSON()" class="group flex-1 md:flex-none px-4 py-2.5 bg-[rgba(255,255,255,0.05)] text-white rounded-xl text-xs font-bold hover:bg-accent hover:text-[#0f001c] transition-all flex items-center justify-center gap-2 shadow-[0_0_10px_var(--accent-glow)] btn-weight btn-3d-purple">
+                        <svg class="w-4 h-4 text-accent group-hover:text-[#0f001c] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                        Restore.JSON
+                    </button>
+                    <button id="import-input-trigger" class="hidden"></button>
+                    <input type="file" id="json-input" class="hidden" accept=".json" onchange="handleJSONImport(event)">
                 </div>
             </div>
 
@@ -406,6 +413,25 @@
                             <!-- JS Injection -->
                         </tbody>
                     </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cyber Terminal Log -->
+        <section class="lg:col-span-12">
+            <div class="glass-card p-4 font-mono text-[10px] bg-[rgba(10,2,20,0.8)] border-accent/20 relative overflow-hidden group">
+                <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-right from-transparent via-accent/30 to-transparent animate-scanline"></div>
+                <div class="flex items-center justify-between mb-2 border-b border-accent/10 pb-2">
+                    <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 rounded-full bg-accent animate-pulse"></div>
+                        <span class="font-black tracking-[0.2em] text-accent">SYSTEM_LOG_CORE_v9.0.9</span>
+                    </div>
+                    <span class="text-accent/40">ONLINE // SECURE_LINK</span>
+                </div>
+                <div id="cyber-terminal" class="h-32 overflow-y-auto space-y-1 custom-scrollbar pr-2">
+                    <div class="text-accent/60">> INITIALIZING HYPERVISOR...</div>
+                    <div class="text-accent/60">> LOADING MODULES: TIMER, STORAGE, ANALYTICS...</div>
+                    <div class="text-success">> SYSTEM READY. STANDBY FOR USER_COMMAND.</div>
                 </div>
             </div>
         </section>
@@ -429,6 +455,9 @@
 
     <!-- Core Logic -->
     <script src="script.js?v=2"></script>
+
+    <!-- Toast Notification System -->
+    <div id="toast-container" class="fixed bottom-8 right-8 z-[100] flex flex-col gap-3 pointer-events-none"></div>
 
     <!-- Native Noise Filter -->
     <svg style="display: none;">

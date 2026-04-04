@@ -31,6 +31,9 @@ let categoryChart = null; // ApexChart instance
 let pomodoroMode = false;
 let pomodoroDuration = 1500; // 25 min default
 
+// Daily Goal State
+let dailyGoalMin = parseInt(localStorage.getItem('dailyGoalMin')) || 480; // 8h default
+
 
 
 // Initialization
@@ -45,23 +48,67 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize pill indicator position after layout is rendered
     requestAnimationFrame(initPillIndicator);
     
-    // Initialize Chart
-    initCategoryChart();
-
-    // Parallax & Background logic
-    window.addEventListener('scroll', () => {
-        const scroll = window.scrollY;
-        const root = document.documentElement;
-        root.style.setProperty('--scroll-y', `${scroll}px`);
-        root.style.setProperty('--scroll-y-slow', `${scroll * 0.05}px`);
-        root.style.setProperty('--scroll-y-med', `${scroll * 0.1}px`);
-        root.style.setProperty('--scroll-y-fast', `${scroll * 0.15}px`);
-    });
-
     if (secondsElapsed > 0) {
         document.getElementById('timer-text').innerText = formatTime(secondsElapsed);
     }
+
+    sysLog('SISTEMA OPERACIONAL INICIALIZADO', 'success');
 });
+
+// ── Cyber Terminal System ──
+function sysLog(message, type = 'info') {
+    const terminal = document.getElementById('cyber-terminal');
+    if (!terminal) return;
+
+    const entry = document.createElement('div');
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('pt-BR', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    
+    let colorClass = 'text-accent/60';
+    if (type === 'success') colorClass = 'text-success';
+    if (type === 'error') colorClass = 'text-danger';
+    if (type === 'warning') colorClass = 'text-amber-400';
+
+    entry.className = `terminal-entry ${colorClass}`;
+    entry.innerHTML = `<span class="opacity-40">[${timeStr}]</span> > ${message.toUpperCase()}`;
+    
+    terminal.appendChild(entry);
+    terminal.scrollTop = terminal.scrollHeight;
+
+    // Keep only last 50 entries
+    if (terminal.children.length > 50) {
+        terminal.removeChild(terminal.firstChild);
+    }
+}
+
+// ── Cyber Toast System ──
+function showToast(message, type = 'success', duration = 4000) {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+
+    const toast = document.createElement('div');
+    toast.className = `cyber-toast toast-${type}`;
+    
+    let icon = '';
+    if (type === 'success') icon = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
+    if (type === 'error')   icon = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
+    if (type === 'warning') icon = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>';
+
+    toast.innerHTML = `
+        <div class="text-accent">${icon}</div>
+        <div class="flex flex-col">
+            <span class="text-[10px] font-black uppercase tracking-widest opacity-50">${type === 'success' ? 'Syscall Return' : 'System Alert'}</span>
+            <span>${message}</span>
+        </div>
+    `;
+
+    container.appendChild(toast);
+
+    setTimeout(() => {
+        toast.classList.add('toast-exit');
+        setTimeout(() => toast.remove(), 300);
+    }, duration);
+}
 
 function initPillIndicator() {
     const indicator = document.getElementById('mode-indicator');
@@ -140,6 +187,7 @@ function toggleTimer() {
                 localStorage.setItem('timerSeconds', secondsElapsed);
             }, 1000);
         }
+        sysLog(`Cronômetro INICIADO (${pomodoroMode ? 'POMODORO' : 'LIVRE'})`, 'info');
     } else {
         stopTimer();
     }
@@ -166,6 +214,7 @@ function stopTimer() {
         timerEl.style.color = '';
         timerEl.style.textShadow = '0 0 30px rgba(192,132,252,0.5)';
     }
+    sysLog('Cronômetro INTERROMPIDO', 'warning');
 }
 
 function setTimerMode(mode) {
@@ -372,6 +421,9 @@ function saveEntry(e) {
     renderQuickFills();
     e.target.reset();
     setDefaultDate();
+    
+    sysLog(`Registro GRAVADO: ${descInput.value}`, 'success');
+    showToast('Bloco de tempo sincronizado com sucesso!');
 }
 
 function editEntry(id) {
@@ -391,10 +443,13 @@ function editEntry(id) {
 
 function deleteEntry(id) {
     if(confirm('Tem certeza que deseja remover este registro?')) {
+        const entry = entries.find(e => e.id === id);
         entries = entries.filter(e => e.id !== id);
         persist();
         renderEntries();
         renderQuickFills();
+        sysLog(`Registro REMOVIDO: ${entry ? entry.desc : 'ID '+id}`, 'error');
+        showToast('Registro eliminado do storage.', 'warning');
     }
 }
 
@@ -539,6 +594,20 @@ function updateDashboard() {
     document.getElementById('card-day').innerText   = minToTime(dayTotal)  + 'h';
     document.getElementById('card-week').innerText  = minToTime(weekTotal) + 'h';
     document.getElementById('card-month').innerText = minToTime(monthTotalMin) + 'h';
+
+    // Update Goal Progress
+    const goalPercent = Math.min(Math.round((dayTotal / dailyGoalMin) * 100), 100);
+    const progressFill = document.getElementById('goal-progress-bar');
+    const percentLabel = document.getElementById('goal-percent');
+    if (progressFill) progressFill.style.width = `${goalPercent}%`;
+    if (percentLabel) percentLabel.innerText = `${goalPercent}%`;
+
+    // Visual encouragement if goal reached
+    if (goalPercent >= 100) {
+        if (progressFill) progressFill.classList.add('glitch-text');
+    } else {
+        if (progressFill) progressFill.classList.remove('glitch-text');
+    }
 
     updateCategoryChart(currentYear, currentMonth);
 }
@@ -872,19 +941,14 @@ function changeTheme() {
             chart: { dropShadow: { color: theme.accent } }
         });
     }
-}
 
-// ── Interactive Background (Mouse Parallax) ──
-document.addEventListener('mousemove', (e) => {
-    const x = (e.clientX / window.innerWidth) - 0.5;
-    const y = (e.clientY / window.innerHeight) - 0.5;
-    
-    const blobs = document.querySelectorAll('.blob');
-    blobs.forEach((blob, index) => {
-        const factor = (index + 1) * 20;
-        blob.style.transform = `translate(${x * factor}px, ${y * factor}px)`;
-    });
-});
+    // Update Circuit Texture Hue
+    const circuit = document.querySelector('.bg-circuit-texture');
+    if (circuit) {
+        const hue = (currentThemeIdx * 60) + 240; // Rough offset for theme colors
+        circuit.style.filter = `sepia(100%) hue-rotate(${hue}deg) brightness(0.7) contrast(1.3)`;
+    }
+}
 
 // ── Maintenance ──
 function confirmClearStorage() {
@@ -893,6 +957,7 @@ function confirmClearStorage() {
         window.location.reload();
     }
 }
+
 
 // ── PWA Installation ──
 let deferredPrompt;
@@ -913,3 +978,72 @@ async function installApp() {
     }
     deferredPrompt = null;
 }
+
+// ── JSON Backup & Restore ──
+function exportJSON() {
+    const data = {
+        entries: entries,
+        categories: categories,
+        dailyGoalMin: dailyGoalMin,
+        version: '9.0.9',
+        exportDate: new Date().toISOString()
+    };
+    
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `timetracker_backup_${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    sysLog('BACKUP JSON EXPORTADO', 'success');
+    showToast('Backup do banco de dados concluído.');
+}
+
+function importJSON() {
+    // We trigger the hidden input in index.html
+    const input = document.getElementById('json-input');
+    if (input) input.click();
+}
+
+function handleJSONImport(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+            if (!data.entries || !data.categories) {
+                throw new Error('Formato de backup inválido.');
+            }
+
+            if (confirm('⚠️ RESTAURAR BACKUP: Isso substituirá todos os seus dados atuais. Continuar?')) {
+                entries = data.entries;
+                categories = data.categories;
+                if (data.dailyGoalMin) dailyGoalMin = data.dailyGoalMin;
+                
+                persist();
+                localStorage.setItem('timeCategories', JSON.stringify(categories));
+                localStorage.setItem('dailyGoalMin', dailyGoalMin);
+                
+                renderCategoryManager();
+                renderEntries();
+                renderQuickFills();
+                updateDashboard();
+                
+                sysLog('BACKUP RESTAURADO COM SUCESSO', 'success');
+                showToast('Banco de dados restaurado!', 'success');
+            }
+        } catch (err) {
+            sysLog('ERRO NA RESTAURAÇÃO: ' + err.message, 'error');
+            showToast('Erro ao ler arquivo de backup.', 'error');
+        }
+        event.target.value = ''; // Reset input
+    };
+    reader.readAsText(file);
+}
+
