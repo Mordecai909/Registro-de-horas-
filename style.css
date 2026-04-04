@@ -277,32 +277,50 @@ body {
     text-shadow: 0 0 30px var(--accent-glow);
 }
 
-/* Flat Modern Cyber-Buttons */
+/* 3D Weighty Buttons Interaction (Restored) */
 .btn-weight, 
 button[type="submit"],
 .glass-card button:not(.mode-pill button) {
     position: relative;
-    border: 1px solid rgba(255, 255, 256, 0.1) !important;
-    background: rgba(255, 255, 255, 0.05);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-bottom-width: 6px !important;
+    border-style: solid !important;
+    transition: all 0.1s cubic-bezier(0.1, 0.7, 0.1, 1);
+    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.35);
     overflow: hidden;
     isolation: isolate;
-    border-radius: 0.75rem;
+}
+
+/* Specific Flat Variant for Header/Status */
+.btn-flat {
+    border-bottom-width: 1px !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+.btn-flat:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 0 15px var(--accent-glow) !important;
+}
+
+.btn-flat:active {
+    transform: scale(0.96) !important;
 }
 
 .btn-weight:hover,
 button[type="submit"]:hover,
 .glass-card button:not(.mode-pill button):hover {
     transform: translateY(-2px);
-    box-shadow: 0 0 15px var(--accent-glow);
-    border-color: var(--accent) !important;
-    filter: brightness(1.1);
+    filter: brightness(1.2);
+    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.5);
 }
 
 .btn-weight:active,
 button[type="submit"]:active,
 .glass-card button:not(.mode-pill button):active {
-    transform: scale(0.98);
+    transform: translateY(6px) scale(0.98);
+    border-bottom-width: 0px !important;
+    filter: brightness(0.85);
+    box-shadow: none !important;
 }
 
 /* Fluid Fill Bottom-to-Top Animation */
@@ -313,8 +331,8 @@ button[type="submit"]::after,
     position: absolute;
     bottom: 0; left: 0; width: 100%; height: 0;
     z-index: -1;
-    transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    opacity: 0.3;
+    transition: height 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+    opacity: 0.8;
 }
 
 .btn-weight:hover::after,
@@ -323,21 +341,22 @@ button[type="submit"]:hover::after,
     height: 100%;
 }
 
-/* Color Themes for Flat Buttons */
-.btn-3d-purple  { --accent: #a855f7; --accent-glow: rgba(168, 85, 247, 0.4); }
-.btn-3d-purple::after  { background: #a855f7; }
+/* 3D Color Variants (Restored) */
+.btn-3d-purple  { border-bottom-color: #581c87 !important; }
+.btn-3d-purple::after  { background: #9333ea; }
 
-.btn-3d-emerald { --accent: #10b981; --accent-glow: rgba(16, 185, 129, 0.4); }
-.btn-3d-emerald::after { background: #10b981; }
+.btn-3d-emerald { border-bottom-color: #064e3b !important; }
+.btn-3d-emerald::after { background: #059669; }
 
-.btn-3d-rose    { --accent: #f43f5e; --accent-glow: rgba(244, 63, 94, 0.4); }
-.btn-3d-rose::after    { background: #f43f5e; }
+.btn-3d-rose    { border-bottom-color: #881337 !important; }
+.btn-3d-rose::after    { background: #e11d48; }
 
-.btn-3d-orange  { --accent: #f97316; --accent-glow: rgba(249, 115, 22, 0.4); }
-.btn-3d-orange::after  { background: #f97316; }
+.btn-3d-orange  { border-bottom-color: #7c2d12 !important; }
+.btn-3d-orange::after  { background: #ea580c; }
 
-.btn-3d-accent  { --accent: var(--accent); --accent-glow: var(--accent-glow); }
+.btn-3d-accent  { border-bottom-color: #4a044e !important; }
 .btn-3d-accent::after  { background: var(--accent); }
+
 
 
 /* ApexCharts Overrides for High-Tech look */
