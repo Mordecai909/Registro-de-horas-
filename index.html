@@ -448,9 +448,6 @@
 
     <!-- PWA Registration -->
     <script>
-        // Initialize Chart
-        initCategoryChart();
-
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js').then((reg) => {
@@ -502,8 +499,5 @@
         </div>
     </div>
 
-    <!-- Script references -->
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-    <script src="script.js?v=2"></script>
 </body>
 </html>

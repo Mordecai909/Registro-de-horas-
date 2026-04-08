@@ -496,7 +496,7 @@ input:focus, select:focus {
         border-bottom: 1px solid #ccc;
         text-align: left;
     }
-    .invoice-table th { background: #eee !important; -webkit-print-color-adjust: exact; }
+    .invoice-table th { background: #eee !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     .invoice-table tfoot td {
         border-top: 2px solid #000;
         font-weight: bold;

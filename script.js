@@ -40,6 +40,7 @@ let dailyGoalMin = parseInt(localStorage.getItem('dailyGoalMin')) || 360; // 6h 
 document.addEventListener('DOMContentLoaded', () => {
     updateCurrentDate();
     renderCategoryManager();
+    initCategoryChart(); // Must be called before renderEntries which calls updateDashboard
     renderEntries();
     setDefaultDate();
     setupSearch();
@@ -575,8 +576,8 @@ function exportPDF() {
     let totalMinutes = 0;
 
     listToExport.forEach(entry => {
-        const catName = entry.cat || 'Sem Categoria';
-        const mins = timeToMin(entry.duration);
+        const catName = entry.category || 'Sem Categoria';
+        const mins = timeToMin(entry.total);
         catMap[catName] = (catMap[catName] || 0) + mins;
         totalMinutes += mins;
     });
@@ -672,8 +673,22 @@ function updateDashboard() {
         .filter(e => e.date === todayStr)
         .reduce((sum, e) => sum + timeToMin(e.total), 0);
 
-    // Week Total
-    const weekTotal = entries.reduce((sum, e) => sum + timeToMin(e.total), 0);
+    // Week Total — current week (Mon–Sun)
+    const dayOfWeek = now.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+    const diffToMonday = (dayOfWeek === 0 ? -6 : 1 - dayOfWeek); // days since last Monday
+    const weekStart = new Date(now);
+    weekStart.setDate(now.getDate() + diffToMonday);
+    weekStart.setHours(0, 0, 0, 0);
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 6);
+    weekEnd.setHours(23, 59, 59, 999);
+
+    const weekTotal = entries
+        .filter(e => {
+            const d = new Date(e.date + 'T00:00:00');
+            return d >= weekStart && d <= weekEnd;
+        })
+        .reduce((sum, e) => sum + timeToMin(e.total), 0);
 
     // Month Total — only current month/year
     const monthTotalMin = entries
