@@ -91,7 +91,6 @@
     inset: 0; /* Tint doesn't need to spin */
     background: var(--accent);
     mix-blend-mode: multiply;
-    transition: background 1s ease;
 }
 
 @keyframes bhSpin {
@@ -166,16 +165,7 @@
     to { stroke-dashoffset: 0; }
 }
 
-.bg-noise {
-    position: absolute;
-    inset: 0;
-    /* Local SVG Filter fallback + SVG Filter usage */
-    background: transparent;
-    filter: url(#noiseFilter); /* Removed contrast for performance */
-    opacity: 0.05; /* Slightly more subtle local noise */
-    pointer-events: none;
-    transform: translateZ(0); /* Hardware acceleration */
-}
+
 
 @keyframes drift {
     0% { transform: translate(0, 0) scale(1); }
@@ -779,11 +769,7 @@ input:focus, select:focus {
 
 /* ─── Performance Optimizations for Mobile & Weaker PCs ─── */
 @media (max-width: 1024px) {
-    /* Disable SVG Noise (massive GPU saver) */
-    .bg-noise {
-        display: none !important;
-    }
-    
+
     /* Reduce Backdrop Blurs */
     .glass-card {
         backdrop-filter: blur(12px) !important;
