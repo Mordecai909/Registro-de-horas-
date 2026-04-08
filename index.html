@@ -318,9 +318,25 @@
                         </div>
                         <div>
                             <label class="block text-[10px] font-black text-accent uppercase tracking-widest mb-1.5 ml-1">Categoria</label>
-                            <select id="form-category" required class="w-full px-4 py-3 text-sm bg-[rgba(15,0,28,0.4)] border border-accent/30 text-white rounded-xl focus:outline-none focus:border-accent appearance-none">
-                                <!-- Preenchido dinamicamente via JS -->
-                            </select>
+                            <!-- Custom Cyber Dropdown -->
+                            <div class="custom-select-wrapper" id="category-select-wrapper">
+                                <!-- Hidden native select kept for form value -->
+                                <select id="form-category" required class="sr-only" aria-hidden="true" tabindex="-1"></select>
+                                <!-- Visible trigger button -->
+                                <button type="button" id="category-select-btn" class="custom-select-btn" aria-haspopup="listbox" aria-expanded="false">
+                                    <span id="category-select-display" class="custom-select-display">
+                                        <span class="cat-dot" id="category-select-dot"></span>
+                                        <span id="category-select-label">Selecionar...</span>
+                                    </span>
+                                    <svg class="custom-select-chevron" id="category-select-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
+                                    </svg>
+                                </button>
+                                <!-- Dropdown list -->
+                                <div class="custom-select-dropdown" id="category-select-dropdown" role="listbox" aria-label="Categorias">
+                                    <!-- Injected by JS -->
+                                </div>
+                            </div>
                         </div>
                         <div>
                             <label class="block text-[10px] font-black text-accent uppercase tracking-widest mb-1.5 ml-1">Pacote de Tarefas</label>

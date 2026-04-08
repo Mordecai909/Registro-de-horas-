@@ -40,7 +40,8 @@ let dailyGoalMin = parseInt(localStorage.getItem('dailyGoalMin')) || 360; // 6h 
 document.addEventListener('DOMContentLoaded', () => {
     updateCurrentDate();
     renderCategoryManager();
-    initCategoryChart(); // Must be called before renderEntries which calls updateDashboard
+    initCustomSelect();       // Wire up custom dropdown interactions
+    initCategoryChart();      // Must be called before renderEntries which calls updateDashboard
     renderEntries();
     setDefaultDate();
     setupSearch();
@@ -432,10 +433,22 @@ function editEntry(id) {
     if (!entry) return;
 
     document.getElementById('form-date').value = entry.date;
-    document.getElementById('form-category').value = entry.category || 'Atividades internas';
     document.getElementById('form-desc').value = entry.desc;
     if (entry.start) document.getElementById('form-start').value = entry.start;
     if (entry.end) document.getElementById('form-end').value = entry.end;
+
+    // Sync native select
+    const catName = entry.category || 'Atividades internas';
+    const select = document.getElementById('form-category');
+    if (select) select.value = catName;
+
+    // Sync custom dropdown display
+    const cat = categories.find(c => c.name === catName) || { name: catName, color: 'var(--accent)' };
+    syncCustomSelectDisplay(cat.name, cat.color);
+    document.querySelectorAll('.custom-select-option').forEach(opt => {
+        const isActive = opt.querySelector('span:last-child')?.textContent === catName;
+        opt.classList.toggle('is-active', isActive);
+    });
     
     editId = id;
     document.querySelector('button[type="submit"]').innerText = 'Atualizar Storage';
@@ -866,13 +879,110 @@ function renderCategoryManager() {
         container.appendChild(tag);
     });
 
-    // Populate select
+    // Populate hidden native select (for form value)
     select.innerHTML = '';
     categories.forEach(cat => {
         const opt = document.createElement('option');
         opt.value = cat.name;
         opt.textContent = cat.name;
         select.appendChild(opt);
+    });
+
+    // Populate custom dropdown UI
+    populateCustomSelect();
+}
+
+function populateCustomSelect() {
+    const dropdown = document.getElementById('category-select-dropdown');
+    const select   = document.getElementById('form-category');
+    if (!dropdown || !select) return;
+
+    const currentValue = select.value || (categories[0] && categories[0].name);
+
+    dropdown.innerHTML = '';
+    categories.forEach(cat => {
+        const opt = document.createElement('div');
+        opt.className = 'custom-select-option' + (cat.name === currentValue ? ' is-active' : '');
+        opt.setAttribute('role', 'option');
+        opt.setAttribute('aria-selected', cat.name === currentValue ? 'true' : 'false');
+        opt.style.setProperty('--cat-color', cat.color);
+        opt.innerHTML = `
+            <span class="cat-dot" style="background:${cat.color};box-shadow:0 0 8px ${cat.color}80;"></span>
+            <span>${cat.name}</span>
+        `;
+        opt.addEventListener('click', () => selectCustomCategory(cat.name, cat.color));
+        dropdown.appendChild(opt);
+    });
+
+    // Sync display to current value
+    const activeCat = categories.find(c => c.name === currentValue) || categories[0];
+    if (activeCat) syncCustomSelectDisplay(activeCat.name, activeCat.color);
+}
+
+function syncCustomSelectDisplay(name, color) {
+    const label = document.getElementById('category-select-label');
+    const dot   = document.getElementById('category-select-dot');
+    if (label) label.textContent = name;
+    if (dot) {
+        dot.style.background = color;
+        dot.style.boxShadow  = `0 0 8px ${color}99`;
+    }
+}
+
+function selectCustomCategory(name, color) {
+    // Update hidden native select
+    const select = document.getElementById('form-category');
+    if (select) select.value = name;
+
+    // Update display
+    syncCustomSelectDisplay(name, color);
+
+    // Update active class in dropdown
+    document.querySelectorAll('.custom-select-option').forEach(opt => {
+        const isActive = opt.querySelector('span:last-child')?.textContent === name;
+        opt.classList.toggle('is-active', isActive);
+        opt.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    });
+
+    // Close dropdown
+    closeCustomSelect();
+}
+
+function openCustomSelect() {
+    const btn      = document.getElementById('category-select-btn');
+    const dropdown = document.getElementById('category-select-dropdown');
+    if (!btn || !dropdown) return;
+    btn.setAttribute('aria-expanded', 'true');
+    dropdown.classList.add('open');
+}
+
+function closeCustomSelect() {
+    const btn      = document.getElementById('category-select-btn');
+    const dropdown = document.getElementById('category-select-dropdown');
+    if (!btn || !dropdown) return;
+    btn.setAttribute('aria-expanded', 'false');
+    dropdown.classList.remove('open');
+}
+
+function initCustomSelect() {
+    const btn     = document.getElementById('category-select-btn');
+    const wrapper = document.getElementById('category-select-wrapper');
+    if (!btn || !wrapper) return;
+
+    btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = btn.getAttribute('aria-expanded') === 'true';
+        if (isOpen) closeCustomSelect(); else openCustomSelect();
+    });
+
+    // Close on outside click
+    document.addEventListener('click', (e) => {
+        if (!wrapper.contains(e.target)) closeCustomSelect();
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeCustomSelect();
     });
 }
 
