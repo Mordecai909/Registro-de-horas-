@@ -69,32 +69,34 @@
     z-index: -10;
 }
 
-.blob {
+/* Black Hole Image Layer */
+.bh-layer {
     position: absolute;
-    border-radius: 50%;
-    opacity: 0.35;
+    inset: -30%; /* Oversize to prevent showing edges when spinning */
+    pointer-events: none;
     will-change: transform;
-    transition: background 0.8s ease;
     transform: translateZ(0); /* Hardware acceleration */
 }
-
-.blob-1 {
-    width: 100vh; height: 100vh;
-    top: -20%; left: -20%;
-    background: radial-gradient(circle at center, var(--blob-1-bg) 0%, transparent 65%);
+.bh-image {
+    background-image: url('black-hole.png');
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.9; 
+    mix-blend-mode: screen; 
+    /* Smooth, 4-minute slow rotation */
+    animation: bhSpin 240s linear infinite;
+}
+.bh-tint {
+    inset: 0; /* Tint doesn't need to spin */
+    background: var(--accent);
+    mix-blend-mode: multiply;
+    transition: background 1s ease;
 }
 
-.blob-2 {
-    width: 80vh; height: 80vh;
-    bottom: -10%; right: -10%;
-    background: radial-gradient(circle at center, var(--blob-2-bg) 0%, transparent 65%);
-}
-
-.blob-3 {
-    width: 60vh; height: 60vh;
-    top: 40%; left: 30%;
-    background: radial-gradient(circle at center, var(--blob-3-bg) 0%, transparent 65%);
-    opacity: 0.2;
+@keyframes bhSpin {
+    0% { transform: translateZ(0) rotate(0deg); }
+    100% { transform: translateZ(0) rotate(360deg); }
 }
 
 .bg-grid {
