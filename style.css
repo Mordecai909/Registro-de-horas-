@@ -280,7 +280,7 @@ body {
 /* 3D Weighty Buttons Interaction (Restored) */
 .btn-weight, 
 button[type="submit"],
-.glass-card button:not(.mode-pill button) {
+.glass-card button:not(.mode-pill button):not(.btn-icon) {
     position: relative;
     border-bottom-width: 6px !important;
     border-style: solid !important;
@@ -308,7 +308,7 @@ button[type="submit"],
 
 .btn-weight:hover,
 button[type="submit"]:hover,
-.glass-card button:not(.mode-pill button):hover {
+.glass-card button:not(.mode-pill button):not(.btn-icon):hover {
     transform: translateY(-2px);
     filter: brightness(1.2);
     box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.5);
@@ -316,7 +316,7 @@ button[type="submit"]:hover,
 
 .btn-weight:active,
 button[type="submit"]:active,
-.glass-card button:not(.mode-pill button):active {
+.glass-card button:not(.mode-pill button):not(.btn-icon):active {
     transform: translateY(6px) scale(0.98);
     border-bottom-width: 0px !important;
     filter: brightness(0.85);
@@ -326,7 +326,7 @@ button[type="submit"]:active,
 /* Fluid Fill Bottom-to-Top Animation */
 .btn-weight::after,
 button[type="submit"]::after,
-.glass-card button::after {
+.glass-card button:not(.mode-pill button):not(.btn-icon)::after {
     content: "";
     position: absolute;
     bottom: 0; left: 0; width: 100%; height: 0;
@@ -337,7 +337,7 @@ button[type="submit"]::after,
 
 .btn-weight:hover::after,
 button[type="submit"]:hover::after,
-.glass-card button:hover::after {
+.glass-card button:not(.mode-pill button):not(.btn-icon):hover::after {
     height: 100%;
 }
 
