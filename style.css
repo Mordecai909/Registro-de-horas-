@@ -72,8 +72,7 @@
 .blob {
     position: absolute;
     border-radius: 50%;
-    filter: blur(80px); /* Reduced blur for performance */
-    opacity: 0.25;
+    opacity: 0.35;
     will-change: transform;
     transition: background 0.8s ease;
     transform: translateZ(0); /* Hardware acceleration */
@@ -82,20 +81,20 @@
 .blob-1 {
     width: 100vh; height: 100vh;
     top: -20%; left: -20%;
-    background: var(--blob-1-bg);
+    background: radial-gradient(circle at center, var(--blob-1-bg) 0%, transparent 65%);
 }
 
 .blob-2 {
     width: 80vh; height: 80vh;
     bottom: -10%; right: -10%;
-    background: var(--blob-2-bg);
+    background: radial-gradient(circle at center, var(--blob-2-bg) 0%, transparent 65%);
 }
 
 .blob-3 {
     width: 60vh; height: 60vh;
     top: 40%; left: 30%;
-    background: var(--blob-3-bg);
-    opacity: 0.15;
+    background: radial-gradient(circle at center, var(--blob-3-bg) 0%, transparent 65%);
+    opacity: 0.2;
 }
 
 .bg-grid {
@@ -170,9 +169,8 @@
     inset: 0;
     /* Local SVG Filter fallback + SVG Filter usage */
     background: transparent;
-    filter: url(#noiseFilter) contrast(120%) brightness(100%);
-    mix-blend-mode: overlay;
-    opacity: 0.08; /* Slightly more subtle local noise */
+    filter: url(#noiseFilter); /* Removed contrast for performance */
+    opacity: 0.05; /* Slightly more subtle local noise */
     pointer-events: none;
     transform: translateZ(0); /* Hardware acceleration */
 }
@@ -732,11 +730,5 @@ input:focus, select:focus {
     .bg-circuit-texture {
         mix-blend-mode: normal !important;
         opacity: 0.05 !important;
-    }
-    
-    /* Reduce Blob Sizes and Blur */
-    .blob {
-        filter: blur(40px) !important;
-        opacity: 0.15 !important;
     }
 }
