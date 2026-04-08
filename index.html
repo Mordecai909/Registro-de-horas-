@@ -157,7 +157,7 @@
                             </label>
                         </div>
                         <button type="submit"
-                            class="w-full py-2.5 bg-accent/15 hover:bg-accent text-accent hover:text-white rounded-xl text-xs font-bold transition-all border border-accent/30 flex items-center justify-center gap-2 btn-weight btn-3d-purple">
+                            class="w-full py-2.5 bg-accent/15 hover:bg-accent text-accent hover:text-white rounded-xl text-xs font-bold transition-all border border-accent/30 flex items-center justify-center gap-2 btn-weight btn-3d-accent">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" /></svg>
                             Adicionar Tag
                         </button>
@@ -285,7 +285,7 @@
 
                 <div class="flex gap-3 w-full timer-buttons-row">
                     <button id="btn-timer-toggle" onclick="toggleTimer()"
-                        class="btn-weight flex-1 py-5 bg-accent hover:opacity-80 text-[#0f001c] rounded-2xl font-bold text-base border border-accent/50 shadow-[0_0_20px_accent_glow] hover:shadow-[0_0_30px_accent_glow] transition-all flex items-center justify-center gap-2 group relative btn-3d-purple">
+                        class="btn-weight flex-1 py-5 bg-accent hover:opacity-80 text-[#0f001c] rounded-2xl font-bold text-base border border-accent/50 shadow-[0_0_20px_accent_glow] hover:shadow-[0_0_30px_accent_glow] transition-all flex items-center justify-center gap-2 group relative btn-3d-accent">
                         <svg id="timer-icon" class="w-5 h-5 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/></svg>
                         <span id="timer-btn-label">Iniciar</span>
                         <span class="absolute bottom-1.5 right-2.5 text-[9px] font-mono opacity-30 leading-none">Space</span>
@@ -384,11 +384,11 @@
                         <svg class="w-4 h-4 text-emerald-400 group-hover:text-[#0f001c] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
                         Export.CSV
                     </button>
-                    <button onclick="exportJSON()" class="group flex-1 md:flex-none px-4 py-2.5 bg-[rgba(255,255,255,0.05)] text-white rounded-xl text-xs font-bold hover:bg-accent hover:text-[#0f001c] transition-all flex items-center justify-center gap-2 shadow-[0_0_10px_var(--accent-glow)] btn-weight btn-3d-purple">
+                    <button onclick="exportJSON()" class="group flex-1 md:flex-none px-4 py-2.5 bg-[rgba(255,255,255,0.05)] text-white rounded-xl text-xs font-bold hover:bg-accent hover:text-[#0f001c] transition-all flex items-center justify-center gap-2 shadow-[0_0_10px_var(--accent-glow)] btn-weight btn-3d-accent">
                         <svg class="w-4 h-4 text-accent group-hover:text-[#0f001c] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg>
                         Backup.JSON
                     </button>
-                    <button onclick="importJSON()" class="group flex-1 md:flex-none px-4 py-2.5 bg-[rgba(255,255,255,0.05)] text-white rounded-xl text-xs font-bold hover:bg-accent hover:text-[#0f001c] transition-all flex items-center justify-center gap-2 shadow-[0_0_10px_var(--accent-glow)] btn-weight btn-3d-purple">
+                    <button onclick="importJSON()" class="group flex-1 md:flex-none px-4 py-2.5 bg-[rgba(255,255,255,0.05)] text-white rounded-xl text-xs font-bold hover:bg-accent hover:text-[#0f001c] transition-all flex items-center justify-center gap-2 shadow-[0_0_10px_var(--accent-glow)] btn-weight btn-3d-accent">
                         <svg class="w-4 h-4 text-accent group-hover:text-[#0f001c] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
                         Restore.JSON
                     </button>

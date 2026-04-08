@@ -355,7 +355,7 @@ button[type="submit"]:hover::after,
 .btn-3d-orange  { border-bottom-color: #7c2d12 !important; }
 .btn-3d-orange::after  { background: #ea580c; }
 
-.btn-3d-accent  { border-bottom-color: #4a044e !important; }
+.btn-3d-accent  { border-bottom-color: rgba(0, 0, 0, 0.4) !important; }
 .btn-3d-accent::after  { background: var(--accent); }
 
 
