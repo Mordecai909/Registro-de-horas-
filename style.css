@@ -457,9 +457,68 @@ input:focus, select:focus {
 }
 
 @media print {
-    body { background: white; color: black; }
-    .glass-card { border: 1px solid #ddd; background: none; }
-    header, #btn-timer-toggle, #btn-timer-reset, #entry-form, .actions-cell { display: none !important; }
+    body { background: white !important; }
+    body * {
+        visibility: hidden;
+    }
+    .cyber-pulse-bg { display: none !important; }
+    #invoice-print-area, #invoice-print-area * {
+        visibility: visible;
+    }
+    #invoice-print-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        display: block !important;
+        margin: 0;
+        padding: 40px 20px;
+        color: #111 !important;
+        background: #fff !important;
+        font-family: 'Inter', sans-serif !important;
+    }
+    .invoice-header {
+        border-bottom: 2px solid #000;
+        padding-bottom: 15px;
+        margin-bottom: 25px;
+    }
+    .invoice-title {
+        font-family: 'Outfit', sans-serif !important;
+        font-size: 20pt;
+        font-weight: 900;
+        margin: 0 0 5px 0;
+        letter-spacing: 1px;
+    }
+    .invoice-date { margin-top: 5px; font-size: 10pt; color: #444; }
+    .invoice-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 40px;
+        font-size: 11pt;
+    }
+    .invoice-table th, .invoice-table td {
+        padding: 10px;
+        border-bottom: 1px solid #ccc;
+        text-align: left;
+    }
+    .invoice-table th { background: #eee !important; -webkit-print-color-adjust: exact; }
+    .invoice-table tfoot td {
+        border-top: 2px solid #000;
+        font-weight: bold;
+        font-size: 12pt;
+    }
+    #print-signatures {
+        margin-top: 80px;
+        display: flex;
+        justify-content: flex-end;
+    }
+    #print-signatures div {
+        border-top: 1px solid #000;
+        width: 300px;
+        text-align: center;
+        padding-top: 5px;
+        font-size: 10pt;
+    }
 }
 
 /* ─── Mode Toggle Pill ─────────────────────────────────────── */

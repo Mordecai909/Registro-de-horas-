@@ -548,7 +548,72 @@ function exportCSV() {
 }
 
 function exportPDF() {
+    // Discover visible tasks to generate invoice for
+    let listToExport = [];
+    const searchInput = document.getElementById('search-input');
+    if (searchInput && searchInput.value.trim() !== '') {
+        const val = searchInput.value.toLowerCase();
+        listToExport = entries.filter(e => 
+            (e.desc || '').toLowerCase().includes(val) || 
+            (e.cat || '').toLowerCase().includes(val) || 
+            (e.date || '').includes(val)
+        );
+    } else {
+        listToExport = entries;
+    }
+
+    if (listToExport.length === 0) {
+        showToast('Nenhum dado para exportar.', 'error');
+        return;
+    }
+
+    // Aggregate by Category
+    const catMap = {};
+    let totalMinutes = 0;
+
+    listToExport.forEach(entry => {
+        const catName = entry.cat || 'Sem Categoria';
+        const mins = timeToMin(entry.duration);
+        catMap[catName] = (catMap[catName] || 0) + mins;
+        totalMinutes += mins;
+    });
+
+    const sortedCats = Object.entries(catMap).sort((a, b) => b[1] - a[1]);
+
+    // Populate Print Structure
+    const printDate = document.getElementById('print-date');
+    if (printDate) {
+        const today = new Date();
+        printDate.innerText = `Ref. Sistema: ${today.toLocaleDateString('pt-BR')} ${today.toLocaleTimeString('pt-BR')} - Protocolo de Emissão PDF`;
+    }
+
+    const tBody = document.getElementById('print-summary-table');
+    if (tBody) {
+        tBody.innerHTML = '';
+        sortedCats.forEach(([cat, mins]) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><strong>${cat}</strong></td>
+                <td style="text-align: right;">${minToTime(mins)}h</td>
+            `;
+            tBody.appendChild(tr);
+        });
+    }
+
+    const grandTotal = document.getElementById('print-grand-total');
+    if (grandTotal) {
+        const h = Math.floor(totalMinutes / 60);
+        const m = totalMinutes % 60;
+        grandTotal.innerText = `${h}h ${m}m (${Math.round(totalMinutes/60*100)/100} decimal)`;
+    }
+
+    // Trigger Print Dialog
     window.print();
+    
+    setTimeout(() => {
+        showToast('Documento gerado com sucesso.', 'success');
+        sysLog('EXPORTAÇÃO PDF: CONCLUÍDA', 'success');
+    }, 1000);
 }
 
 // Helpers

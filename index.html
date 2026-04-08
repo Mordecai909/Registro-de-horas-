@@ -384,6 +384,10 @@
                         <svg class="w-4 h-4 text-emerald-400 group-hover:text-[#0f001c] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
                         Export.CSV
                     </button>
+                    <button onclick="exportPDF()" class="group flex-1 md:flex-none px-4 py-2.5 bg-[rgba(255,255,255,0.05)] text-white rounded-xl text-xs font-bold hover:bg-white hover:text-[#0f001c] transition-all flex items-center justify-center gap-2 shadow-[0_0_10px_rgba(255,255,255,0.05)] hover:shadow-[0_0_20px_rgba(255,255,255,0.5)] btn-weight">
+                        <svg class="w-4 h-4 text-white group-hover:text-[#0f001c] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                        Fatura.PDF
+                    </button>
                     <button onclick="exportJSON()" class="group flex-1 md:flex-none px-4 py-2.5 bg-[rgba(255,255,255,0.05)] text-white rounded-xl text-xs font-bold hover:bg-accent hover:text-[#0f001c] transition-all flex items-center justify-center gap-2 shadow-[0_0_10px_var(--accent-glow)] btn-weight btn-3d-accent">
                         <svg class="w-4 h-4 text-accent group-hover:text-[#0f001c] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg>
                         Backup.JSON
@@ -458,6 +462,40 @@
 
     <!-- Toast Notification System -->
     <div id="toast-container" class="fixed bottom-8 right-8 z-[100] flex flex-col gap-3 pointer-events-none"></div>
+
+    <!-- PDF Invoice Hidden Area -->
+    <div id="invoice-print-area" class="hidden">
+        <div class="invoice-header">
+            <h1 class="invoice-title">PROTOCOLO 9.0.9</h1>
+            <p class="invoice-subtitle">Relatório de Horas Técnicas</p>
+            <p class="invoice-date" id="print-date"></p>
+        </div>
+        
+        <div class="invoice-body">
+            <h3>Resumo por Categoria</h3>
+            <table class="invoice-table">
+                <thead>
+                    <tr>
+                        <th>Categoria / Atividade</th>
+                        <th style="text-align: right;">Total de Horas</th>
+                    </tr>
+                </thead>
+                <tbody id="print-summary-table">
+                    <!-- Injected via JS -->
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td>Total Geral Executado</td>
+                        <td style="text-align: right;" id="print-grand-total">00h 00m</td>
+                    </tr>
+                </tfoot>
+            </table>
+            
+            <div id="print-signatures">
+                <div>Assinatura Digital / Responsável</div>
+            </div>
+        </div>
+    </div>
 
     <!-- Native Noise Filter -->
     <svg style="display: none;">
