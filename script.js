@@ -32,7 +32,7 @@ let pomodoroMode = false;
 let pomodoroDuration = 1500; // 25 min default
 
 // Daily Goal State
-let dailyGoalMin = parseInt(localStorage.getItem('dailyGoalMin')) || 480; // 8h default
+let dailyGoalMin = parseInt(localStorage.getItem('dailyGoalMin')) || 360; // 6h default
 
 
 

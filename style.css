@@ -72,11 +72,11 @@
 .blob {
     position: absolute;
     border-radius: 50%;
-    filter: blur(140px); /* Massive, soft aura */
+    filter: blur(80px); /* Reduced blur for performance */
     opacity: 0.25;
-    mix-blend-mode: screen;
     will-change: transform;
     transition: background 0.8s ease;
+    transform: translateZ(0); /* Hardware acceleration */
 }
 
 .blob-1 {
@@ -174,6 +174,7 @@
     mix-blend-mode: overlay;
     opacity: 0.08; /* Slightly more subtle local noise */
     pointer-events: none;
+    transform: translateZ(0); /* Hardware acceleration */
 }
 
 @keyframes drift {
@@ -712,4 +713,30 @@ input:focus, select:focus {
     0% { transform: translate(0); text-shadow: -2px 0 #ff00c1, 2px 0 #00fff9; }
     50% { transform: translate(-1px, 1px); text-shadow: 2px 0 #ff00c1, -2px 0 #00fff9; }
     100% { transform: translate(1px, -1px); text-shadow: -2px 0 #ff00c1, 2px 0 #00fff9; }
+}
+
+/* ─── Performance Optimizations for Mobile & Weaker PCs ─── */
+@media (max-width: 1024px) {
+    /* Disable SVG Noise (massive GPU saver) */
+    .bg-noise {
+        display: none !important;
+    }
+    
+    /* Reduce Backdrop Blurs */
+    .glass-card {
+        backdrop-filter: blur(12px) !important;
+        background: rgba(22, 5, 43, 0.85) !important; /* Increase opacity to compensate for less blur */
+    }
+    
+    /* Remove expensive mix-blend modes */
+    .bg-circuit-texture {
+        mix-blend-mode: normal !important;
+        opacity: 0.05 !important;
+    }
+    
+    /* Reduce Blob Sizes and Blur */
+    .blob {
+        filter: blur(40px) !important;
+        opacity: 0.15 !important;
+    }
 }
