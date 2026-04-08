@@ -548,6 +548,9 @@ function exportCSV() {
 }
 
 function exportPDF() {
+    const rateInput = document.getElementById('hourly-rate');
+    const hourlyRate = rateInput && rateInput.value ? parseFloat(rateInput.value) : 0;
+
     // Discover visible tasks to generate invoice for
     let listToExport = [];
     const searchInput = document.getElementById('search-input');
@@ -587,24 +590,48 @@ function exportPDF() {
         printDate.innerText = `Ref. Sistema: ${today.toLocaleDateString('pt-BR')} ${today.toLocaleTimeString('pt-BR')} - Protocolo de Emissão PDF`;
     }
 
+    const tHead = document.querySelector('.invoice-table thead');
+    const tFoot = document.querySelector('.invoice-table tfoot');
     const tBody = document.getElementById('print-summary-table');
+
+    if (tHead) {
+        tHead.innerHTML = `
+            <tr>
+                <th>Categoria / Atividade</th>
+                <th style="text-align: right;">Total de Horas</th>
+                ${hourlyRate > 0 ? '<th style="text-align: right;">Valor Calculado</th>' : ''}
+            </tr>
+        `;
+    }
+
     if (tBody) {
         tBody.innerHTML = '';
         sortedCats.forEach(([cat, mins]) => {
+            const hDec = mins / 60;
+            const priceStr = hourlyRate > 0 ? `<td style="text-align: right;">R$ ${(hDec * hourlyRate).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>` : '';
+            
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td><strong>${cat}</strong></td>
                 <td style="text-align: right;">${minToTime(mins)}h</td>
+                ${priceStr}
             `;
             tBody.appendChild(tr);
         });
     }
 
-    const grandTotal = document.getElementById('print-grand-total');
-    if (grandTotal) {
-        const h = Math.floor(totalMinutes / 60);
-        const m = totalMinutes % 60;
-        grandTotal.innerText = `${h}h ${m}m (${Math.round(totalMinutes/60*100)/100} decimal)`;
+    if (tFoot) {
+        const grandHDec = totalMinutes / 60;
+        const grandPriceStr = hourlyRate > 0 ? `<td style="text-align: right;"><strong>R$ ${(grandHDec * hourlyRate).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong></td>` : '';
+        tFoot.innerHTML = `
+            <tr>
+                <td>Total Geral Executado</td>
+                <td style="text-align: right;" id="print-grand-total">
+                    ${Math.floor(totalMinutes / 60)}h ${totalMinutes % 60}m (${Math.round(grandHDec*100)/100} dec.)
+                </td>
+                ${grandPriceStr}
+            </tr>
+        `;
     }
 
     // Trigger Print Dialog

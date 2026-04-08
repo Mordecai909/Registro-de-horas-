@@ -380,6 +380,10 @@
                 </div>
                 
                 <div class="flex gap-2 w-full md:w-auto">
+                    <div class="relative group flex-1 md:flex-none">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-white/50 text-xs font-bold">R$</span>
+                        <input type="number" id="hourly-rate" placeholder="Valor/Hora" class="w-[110px] pl-8 pr-2 py-2.5 bg-[rgba(255,255,255,0.05)] text-white text-xs font-bold rounded-xl border border-transparent focus:border-white focus:outline-none transition-all placeholder:text-white/30 btn-weight" min="0">
+                    </div>
                     <button onclick="exportCSV()" class="group flex-1 md:flex-none px-4 py-2.5 bg-[rgba(255,255,255,0.05)] text-white rounded-xl text-xs font-bold hover:bg-emerald-500 hover:text-[#0f001c] transition-all flex items-center justify-center gap-2 shadow-[0_0_10px_rgba(16,185,129,0.05)] hover:shadow-[0_0_20px_rgba(16,185,129,0.5)] btn-weight btn-3d-emerald">
                         <svg class="w-4 h-4 text-emerald-400 group-hover:text-[#0f001c] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
                         Export.CSV
