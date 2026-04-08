@@ -346,6 +346,9 @@ button[type="submit"]:hover::after,
 .btn-3d-purple  { border-bottom-color: #581c87 !important; }
 .btn-3d-purple::after  { background: #9333ea; }
 
+.btn-3d-white   { border-bottom-color: #52525b !important; }
+.btn-3d-white::after   { background: #e4e4e7; }
+
 .btn-3d-emerald { border-bottom-color: #064e3b !important; }
 .btn-3d-emerald::after { background: #059669; }
 

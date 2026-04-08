@@ -170,23 +170,23 @@
     </aside>
 
     <!-- Header -->
-    <header class="w-full py-6 px-6 bg-[var(--card-bg)] backdrop-blur-xl sticky top-0 z-50">
-        <div class="neon-divider !absolute bottom-0 left-0 animate-pulse-subtle opacity-30"></div>
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-4">
-                <button onclick="toggleSidebar(true)" class="btn-weight btn-3d-accent btn-flat p-2.5 rounded-xl bg-accent/10 text-accent hover:bg-accent/20 hover:text-white transition-all shadow-[0_0_15px_accent_glow]">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16" /></svg>
+    <header class="w-full py-5 px-6 md:px-10 bg-transparent sticky top-0 z-50 pointer-events-none">
+        <div class="max-w-7xl mx-auto flex justify-between items-center pointer-events-auto">
+            <div class="flex items-center gap-6">
+                <button onclick="toggleSidebar(true)" class="p-2 text-white/40 hover:text-white transition-colors focus:outline-none hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" /></svg>
                 </button>
-                <h1 class="text-2xl font-display font-extrabold tracking-tight text-white shadow-neon">
-                    Time<span class="text-accent underline decoration-accent/40 underline-offset-4">Tracker</span>
+                <h1 class="text-xl md:text-2xl font-display font-light tracking-wide text-white/90">
+                    Time<span class="text-accent font-extrabold px-0.5">Tracker</span><span class="text-white/30 animate-[pulse_1.5s_ease-in-out_infinite]">_</span>
                 </h1>
             </div>
-            <div class="flex items-center gap-4">
-                <div class="flex flex-col items-end">
-                    <span class="text-sm font-semibold text-accent/90" id="current-date-display">Carregando...</span>
-                    <span class="text-[10px] uppercase tracking-widest text-accent font-bold">Residência Cibernética</span>
+            <div class="flex items-center gap-6">
+                <!-- Date -->
+                <div class="hidden md:flex flex-col items-end">
+                    <span class="text-xs font-medium text-white/50 tracking-[0.2em] uppercase" id="current-date-display">Carregando...</span>
                 </div>
-                <button onclick="toggleRightSidebar(true)" class="h-10 w-10 btn-weight btn-3d-accent btn-flat rounded-xl bg-accent/10 flex items-center justify-center text-accent shadow-[0_0_15px_accent_glow] hover:bg-accent/20 transition-all">
+                <!-- Right Sidebar Toggle -->
+                <button onclick="toggleRightSidebar(true)" class="p-2 text-white/40 hover:text-white transition-colors focus:outline-none hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" /></svg>
                 </button>
             </div>
@@ -390,7 +390,7 @@
                         <svg class="w-4 h-4 text-emerald-400 group-hover:text-[#0f001c] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
                         Export.CSV
                     </button>
-                    <button onclick="exportPDF()" class="group flex-1 md:flex-none px-4 py-2.5 bg-[rgba(255,255,255,0.05)] text-white rounded-xl text-xs font-bold hover:bg-white hover:text-[#0f001c] transition-all flex items-center justify-center gap-2 shadow-[0_0_10px_rgba(255,255,255,0.05)] hover:shadow-[0_0_20px_rgba(255,255,255,0.5)] btn-weight">
+                    <button onclick="exportPDF()" class="group flex-1 md:flex-none px-4 py-2.5 bg-[rgba(255,255,255,0.05)] text-white rounded-xl text-xs font-bold hover:bg-white hover:text-[#0f001c] transition-all flex items-center justify-center gap-2 shadow-[0_0_10px_rgba(255,255,255,0.05)] hover:shadow-[0_0_20px_rgba(255,255,255,0.5)] btn-weight btn-3d-white">
                         <svg class="w-4 h-4 text-white group-hover:text-[#0f001c] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                         Fatura.PDF
                     </button>
