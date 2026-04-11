@@ -50,12 +50,29 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize pill indicator position after layout is rendered
     requestAnimationFrame(initPillIndicator);
     
+    // Init custom date & time pickers
+    CyberDatePicker.init();
+    CyberTimePickers.start = createTimePicker('form-start', 'time-start-btn', 'time-start-display', 'time-start-popup');
+    CyberTimePickers.end   = createTimePicker('form-end',   'time-end-btn',   'time-end-display',   'time-end-popup');
+    CyberTimePickers.start.init();
+    CyberTimePickers.end.init();
+
     if (secondsElapsed > 0) {
         document.getElementById('timer-text').innerText = formatTime(secondsElapsed);
     }
 
     sysLog('SISTEMA OPERACIONAL INICIALIZADO', 'success');
 });
+
+// Helper to close EVERY custom popup in the UI
+function closeAllPopups() {
+    closeCustomSelect();
+    CyberDatePicker.close();
+    Object.values(CyberTimePickers).forEach(p => p.close());
+    
+    // Reset all cards' elevation
+    document.querySelectorAll('.glass-card').forEach(c => c.classList.remove('z-elevated'));
+}
 
 // ── Cyber Terminal System ──
 function sysLog(message, type = 'info') {
@@ -138,6 +155,7 @@ function setDefaultDate() {
     const today = new Date().toISOString().split('T')[0];
     const dateInput = document.getElementById('form-date');
     if (dateInput) dateInput.value = today;
+    CyberDatePicker.setDate(today);
 }
 
 // Timer Logic
@@ -351,6 +369,9 @@ function saveTimerToForm() {
 
     document.getElementById('form-start').value = `${startH}:${startM}`;
     document.getElementById('form-end').value   = `${endH}:${endM}`;
+    // Sync custom time picker displays
+    CyberTimePickers.start?.setTime(`${startH}:${startM}`);
+    CyberTimePickers.end?.setTime(`${endH}:${endM}`);
     document.getElementById('entry-form').scrollIntoView({ behavior: 'smooth' });
 }
 
@@ -422,7 +443,12 @@ function saveEntry(e) {
     renderEntries();
     renderQuickFills();
     e.target.reset();
-    setDefaultDate();
+    setDefaultDate(); // also resets date picker display
+    // Reset time picker displays
+    const startDisp = document.getElementById('time-start-display');
+    const endDisp   = document.getElementById('time-end-display');
+    if (startDisp) startDisp.textContent = '--:--';
+    if (endDisp)   endDisp.textContent   = '--:--';
     
     sysLog(`Registro GRAVADO: ${descInput.value}`, 'success');
     showToast('Bloco de tempo sincronizado com sucesso!');
@@ -437,12 +463,17 @@ function editEntry(id) {
     if (entry.start) document.getElementById('form-start').value = entry.start;
     if (entry.end) document.getElementById('form-end').value = entry.end;
 
-    // Sync native select
+    // Sync custom date picker
+    CyberDatePicker.setDate(entry.date);
+
+    // Sync custom time pickers
+    if (entry.start) CyberTimePickers.start?.setTime(entry.start);
+    if (entry.end)   CyberTimePickers.end?.setTime(entry.end);
+
+    // Sync native category select + custom dropdown
     const catName = entry.category || 'Atividades internas';
     const select = document.getElementById('form-category');
     if (select) select.value = catName;
-
-    // Sync custom dropdown display
     const cat = categories.find(c => c.name === catName) || { name: catName, color: 'var(--accent)' };
     syncCustomSelectDisplay(cat.name, cat.color);
     document.querySelectorAll('.custom-select-option').forEach(opt => {
@@ -949,9 +980,19 @@ function selectCustomCategory(name, color) {
 }
 
 function openCustomSelect() {
+    closeAllPopups(); // Ensure other things are closed
     const btn      = document.getElementById('category-select-btn');
     const dropdown = document.getElementById('category-select-dropdown');
     if (!btn || !dropdown) return;
+
+    // Elevate parent card
+    btn.closest('.glass-card')?.classList.add('z-elevated');
+
+    // Auto-flip up if near bottom
+    const rect = btn.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom;
+    dropdown.classList.toggle('open-up', spaceBelow < 300);
+
     btn.setAttribute('aria-expanded', 'true');
     dropdown.classList.add('open');
 }
@@ -1264,3 +1305,276 @@ function handleJSONImport(event) {
     reader.readAsText(file);
 }
 
+
+// ─── Custom Date Picker ──────────────────────────────────────────────────────
+const CyberDatePicker = (() => {
+    const MONTHS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+                    'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+    let displayMonth = new Date();
+    let selectedDate = null;
+
+    function $ (id) { return document.getElementById(id); }
+
+    function init() {
+        const btn     = $('date-picker-btn');
+        const wrapper = $('date-picker-wrapper');
+        if (!btn || !wrapper) return;
+
+        btn.addEventListener('click', e => { e.stopPropagation(); toggle(); });
+        document.addEventListener('click', e => { if (!wrapper.contains(e.target)) close(); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+        renderCalendar();
+    }
+
+    function toggle() {
+        $('date-picker-popup').classList.contains('open') ? close() : open();
+    }
+    function open()  {
+        closeAllPopups();
+        const btn = $('date-picker-btn');
+        const pop = $('date-picker-popup');
+        if (!btn || !pop) return;
+
+        // Elevate parent card
+        btn.closest('.glass-card')?.classList.add('z-elevated');
+
+        // Auto-flip up if near bottom
+        const rect = btn.getBoundingClientRect();
+        const spaceBelow = window.innerHeight - rect.bottom;
+        pop.classList.toggle('open-up', spaceBelow < 320);
+
+        btn.classList.add('open');
+        pop.classList.add('open');
+        renderCalendar();
+    }
+    function close() {
+        $('date-picker-btn').classList.remove('open');
+        $('date-picker-popup').classList.remove('open');
+    }
+
+    function prevMonth() { displayMonth.setMonth(displayMonth.getMonth() - 1); renderCalendar(); }
+    function nextMonth() { displayMonth.setMonth(displayMonth.getMonth() + 1); renderCalendar(); }
+
+    function selectDay(y, m, d) {
+        selectedDate  = new Date(y, m, d);
+        displayMonth  = new Date(y, m, d);
+        const inp = $('form-date');
+        if (inp) inp.value = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        syncDisplay();
+        renderCalendar();
+        setTimeout(close, 160);
+    }
+
+    function setDate(dateStr) {
+        if (!dateStr) return;
+        const [y, m, d] = dateStr.split('-').map(Number);
+        selectedDate  = new Date(y, m - 1, d);
+        displayMonth  = new Date(y, m - 1, d);
+        syncDisplay();
+        renderCalendar();
+    }
+
+    function syncDisplay() {
+        const el = $('date-picker-display');
+        if (!el) return;
+        if (selectedDate) {
+            const dd = String(selectedDate.getDate()).padStart(2,'0');
+            const mm = String(selectedDate.getMonth()+1).padStart(2,'0');
+            el.textContent = `${dd}/${mm}/${selectedDate.getFullYear()}`;
+            el.classList.add('text-accent');
+        } else {
+            el.textContent = 'Selecionar data';
+            el.classList.remove('text-accent');
+        }
+    }
+
+    function setToday() {
+        const d = new Date();
+        selectDay(d.getFullYear(), d.getMonth(), d.getDate());
+    }
+
+    function renderCalendar() {
+        const grid = $('cal-day-grid');
+        const lbl  = $('cal-month-lbl');
+        if (!grid || !lbl) return;
+
+        const y  = displayMonth.getFullYear();
+        const m  = displayMonth.getMonth();
+        lbl.textContent = `${MONTHS[m]} ${y}`;
+
+        const today     = new Date();
+        const firstDow  = new Date(y, m, 1).getDay();
+        const daysInM   = new Date(y, m + 1, 0).getDate();
+        const prevLast  = new Date(y, m, 0).getDate();
+        const total     = Math.ceil((firstDow + daysInM) / 7) * 7;
+
+        let html = '';
+        for (let i = 0; i < total; i++) {
+            if (i < firstDow) {
+                html += `<button type="button" class="cal-day other-month" disabled>${prevLast - firstDow + 1 + i}</button>`;
+            } else if (i >= firstDow + daysInM) {
+                html += `<button type="button" class="cal-day other-month" disabled>${i - firstDow - daysInM + 1}</button>`;
+            } else {
+                const d = i - firstDow + 1;
+                const isTod = today.getFullYear()===y && today.getMonth()===m && today.getDate()===d;
+                const isSel = selectedDate && selectedDate.getFullYear()===y && selectedDate.getMonth()===m && selectedDate.getDate()===d;
+                let cls = 'cal-day';
+                if (isTod) cls += ' today';
+                if (isSel) cls += ' selected';
+                html += `<button type="button" class="${cls}" onclick="CyberDatePicker.selectDay(${y},${m},${d})"><span>${d}</span></button>`;
+            }
+        }
+        grid.innerHTML = html;
+
+        // Append "Hoje" button if not already there or handle it via a footer
+        let footer = $('cal-footer');
+        if (!footer) {
+            footer = document.createElement('div');
+            footer.id = 'cal-footer';
+            footer.className = 'cal-footer';
+            footer.innerHTML = `<button type="button" class="cal-today-btn" onclick="CyberDatePicker.setToday()">HOJE</button>`;
+            $('date-picker-popup').appendChild(footer);
+        }
+    }
+
+    return { init, open, close, toggle, selectDay, prevMonth, nextMonth, setDate, setToday };
+})();
+
+// ─── Custom Time Picker Factory ──────────────────────────────────────────────
+const CyberTimePickers = {}; // stores .start and .end
+
+function createTimePicker(inputId, btnId, displayId, popupId) {
+    const ITEM_H = 36;
+    const PAD    = 52; // (140-36)/2 → centers item when scrollTop = idx*ITEM_H
+
+    let h = 7, m = 0;
+
+    const $ = id => document.getElementById(id);
+    const pad = n  => String(n).padStart(2, '0');
+
+    function getTime()     { return `${pad(h)}:${pad(m)}`; }
+    function updateDisplay() {
+        const el = $(displayId); if (el) el.textContent = getTime();
+        const inp = $(inputId);  if (inp) inp.value = getTime();
+    }
+
+    function syncFromInput() {
+        const val = $(inputId)?.value;
+        if (val) { const parts = val.split(':').map(Number); h = parts[0]; m = parts[1]; }
+        updateDisplay();
+    }
+
+    function setTime(timeStr) {
+        if (!timeStr) return;
+        const parts = timeStr.split(':').map(Number);
+        h = parts[0]; m = parts[1];
+        updateDisplay();
+    }
+
+    function buildColumns() {
+        buildCol(`${popupId}-hours`, 24, h, v => { h = v; updateDisplay(); });
+        buildCol(`${popupId}-mins`,  60, m, v => { m = v; updateDisplay(); });
+    }
+
+    function buildCol(listId, count, selected, onChange) {
+        const list = $(listId);
+        if (!list) return;
+        list.innerHTML = '';
+
+        for (let i = 0; i < count; i++) {
+            const item = document.createElement('div');
+            item.className = 'time-col-item' + (i === selected ? ' selected' : '');
+            item.dataset.val = i;
+            item.textContent = pad(i);
+            item.addEventListener('click', () => selectItem(list, i, onChange));
+            list.appendChild(item);
+        }
+        scrollTo(list, selected, false);
+
+        // Mouse wheel support
+        list.addEventListener('wheel', e => {
+            e.preventDefault();
+            const cur  = +list.querySelector('.selected')?.dataset.val ?? 0;
+            const next = Math.max(0, Math.min(count - 1, cur + (e.deltaY > 0 ? 1 : -1)));
+            if (next !== cur) selectItem(list, next, onChange);
+        }, { passive: false });
+    }
+
+    function selectItem(list, idx, onChange) {
+        onChange(idx);
+        list.querySelectorAll('.time-col-item').forEach((el, i) => {
+            el.classList.toggle('selected', i === idx);
+        });
+        scrollTo(list, idx, true);
+    }
+
+    function scrollTo(list, idx, animate) {
+        requestAnimationFrame(() => {
+            list.scrollTo({ top: idx * ITEM_H, behavior: animate ? 'smooth' : 'auto' });
+        });
+    }
+
+    function open()  {
+        closeAllPopups();
+        const btn = $(btnId);
+        const pop = $(popupId);
+        if (!btn || !pop) return;
+
+        // Elevate parent card
+        btn.closest('.glass-card')?.classList.add('z-elevated');
+
+        // Smart Positioning
+        const rect = btn.getBoundingClientRect();
+        const spaceBelow = window.innerHeight - rect.bottom;
+        const spaceRight = window.innerWidth - rect.left;
+
+        // Detect Vertical collision (Approx picker height 250px)
+        pop.classList.toggle('open-up', spaceBelow < 250);
+        // Detect Horizontal collision (Picker width 180px)
+        pop.classList.toggle('align-right', spaceRight < 200);
+
+        btn.classList.add('open');
+        pop.classList.add('open');
+        buildColumns();
+    }
+    function close() {
+        $(btnId)?.classList.remove('open');
+        $(popupId)?.classList.remove('open');
+    }
+    function toggle() { $(popupId)?.classList.contains('open') ? close() : open(); }
+
+    function setNow() {
+        const d = new Date();
+        h = d.getHours();
+        m = d.getMinutes();
+        updateDisplay();
+        buildColumns();
+    }
+
+    function init() {
+        const b = $(btnId);
+        const w = b?.closest('.custom-time-wrapper');
+        const p = $(popupId);
+        if (!b || !p) return;
+
+        // Add "Agora" footer
+        if (!p.querySelector('.time-picker-footer')) {
+            const footer = document.createElement('div');
+            footer.className = 'time-picker-footer';
+            footer.innerHTML = `<button type="button" class="time-now-btn">AGORA</button>`;
+            footer.querySelector('.time-now-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                setNow();
+                setTimeout(close, 200);
+            });
+            p.appendChild(footer);
+        }
+
+        b.addEventListener('click', e => { e.stopPropagation(); toggle(); });
+        document.addEventListener('click', e => { if (!w?.contains(e.target)) close(); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+        syncFromInput();
+    }
+
+    return { init, open, close, syncFromInput, setTime, getTime, setNow };
+}
