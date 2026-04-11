@@ -608,10 +608,13 @@ input:focus, select:focus {
 }
 
 #pomodoro-config.config-visible {
+    position: relative;
+    z-index: 100;
     max-height: 60px;
     opacity: 1;
     transform: scale(1) translateY(0);
     pointer-events: auto;
+    overflow: visible;
 }
 
 /* ─── Mode Label Sliding Push Animation ──────────────────── */
