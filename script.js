@@ -67,6 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // Helper to close EVERY custom popup in the UI
 function closeAllPopups() {
     closeCustomSelect();
+    closePomoSelect();
     CyberDatePicker.close();
     Object.values(CyberTimePickers).forEach(p => p.close());
     
@@ -1025,6 +1026,52 @@ function initCustomSelect() {
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') closeCustomSelect();
     });
+
+    // --- Pomodoro Select ---
+    const pomoBtn = document.getElementById('pomo-select-btn');
+    const pomoWrapper = document.getElementById('pomo-select-wrapper');
+    if (pomoBtn && pomoWrapper) {
+        pomoBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = pomoBtn.getAttribute('aria-expanded') === 'true';
+            if (isOpen) closePomoSelect(); else openPomoSelect();
+        });
+        document.addEventListener('click', (e) => {
+            if (!pomoWrapper.contains(e.target)) closePomoSelect();
+        });
+    }
+}
+
+function openPomoSelect() {
+    closeAllPopups();
+    const btn = document.getElementById('pomo-select-btn');
+    const dropdown = document.getElementById('pomo-select-dropdown');
+    if (!btn || !dropdown) return;
+    btn.setAttribute('aria-expanded', 'true');
+    dropdown.classList.add('open');
+}
+
+function closePomoSelect() {
+    const btn = document.getElementById('pomo-select-btn');
+    const dropdown = document.getElementById('pomo-select-dropdown');
+    if (!btn || !dropdown) return;
+    btn.setAttribute('aria-expanded', 'false');
+    dropdown.classList.remove('open');
+}
+
+function updatePomodoroVal(val, label, el) {
+    const select = document.getElementById('pomodoro-duration');
+    const display = document.getElementById('pomo-select-label');
+    if (select) {
+        select.value = val;
+        updatePomodoroDuration();
+    }
+    if (display) display.textContent = label;
+    if (el) {
+        el.parentElement.querySelectorAll('.custom-select-option').forEach(opt => opt.classList.remove('is-active'));
+        el.classList.add('is-active');
+    }
+    closePomoSelect();
 }
 
 function addCategory(e) {

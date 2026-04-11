@@ -259,13 +259,25 @@
                 </div>
 
                 <div id="pomodoro-config">
-                    <span class="text-[10px] text-orange-400 font-bold uppercase tracking-widest">Duração:</span>
-                    <select id="pomodoro-duration" onchange="updatePomodoroDuration()"
-                        class="text-xs bg-[rgba(15,0,28,0.5)] border border-orange-500/30 text-orange-300 rounded-lg px-2 py-1 focus:outline-none focus:border-orange-400">
-                        <option value="900">15 min</option>
-                        <option value="1500" selected>25 min</option>
-                        <option value="3000">50 min</option>
-                    </select>
+                    <span class="text-[10px] text-orange-400 font-bold uppercase tracking-widest px-1">Duração:</span>
+                    <div class="custom-select-wrapper is-pomodoro" id="pomo-select-wrapper">
+                        <select id="pomodoro-duration" class="sr-only" onchange="updatePomodoroDuration()">
+                            <option value="900">15 min</option>
+                            <option value="1500" selected>25 min</option>
+                            <option value="3000">50 min</option>
+                        </select>
+                        <button type="button" id="pomo-select-btn" class="custom-select-btn !py-1.5 !px-3 min-w-[100px]">
+                            <span class="custom-select-display">
+                                <span id="pomo-select-label">25 min</span>
+                            </span>
+                            <svg class="custom-select-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        <div class="custom-select-dropdown" id="pomo-select-dropdown">
+                            <div class="custom-select-option" onclick="updatePomodoroVal(900, '15 min', this)">15 min</div>
+                            <div class="custom-select-option is-active" onclick="updatePomodoroVal(1500, '25 min', this)">25 min</div>
+                            <div class="custom-select-option" onclick="updatePomodoroVal(3000, '50 min', this)">50 min</div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="mode-label-mask mx-auto mb-1">
