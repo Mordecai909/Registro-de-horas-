@@ -642,6 +642,38 @@ function syncCustomSelectDisplay(n, c) { UI.syncCustomSelectDisplay(n, c); }
 function selectCustomCategory(n, c)   { UI.selectCustomCategory(n, c); }
 function populateCustomSelect()    { UI._populateCustomSelect(); }
 
+// ─── Day Column Chart Tooltip ────────────────────────────────────────────────
+
+const DayColChart = {
+    _tt: null,
+    _get() {
+        if (!this._tt) {
+            this._tt = document.createElement('div');
+            this._tt.id = 'day-col-tooltip';
+            this._tt.className = 'day-col-tooltip';
+            this._tt.innerHTML =
+                '<span class="day-col-tt-dot"></span>' +
+                '<span class="day-col-tt-name"></span>' +
+                '<span class="day-col-tt-hours"></span>';
+            document.body.appendChild(this._tt);
+        }
+        return this._tt;
+    },
+    show(e, name, hours, color) {
+        const tt = this._get();
+        tt.querySelector('.day-col-tt-dot').style.cssText   = `background:${color};box-shadow:0 0 6px ${color};`;
+        tt.querySelector('.day-col-tt-name').textContent  = name;
+        tt.querySelector('.day-col-tt-hours').textContent = hours;
+        tt.style.left    = (e.clientX + 14) + 'px';
+        tt.style.top     = (e.clientY - 42) + 'px';
+        tt.style.display = 'flex';
+    },
+    move(e) {
+        if (this._tt) { this._tt.style.left = (e.clientX + 14) + 'px'; this._tt.style.top = (e.clientY - 42) + 'px'; }
+    },
+    hide() { if (this._tt) this._tt.style.display = 'none'; },
+};
+
 // ─── Dashboard Module ─────────────────────────────────────────────────────────
 
 const DashboardModule = {
@@ -683,66 +715,110 @@ const DashboardModule = {
         if (percentLabel) percentLabel.innerText = `${goalPercent}%`;
         if (progressFill) progressFill.classList.toggle('glitch-text', goalPercent >= 100);
 
-        this._updateChart(currentYear, currentMonth);
+        this._renderDayColumns();
     },
 
     initChart() {
-        const container = $('category-chart');
-        if (!container) return;
-
-        AppState.ui.categoryChart = new ApexCharts(container, {
-            series: [],
-            chart: {
-                type: 'donut', height: 320, background: 'transparent',
-                animations: { enabled: true, easing: 'easeinout', speed: 800 },
-                dropShadow: { enabled: true, blur: 10, color: 'var(--accent)', opacity: 0.35 },
-            },
-            stroke: { show: false, width: 0 },
-            plotOptions: {
-                pie: {
-                    donut: {
-                        size: '75%', background: 'transparent',
-                        labels: {
-                            show: true,
-                            name:  { show: true, fontSize: '12px', fontFamily: 'Outfit', fontWeight: 900, color: 'var(--accent)', offsetY: -10 },
-                            value: { show: true, fontSize: '24px', fontFamily: 'Outfit', fontWeight: 700, color: '#fff', offsetY: 10, formatter: val => minToTime(val) + 'h' },
-                            total: { show: true, label: 'TOTAL', color: 'var(--accent)', fontSize: '10px', fontWeight: 900, formatter: w => minToTime(w.globals.seriesTotals.reduce((a, b) => a + b, 0)) + 'h' },
-                        },
-                    },
-                },
-            },
-            dataLabels: { enabled: false },
-            legend: { show: false },
-            colors: [],
-            tooltip: { enabled: true, theme: 'dark', fillSeriesColor: false, y: { formatter: val => `${minToTime(val)}h exploradas` } },
-            noData: { text: 'SEM DADOS NO CICLO', align: 'center', verticalAlign: 'middle', style: { color: 'var(--accent)', fontSize: '10px', fontFamily: 'Outfit' } },
-            labels: [],
-        });
-
-        AppState.ui.categoryChart.render();
+        // Replaced by custom day-column chart — rendered via _renderDayColumns
     },
 
-    _updateChart(year, month) {
-        const chart = AppState.ui.categoryChart;
-        if (!chart) return;
+_renderDayColumns() {
+        const container = $('day-column-chart');
+        const empty = $('day-col-empty');
+        if (!container) return;
 
-        const catMap = {};
-        AppState.entries
-            .filter(e => { const d = new Date(e.date + 'T00:00:00'); return d.getFullYear() === year && d.getMonth() === month; })
-            .forEach(e => { const k = e.category || 'Geral'; catMap[k] = (catMap[k] || 0) + timeToMin(e.total); });
+        const dateMap = {};
+        AppState.entries.forEach(e => {
+            if (!dateMap[e.date]) dateMap[e.date] = [];
+            dateMap[e.date].push(e);
+        });
 
-        const labels  = Object.keys(catMap);
-        const series  = Object.values(catMap);
-        const colors  = labels.map(name => AppState.categories.find(c => c.name === name)?.color || 'var(--accent)');
+        const dates = Object.keys(dateMap).sort();
 
-        chart.updateOptions({ series, labels, colors, chart: { dropShadow: { color: colors[0] || 'var(--accent)' } } });
+        if (dates.length === 0) {
+            container.innerHTML = '';
+            if (empty) empty.classList.remove('hidden');
+            return;
+        }
+        if (empty) empty.classList.add('hidden');
+
+        const MAX_MIN = DEFAULTS.DAILY_GOAL_MIN; // 360 min = 6 h
+        const PIXEL_PER_MIN = 240 / MAX_MIN; // 240px represents 6 hours
+        container.innerHTML = '';
+
+        dates.forEach(dateStr => {
+            const dayEntries = dateMap[dateStr];
+            const catMap = {};
+            dayEntries.forEach(e => {
+                const k = e.category || 'Geral';
+                catMap[k] = (catMap[k] || 0) + timeToMin(e.total);
+            });
+            const totalMin = Object.values(catMap).reduce((a, b) => a + b, 0);
+
+            const col = document.createElement('div');
+            col.className = 'day-col';
+
+            const bar = document.createElement('div');
+            bar.className = 'day-col-bar-wrapper';
+
+            // Check if today
+            const today = new Date().toISOString().split('T')[0];
+            if (dateStr === today) col.classList.add('day-col-today');
+
+            Object.entries(catMap).forEach(([catName, mins]) => {
+                const cat = AppState.categories.find(c => c.name === catName);
+                const color = cat ? cat.color : '#c084fc';
+                const heightPx = mins * PIXEL_PER_MIN;
+                const seg = document.createElement('div');
+                seg.className = 'day-col-segment';
+                seg.style.cssText = `height:${heightPx}px;background:${color};`;
+                const hStr = minToTime(mins) + 'h';
+                seg.addEventListener('mouseenter', ev => DayColChart.show(ev, catName, hStr, color));
+                seg.addEventListener('mousemove',  ev => DayColChart.move(ev));
+                seg.addEventListener('mouseleave', ()  => DayColChart.hide());
+                bar.appendChild(seg);
+            });
+
+            const [, mo, d] = dateStr.split('-');
+            const lbl = document.createElement('div');
+            lbl.className = 'day-col-label';
+            lbl.textContent = `${d}/${mo}`;
+
+            const tot = document.createElement('div');
+            tot.className = 'day-col-total';
+            tot.textContent = minToTime(totalMin) + 'h';
+
+            col.appendChild(bar);
+            col.appendChild(lbl);
+            col.appendChild(tot);
+            container.appendChild(col);
+        });
+
+        // Add 6-hour limit line
+        const limitLine = document.createElement('div');
+        limitLine.className = 'six-hour-limit-line';
+        limitLine.style.cssText = `
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--danger);
+            margin-top: 240px; /* 6 hours mark */
+            z-index: 10;
+            pointer-events: none;
+        `;
+        container.parentNode.style.position = 'relative';
+        container.parentNode.appendChild(limitLine);
+
+        // Scroll to most recent (right)
+        const wrap = $('day-column-chart-container');
+        if (wrap) requestAnimationFrame(() => { wrap.scrollLeft = wrap.scrollWidth; });
     },
 };
 
 // Legacy aliases
-function updateDashboard()                { DashboardModule.update(); }
-function initCategoryChart()             { DashboardModule.initChart(); }
-function updateCategoryChart(y, m)       { DashboardModule._updateChart(y, m); }
+function updateDashboard()    { DashboardModule.update(); }
+function initCategoryChart() { DashboardModule.initChart(); }
 
 // ─── Category Module ──────────────────────────────────────────────────────────
 
@@ -1257,8 +1333,10 @@ function createTimePicker(inputId, btnId, displayId, popupId) {
 
     function getTime()      { return `${pad(h)}:${pad(m)}`; }
     function updateDisplay() {
-        const elD = el(displayId); if (elD) elD.textContent = getTime();
-        const inp = el(inputId);   if (inp) inp.value = getTime();
+        const elD    = el(displayId);            if (elD)    elD.textContent = getTime();
+        const inp    = el(inputId);              if (inp)    inp.value = getTime();
+        const kbInp  = el(inputId + '-keyboard');
+        if (kbInp && document.activeElement !== kbInp) kbInp.value = getTime();
     }
     function syncFromInput() {
         const val = el(inputId)?.value;
@@ -1332,6 +1410,51 @@ function createTimePicker(inputId, btnId, displayId, popupId) {
         const w = b?.closest('.custom-time-wrapper');
         const p = el(popupId);
         if (!b || !p) return;
+
+        // ─ Inject keyboard text input (if not already present) ─
+        const kbId = inputId + '-keyboard';
+        if (!el(kbId)) {
+            const kbInp = document.createElement('input');
+            kbInp.type        = 'text';
+            kbInp.id          = kbId;
+            kbInp.className   = 'time-text-field';
+            kbInp.placeholder = 'HH:MM';
+            kbInp.maxLength   = 5;
+            kbInp.value       = getTime();
+            kbInp.addEventListener('input', e => {
+                let v = e.target.value.replace(/[^0-9:]/g, '');
+                // Auto-insert colon after 2 digits while typing
+                if (v.length === 2 && !v.includes(':') && e.inputType !== 'deleteContentBackward') {
+                    v = v + ':';
+                    e.target.value = v;
+                }
+                const match = v.match(/^(\d{1,2}):(\d{2})$/);
+                if (match) {
+                    const hh = parseInt(match[1]), mm = parseInt(match[2]);
+                    if (hh >= 0 && hh <= 23 && mm >= 0 && mm <= 59) {
+                        h = hh; m = mm;
+                        const hidden = el(inputId);
+                        if (hidden) hidden.value = getTime();
+                        const dsp = el(displayId);
+                        if (dsp) dsp.textContent = getTime();
+                    }
+                }
+            });
+            kbInp.addEventListener('blur', e => {
+                const raw   = e.target.value.replace(/[^0-9:]/g, '');
+                const parts = raw.split(':');
+                const hh = Math.min(23, parseInt(parts[0]) || 0);
+                const mm = Math.min(59, parseInt(parts[1]) || 0);
+                h = hh; m = mm;
+                e.target.value = getTime();
+                const hidden = el(inputId); if (hidden) hidden.value = getTime();
+                const dsp = el(displayId); if (dsp) dsp.textContent = getTime();
+            });
+            kbInp.addEventListener('keydown', e => { if (e.key === 'Enter') e.target.blur(); });
+            // Insert BEFORE the existing button
+            w.insertBefore(kbInp, b);
+        }
+
         if (!p.querySelector('.time-picker-footer')) {
             const footer = document.createElement('div');
             footer.className = 'time-picker-footer';

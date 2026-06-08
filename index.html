@@ -13,8 +13,8 @@
     
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
-    <!-- ApexCharts -->
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <!-- ApexCharts (kept for compatibility) -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script> -->
     <!-- Configuração do Tailwind -->
     <script>
         tailwind.config = {
@@ -225,7 +225,7 @@
                 </div>
                 <p class="text-[10px] font-black uppercase tracking-[0.25em] text-accent">Tráfego Semanal</p>
                 <h3 class="text-4xl font-display font-extrabold text-white drop-shadow-[0_0_12px_accent_glow]" id="card-week">00:00h</h3>
-                <div class="text-[10px] text-accent font-bold uppercase tracking-widest">Alvo 15:00h</div>
+                <div class="text-[10px] text-accent font-bold uppercase tracking-widest">Alvo 30:00h</div>
             </div>
 
             <!-- Total do Mês -->
@@ -435,8 +435,13 @@
                     </h4>
                     <span class="text-[10px] font-bold text-accent uppercase tracking-widest">Mês atual</span>
                 </div>
-                <div id="category-chart" class="min-h-[350px] flex items-center justify-center">
-                    <!-- ApexCharts Injection -->
+                <div class="day-col-chart-outer">
+                    <div id="day-column-chart-container" class="day-col-scroll-container">
+                        <div id="day-column-chart" class="day-col-track">
+                            <!-- JS Injection -->
+                        </div>
+                    </div>
+                    <div id="day-col-empty" class="hidden flex items-center justify-center py-12 text-[10px] font-black text-accent/40 uppercase tracking-[0.2em]">SEM DADOS NO CICLO</div>
                 </div>
             </div>
         </section>
