@@ -198,7 +198,7 @@ body {
         inset 0 0 1px 1px rgba(255, 255, 255, 0.05);
 }
 .z-elevated {
-    z-index: 1000 !important;
+    z-index: 45 !important;
 }
 
 
@@ -1359,11 +1359,43 @@ input:focus, select:focus {
 .day-col-track {
     display: flex;
     align-items: flex-end;
-    gap: 24px;
+    gap: 32px; /* Increased gap between weeks */
     min-width: max-content;
-    height: 240px;
+    height: 260px; /* Increased height to accommodate the bracket */
     padding: 12px 8px 0;
     position: relative;
+}
+
+.week-group {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    height: 100%;
+}
+
+.week-cols {
+    display: flex;
+    gap: 24px;
+    align-items: flex-end;
+    flex: 1;
+}
+
+.week-bracket-wrap {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 4px;
+    padding-bottom: 2px;
+}
+
+.week-bracket-svg {
+    width: 100%;
+    height: 12px;
+    stroke: var(--accent);
+    fill: none;
+    opacity: 0.5;
+    overflow: visible;
 }
 
 .day-col {

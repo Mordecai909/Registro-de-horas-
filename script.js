@@ -157,6 +157,91 @@ const Terminal = {
 // Legacy global alias kept for HTML inline calls
 function sysLog(message, type) { Terminal.log(message, type); }
 
+// ─── Sound Module ─────────────────────────────────────────────────────────────
+
+const SoundModule = {
+    ctx: null,
+    _lastHover: null,
+
+    init() {
+        if (!this.ctx) {
+            try { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); }
+            catch (e) { /* ignore */ }
+        }
+        if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+    },
+
+    play(type) {
+        if (!this.ctx) return;
+        if (this.ctx.state === 'suspended') this.ctx.resume();
+
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        const t = this.ctx.currentTime;
+
+        if (type === 'hover') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(600, t);
+            osc.frequency.exponentialRampToValueAtTime(800, t + 0.05);
+            gain.gain.setValueAtTime(0.02, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+            osc.start(t); osc.stop(t + 0.05);
+        } else if (type === 'click') {
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(800, t);
+            osc.frequency.exponentialRampToValueAtTime(1200, t + 0.1);
+            gain.gain.setValueAtTime(0.05, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
+            osc.start(t); osc.stop(t + 0.1);
+        } else if (type === 'success') {
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(400, t);
+            osc.frequency.setValueAtTime(600, t + 0.1);
+            gain.gain.setValueAtTime(0.03, t);
+            gain.gain.setValueAtTime(0.03, t + 0.1);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+            osc.start(t); osc.stop(t + 0.3);
+        } else if (type === 'error') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(300, t);
+            osc.frequency.exponentialRampToValueAtTime(150, t + 0.3);
+            gain.gain.setValueAtTime(0.05, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+            osc.start(t); osc.stop(t + 0.3);
+        } else if (type === 'warning') {
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(400, t);
+            osc.frequency.exponentialRampToValueAtTime(200, t + 0.2);
+            gain.gain.setValueAtTime(0.05, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
+            osc.start(t); osc.stop(t + 0.2);
+        }
+    },
+
+    setupDelegation() {
+        document.addEventListener('click', (e) => {
+            this.init();
+            const target = e.target.closest('button, .btn-weight, .custom-select-option, .cal-day:not([disabled]), a');
+            if (target) this.play('click');
+        });
+        document.addEventListener('mouseover', (e) => {
+            const target = e.target.closest('button, .btn-weight, .custom-select-option, .cal-day:not([disabled]), a');
+            if (target && target !== this._lastHover) {
+                this.play('hover');
+                this._lastHover = target;
+            }
+        });
+        document.addEventListener('mouseout', (e) => {
+            const target = e.target.closest('button, .btn-weight, .custom-select-option, .cal-day:not([disabled]), a');
+            if (target && target === this._lastHover) {
+                this._lastHover = null;
+            }
+        });
+    }
+};
+
 // ─── Toast Module ─────────────────────────────────────────────────────────────
 
 const Toast = {
@@ -167,6 +252,7 @@ const Toast = {
     },
 
     show(message, type = 'success', duration = DEFAULTS.TOAST_DURATION_MS) {
+        SoundModule.play(type);
         const container = $('toast-container');
         if (!container) return;
 
@@ -746,52 +832,90 @@ _renderDayColumns() {
         const PIXEL_PER_MIN = 240 / MAX_MIN; // 240px represents 6 hours
         container.innerHTML = '';
 
+        // Helper to get Monday of the week for a given date
+        const getMonday = (dateStr) => {
+            const d = new Date(dateStr + 'T00:00:00');
+            const dow = d.getDay();
+            const diffToMon = (dow === 0 ? -6 : 1 - dow);
+            d.setDate(d.getDate() + diffToMon);
+            return d.toISOString().split('T')[0];
+        };
+
+        const weekGroups = {};
         dates.forEach(dateStr => {
-            const dayEntries = dateMap[dateStr];
-            const catMap = {};
-            dayEntries.forEach(e => {
-                const k = e.category || 'Geral';
-                catMap[k] = (catMap[k] || 0) + timeToMin(e.total);
+            const monday = getMonday(dateStr);
+            if (!weekGroups[monday]) weekGroups[monday] = [];
+            weekGroups[monday].push(dateStr);
+        });
+
+        Object.keys(weekGroups).sort().forEach(weekKey => {
+            const groupDates = weekGroups[weekKey];
+            
+            const weekWrap = document.createElement('div');
+            weekWrap.className = 'week-group';
+            
+            const colsWrap = document.createElement('div');
+            colsWrap.className = 'week-cols';
+
+            groupDates.forEach(dateStr => {
+                const dayEntries = dateMap[dateStr];
+                const catMap = {};
+                dayEntries.forEach(e => {
+                    const k = e.category || 'Geral';
+                    catMap[k] = (catMap[k] || 0) + timeToMin(e.total);
+                });
+                const totalMin = Object.values(catMap).reduce((a, b) => a + b, 0);
+
+                const col = document.createElement('div');
+                col.className = 'day-col';
+
+                const bar = document.createElement('div');
+                bar.className = 'day-col-bar-wrapper';
+
+                // Check if today
+                const today = new Date().toISOString().split('T')[0];
+                if (dateStr === today) col.classList.add('day-col-today');
+
+                Object.entries(catMap).forEach(([catName, mins]) => {
+                    const cat = AppState.categories.find(c => c.name === catName);
+                    const color = cat ? cat.color : '#c084fc';
+                    const heightPx = mins * PIXEL_PER_MIN;
+                    const seg = document.createElement('div');
+                    seg.className = 'day-col-segment';
+                    seg.style.cssText = `height:${heightPx}px;background:${color};`;
+                    const hStr = minToTime(mins) + 'h';
+                    seg.addEventListener('mouseenter', ev => DayColChart.show(ev, catName, hStr, color));
+                    seg.addEventListener('mousemove',  ev => DayColChart.move(ev));
+                    seg.addEventListener('mouseleave', ()  => DayColChart.hide());
+                    bar.appendChild(seg);
+                });
+
+                const [, mo, d] = dateStr.split('-');
+                const lbl = document.createElement('div');
+                lbl.className = 'day-col-label';
+                lbl.textContent = `${d}/${mo}`;
+
+                const tot = document.createElement('div');
+                tot.className = 'day-col-total';
+                tot.textContent = minToTime(totalMin) + 'h';
+
+                col.appendChild(bar);
+                col.appendChild(lbl);
+                col.appendChild(tot);
+                colsWrap.appendChild(col);
             });
-            const totalMin = Object.values(catMap).reduce((a, b) => a + b, 0);
 
-            const col = document.createElement('div');
-            col.className = 'day-col';
+            const bracketWrap = document.createElement('div');
+            bracketWrap.className = 'week-bracket-wrap';
+            bracketWrap.innerHTML = `
+                <svg preserveAspectRatio="none" viewBox="0 0 100 20" class="week-bracket-svg">
+                    <path d="M 0,0 Q 0,5 5,5 L 45,5 Q 50,5 50,15 Q 50,5 55,5 L 95,5 Q 100,5 100,0" vector-effect="non-scaling-stroke" stroke-width="2"/>
+                </svg>
+            `;
 
-            const bar = document.createElement('div');
-            bar.className = 'day-col-bar-wrapper';
-
-            // Check if today
-            const today = new Date().toISOString().split('T')[0];
-            if (dateStr === today) col.classList.add('day-col-today');
-
-            Object.entries(catMap).forEach(([catName, mins]) => {
-                const cat = AppState.categories.find(c => c.name === catName);
-                const color = cat ? cat.color : '#c084fc';
-                const heightPx = mins * PIXEL_PER_MIN;
-                const seg = document.createElement('div');
-                seg.className = 'day-col-segment';
-                seg.style.cssText = `height:${heightPx}px;background:${color};`;
-                const hStr = minToTime(mins) + 'h';
-                seg.addEventListener('mouseenter', ev => DayColChart.show(ev, catName, hStr, color));
-                seg.addEventListener('mousemove',  ev => DayColChart.move(ev));
-                seg.addEventListener('mouseleave', ()  => DayColChart.hide());
-                bar.appendChild(seg);
-            });
-
-            const [, mo, d] = dateStr.split('-');
-            const lbl = document.createElement('div');
-            lbl.className = 'day-col-label';
-            lbl.textContent = `${d}/${mo}`;
-
-            const tot = document.createElement('div');
-            tot.className = 'day-col-total';
-            tot.textContent = minToTime(totalMin) + 'h';
-
-            col.appendChild(bar);
-            col.appendChild(lbl);
-            col.appendChild(tot);
-            container.appendChild(col);
+            weekWrap.appendChild(colsWrap);
+            weekWrap.appendChild(bracketWrap);
+            container.appendChild(weekWrap);
         });
 
         // Add 6-hour limit line
@@ -1018,6 +1142,7 @@ function toggleSidebar(show) {
     const menu    = $('sidebar-menu');
     const overlay = $('sidebar-overlay');
     if (!menu || !overlay) return;
+    if (show) closeAllPopups();
     menu.classList.toggle('sidebar-open', show);
     overlay.classList.toggle('overlay-visible', show);
     document.body.style.overflow = show ? 'hidden' : '';
@@ -1032,6 +1157,7 @@ function toggleRightSidebar(lock) {
     const sidebar = $('right-sidebar');
     const overlay = $('sidebar-overlay');
     if (!sidebar) return;
+    if (lock) closeAllPopups();
     sidebar.classList.toggle('sidebar-lock', lock);
     sidebar.classList.toggle('sidebar-open', lock);
     if (overlay) {
@@ -1496,4 +1622,5 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     Terminal.log('SISTEMA OPERACIONAL INICIALIZADO', 'success');
+    SoundModule.setupDelegation();
 });
