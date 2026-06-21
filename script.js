@@ -245,12 +245,13 @@ const SoundModule = {
 // ─── WebGL Module ─────────────────────────────────────────────────────────────
 
 const WebGLModule = {
-    scene: null, camera: null, renderer: null, mesh: null,
+    scene: null, camera: null, renderer: null, fanGroup: null, rotor: null, fanLight: null,
     animationId: null,
-    baseSpeed: 0.001,
-    activeSpeed: 0.02,
-    currentSpeed: 0.001,
-    targetSpeed: 0.001,
+    baseSpeed: 0.01,
+    activeSpeed: 0.45,
+    currentSpeed: 0.01,
+    targetSpeed: 0.01,
+    mode: 'free',
 
     init() {
         if (!window.THREE) return;
@@ -258,30 +259,73 @@ const WebGLModule = {
         if (!container) return;
 
         this.scene = new THREE.Scene();
-        this.camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 1000);
-        this.camera.position.z = 4.5;
+        this.camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+        this.camera.position.set(0, 0, 5.5);
 
         this.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
         this.renderer.setSize(container.clientWidth, container.clientHeight);
         this.renderer.setPixelRatio(window.devicePixelRatio);
         container.appendChild(this.renderer.domElement);
 
-        // Cyberpunk floating object: Icosahedron with wireframe
-        const geometry = new THREE.IcosahedronGeometry(1.2, 0);
+        this.fanGroup = new THREE.Group();
+        this.rotor = new THREE.Group();
+
+        // Materials
+        const chassisMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.8, metalness: 0.6 });
+        const bladeMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.3, metalness: 0.9 });
         
-        // Inner solid core
-        const coreMat = new THREE.MeshBasicMaterial({ color: 0x0f001c });
-        const core = new THREE.Mesh(geometry, coreMat);
+        // Chassis (Outer ring)
+        const shroudGeo = new THREE.TorusGeometry(1.6, 0.15, 16, 64);
+        const shroud = new THREE.Mesh(shroudGeo, chassisMat);
+        this.fanGroup.add(shroud);
+
+        // Center Motor Hub
+        const hubGeo = new THREE.CylinderGeometry(0.5, 0.5, 0.2, 32);
+        hubGeo.rotateX(Math.PI / 2);
+        const hub = new THREE.Mesh(hubGeo, chassisMat);
+        this.rotor.add(hub);
+
+        // Blades
+        const numBlades = 9;
+        const bladeGeo = new THREE.BoxGeometry(1.0, 0.04, 0.5);
+        bladeGeo.translate(0.5, 0, 0); 
         
-        // Outer neon wireframe
-        const wireMat = new THREE.LineBasicMaterial({ color: 0xc084fc, linewidth: 2 });
-        const wireframe = new THREE.LineSegments(new THREE.WireframeGeometry(geometry), wireMat);
+        for(let i=0; i<numBlades; i++) {
+            const angle = (i / numBlades) * Math.PI * 2;
+            const blade = new THREE.Mesh(bladeGeo, bladeMat);
+            blade.rotation.z = angle;
+            blade.rotation.x = 0.5; // Pitch
+            this.rotor.add(blade);
+        }
+
+        this.fanGroup.add(this.rotor);
         
-        this.mesh = new THREE.Group();
-        this.mesh.add(core);
-        this.mesh.add(wireframe);
+        // 4 corner mounts
+        for(let i=0; i<4; i++) {
+            const mountGeo = new THREE.BoxGeometry(0.5, 0.5, 0.2);
+            const mount = new THREE.Mesh(mountGeo, chassisMat);
+            mount.position.x = (i%2===0 ? 1 : -1) * 1.5;
+            mount.position.y = (i<2 ? 1 : -1) * 1.5;
+            this.fanGroup.add(mount);
+        }
+
+        // Tilt for 3D perspective
+        this.fanGroup.rotation.x = 0.25;
+        this.fanGroup.rotation.y = -0.3;
         
-        this.scene.add(this.mesh);
+        this.scene.add(this.fanGroup);
+
+        // Lighting
+        const ambient = new THREE.AmbientLight(0xffffff, 0.4);
+        this.scene.add(ambient);
+
+        this.fanLight = new THREE.PointLight(0x0ea5e9, 1.5, 10); // Faint blue initially
+        this.fanLight.position.set(0, 0, 1.5);
+        this.scene.add(this.fanLight);
+
+        const backLight = new THREE.PointLight(0xffffff, 0.8, 10);
+        backLight.position.set(0, 0, -2);
+        this.scene.add(backLight);
 
         window.addEventListener('resize', () => {
             if (!container || !this.camera || !this.renderer) return;
@@ -291,35 +335,55 @@ const WebGLModule = {
         });
 
         this.animate();
+        this.updateState(false, AppState.timer.pomodoroMode ? 'pomodoro' : 'free');
     },
 
     animate() {
         this.animationId = requestAnimationFrame(() => this.animate());
         
-        // Smoothly interpolate speed
-        this.currentSpeed += (this.targetSpeed - this.currentSpeed) * 0.05;
+        this.currentSpeed += (this.targetSpeed - this.currentSpeed) * 0.03;
         
-        if (this.mesh) {
-            this.mesh.rotation.x += this.currentSpeed;
-            this.mesh.rotation.y += this.currentSpeed * 1.2;
-            
-            // Floating effect
-            this.mesh.position.y = Math.sin(Date.now() * 0.002) * 0.15;
+        if (this.rotor) {
+            this.rotor.rotation.z -= this.currentSpeed;
+        }
+        
+        if (this.fanGroup) {
+            this.fanGroup.position.y = Math.sin(Date.now() * 0.0015) * 0.12;
         }
 
         this.renderer.render(this.scene, this.camera);
     },
 
-    setSpeed(isActive) {
-        this.targetSpeed = isActive ? this.activeSpeed : this.baseSpeed;
+    updateState(isRunning, mode) {
+        this.mode = mode;
+        if (!isRunning) {
+            this.targetSpeed = this.baseSpeed;
+            if (this.fanLight) {
+                this.fanLight.color.setHex(0x0ea5e9); // Blue
+                this.fanLight.intensity = 1.0;
+            }
+        } else {
+            if (mode === 'pomodoro') {
+                this.targetSpeed = this.activeSpeed; // Overclock
+                if (this.fanLight) {
+                    this.fanLight.color.setHex(0xfb7185); // Red glow
+                    this.fanLight.intensity = 5.0;
+                }
+            } else {
+                this.targetSpeed = this.activeSpeed * 0.5; // Medium load
+                if (this.fanLight) {
+                    this.fanLight.color.setHex(0x34d399); // Emerald
+                    this.fanLight.intensity = 3.5;
+                }
+            }
+        }
     },
     
     updateColor(colorHex) {
-        if (this.mesh) {
-            const wireframe = this.mesh.children[1];
-            if (wireframe && wireframe.material) {
-                wireframe.material.color.setHex(parseInt(colorHex.replace('#', '0x')));
-            }
+        // Fan lighting is determined by state, but we can set ambient to match theme
+        if (this.scene) {
+            const ambient = this.scene.children.find(c => c.type === 'AmbientLight');
+            if (ambient) ambient.color.setHex(parseInt(colorHex.replace('#', '0x')));
         }
     }
 };
@@ -370,7 +434,7 @@ const TimerModule = {
     start() {
         const { timer } = AppState;
         timer.running = true;
-        WebGLModule.setSpeed(true);
+        WebGLModule.updateState(true, timer.pomodoroMode ? 'pomodoro' : 'free');
 
         const timerEl   = $('timer-text');
         const btnLabel  = $('timer-btn-label');
@@ -419,7 +483,7 @@ const TimerModule = {
         const { timer } = AppState;
         timer.running = false;
         clearInterval(timer.interval);
-        WebGLModule.setSpeed(false);
+        WebGLModule.updateState(false, timer.pomodoroMode ? 'pomodoro' : 'free');
 
         const btnLabel  = $('timer-btn-label');
         const btnIcon   = $('timer-icon');
@@ -498,6 +562,8 @@ const TimerModule = {
             timerEl.style.textShadow = '0 0 30px var(--accent-glow)';
             timerEl.innerText = '00:00:00';
         }
+        
+        if (window.WebGLModule) WebGLModule.updateState(false, mode);
     },
 
     updatePomodoroDuration() {
