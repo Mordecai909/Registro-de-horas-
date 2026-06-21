@@ -249,8 +249,11 @@
         <section class="lg:col-span-12 grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Active Timer -->
             <div class="glass-card p-8 text-center relative flex flex-col items-center justify-center gap-6 overflow-hidden">
-                <!-- WebGL 3D Object Container -->
+                <!-- WebGL 3D Object Container (PC Fan) -->
                 <div id="webgl-container" class="absolute inset-0 z-0 opacity-40 mix-blend-screen pointer-events-none flex items-center justify-center"></div>
+
+                <!-- 3D Servo Mechanism (Timer Progress) -->
+                <div id="servo-canvas-container" class="w-full h-[80px] relative z-10 rounded-xl overflow-hidden border border-accent/20 bg-black/40 shadow-[inset_0_0_20px_rgba(0,0,0,0.8)]"></div>
 
                 <div class="mode-pill relative z-10" id="mode-pill-wrap">
                     <div class="mode-pill-indicator is-free" id="mode-indicator"></div>

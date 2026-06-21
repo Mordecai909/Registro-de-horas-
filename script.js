@@ -242,6 +242,187 @@ const SoundModule = {
     }
 };
 
+// ─── Servo Module (3D Mechanical Progress) ────────────────────────────────────
+
+const ServoModule = {
+    scene: null, camera: null, renderer: null,
+    gearMain: null, gearSmall: null, servoArm: null, servoLight: null,
+    animId: null,
+    targetPercent: 0,
+    currentAngle: 0,
+    targetAngle: 0,
+    _resetting: false,
+
+    init() {
+        if (!window.THREE) return;
+        const container = document.getElementById('servo-canvas-container');
+        if (!container) return;
+
+        const W = container.clientWidth, H = container.clientHeight;
+        this.scene = new THREE.Scene();
+        this.camera = new THREE.OrthographicCamera(-3.5, 3.5, 2.2, -2.2, 0.1, 100);
+        this.camera.position.set(0, 0, 10);
+
+        this.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        this.renderer.setSize(W, H);
+        this.renderer.setPixelRatio(window.devicePixelRatio);
+        // Place canvas behind the fallback bar
+        container.insertBefore(this.renderer.domElement, container.firstChild);
+        this.renderer.domElement.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;';
+
+        // Hide the fallback 2D bar once WebGL is running
+        const fb = document.getElementById('goal-progress-bar');
+        if (fb) fb.style.display = 'none';
+
+        const metalMat   = new THREE.MeshStandardMaterial({ color: 0x2a2a3a, roughness: 0.4, metalness: 0.9 });
+        const accentMat  = new THREE.MeshStandardMaterial({ color: 0xc084fc, roughness: 0.2, metalness: 1.0, emissive: 0x6610cc, emissiveIntensity: 0.4 });
+        const darkMat    = new THREE.MeshStandardMaterial({ color: 0x111120, roughness: 0.8, metalness: 0.5 });
+
+        // ── Main Gear ──────────────────────────────────────────────────────────
+        this.gearMain = new THREE.Group();
+        const gearBodyGeo = new THREE.CylinderGeometry(0.85, 0.85, 0.22, 32);
+        gearBodyGeo.rotateX(Math.PI / 2);
+        const gearBody = new THREE.Mesh(gearBodyGeo, metalMat);
+        this.gearMain.add(gearBody);
+
+        // Gear teeth
+        const numTeeth = 16;
+        for (let i = 0; i < numTeeth; i++) {
+            const angle = (i / numTeeth) * Math.PI * 2;
+            const toothGeo = new THREE.BoxGeometry(0.18, 0.22, 0.18);
+            const tooth = new THREE.Mesh(toothGeo, metalMat);
+            tooth.position.set(Math.cos(angle) * 0.97, Math.sin(angle) * 0.97, 0);
+            tooth.rotation.z = angle;
+            this.gearMain.add(tooth);
+        }
+        // Gear hub
+        const hubGeo = new THREE.CylinderGeometry(0.22, 0.22, 0.35, 16);
+        hubGeo.rotateX(Math.PI / 2);
+        this.gearMain.add(new THREE.Mesh(hubGeo, accentMat));
+
+        this.gearMain.position.set(-1.2, 0, 0);
+        this.scene.add(this.gearMain);
+
+        // ── Small Gear ────────────────────────────────────────────────────────
+        this.gearSmall = new THREE.Group();
+        const sgBodyGeo = new THREE.CylinderGeometry(0.45, 0.45, 0.22, 24);
+        sgBodyGeo.rotateX(Math.PI / 2);
+        this.gearSmall.add(new THREE.Mesh(sgBodyGeo, darkMat));
+        const numTeethS = 9;
+        for (let i = 0; i < numTeethS; i++) {
+            const angle = (i / numTeethS) * Math.PI * 2;
+            const toothGeo = new THREE.BoxGeometry(0.15, 0.22, 0.15);
+            const tooth = new THREE.Mesh(toothGeo, darkMat);
+            tooth.position.set(Math.cos(angle) * 0.52, Math.sin(angle) * 0.52, 0);
+            tooth.rotation.z = angle;
+            this.gearSmall.add(tooth);
+        }
+        const sgHubGeo = new THREE.CylinderGeometry(0.1, 0.1, 0.3, 12);
+        sgHubGeo.rotateX(Math.PI / 2);
+        this.gearSmall.add(new THREE.Mesh(sgHubGeo, accentMat));
+
+        // Small gear sits right of big gear (teeth mesh at distance r1+r2)
+        this.gearSmall.position.set(0.3, 0, 0);
+        this.scene.add(this.gearSmall);
+
+        // ── Servo Arm ─────────────────────────────────────────────────────────
+        this.servoArm = new THREE.Group();
+        // Arm shaft
+        const armGeo = new THREE.BoxGeometry(0.9, 0.14, 0.14);
+        armGeo.translate(0.45, 0, 0); // pivot at left end
+        const armMesh = new THREE.Mesh(armGeo, accentMat);
+        this.servoArm.add(armMesh);
+        // Arm tip dot
+        const tipGeo = new THREE.SphereGeometry(0.12, 12, 12);
+        const tipMesh = new THREE.Mesh(tipGeo, new THREE.MeshStandardMaterial({
+            color: 0xffffff, emissive: 0xc084fc, emissiveIntensity: 1.5, roughness: 0.1, metalness: 0.8
+        }));
+        tipMesh.position.set(0.95, 0, 0);
+        this.servoArm.add(tipMesh);
+
+        this.servoArm.position.set(0.3, 0, 0.22);
+        this.scene.add(this.servoArm);
+
+        // ── Chassis / Body of Servo ────────────────────────────────────────────
+        const chassisGeo = new THREE.BoxGeometry(1.0, 0.8, 0.18);
+        const chassis = new THREE.Mesh(chassisGeo, darkMat);
+        chassis.position.set(0.3, 0, -0.08);
+        this.scene.add(chassis);
+
+        // ── Lights ────────────────────────────────────────────────────────────
+        const ambient = new THREE.AmbientLight(0xffffff, 0.5);
+        this.scene.add(ambient);
+        const key = new THREE.DirectionalLight(0xffffff, 1.2);
+        key.position.set(2, 3, 5);
+        this.scene.add(key);
+        this.servoLight = new THREE.PointLight(0xc084fc, 2.0, 6);
+        this.servoLight.position.set(0.3, 0, 1);
+        this.scene.add(this.servoLight);
+
+        window.addEventListener('resize', () => {
+            if (!this.renderer || !container) return;
+            this.renderer.setSize(container.clientWidth, container.clientHeight);
+        });
+
+        this.animate();
+    },
+
+    animate() {
+        this.animId = requestAnimationFrame(() => this.animate());
+
+        // Smooth angle interpolation
+        const ease = this._resetting ? 0.15 : 0.025;
+        this.currentAngle += (this.targetAngle - this.currentAngle) * ease;
+
+        // Main gear rotates with currentAngle (maps 0–360 to 0–2π)
+        if (this.gearMain) this.gearMain.rotation.z = -(this.currentAngle * Math.PI / 180);
+        // Small gear counter-rotates at ratio ~1.9x (big/small tooth count)
+        if (this.gearSmall) this.gearSmall.rotation.z = (this.currentAngle * Math.PI / 180) * (16 / 9);
+        // Servo arm follows the small gear axis
+        if (this.servoArm) this.servoArm.rotation.z = -(this.currentAngle * Math.PI / 180) * (16 / 9);
+
+        if (this.renderer) this.renderer.render(this.scene, this.camera);
+    },
+
+    /**
+     * Set progress 0–100 → maps to 0–340° rotation of main gear
+     * When percent reaches 100, triggers a fast reset animation.
+     */
+    setProgress(percent) {
+        this.targetPercent = Math.min(Math.max(percent, 0), 100);
+        const newTarget = (this.targetPercent / 100) * 340;
+
+        if (percent >= 100 && this.targetAngle < 340) {
+            // First time reaching 100% — full rotation, then schedule reset
+            this.targetAngle = 340;
+            setTimeout(() => this._triggerReset(), 1200);
+        } else if (!this._resetting) {
+            this.targetAngle = newTarget;
+        }
+
+        // Update light color based on progress
+        if (this.servoLight) {
+            if (percent < 33)       this.servoLight.color.setHex(0x0ea5e9); // blue
+            else if (percent < 66)  this.servoLight.color.setHex(0xc084fc); // purple
+            else if (percent < 100) this.servoLight.color.setHex(0xfb923c); // orange
+            else                    this.servoLight.color.setHex(0x34d399); // green - done!
+            this.servoLight.intensity = 1.5 + (percent / 100) * 3;
+        }
+    },
+
+    _triggerReset() {
+        this._resetting = true;
+        this.targetAngle = 0;
+        setTimeout(() => { this._resetting = false; }, 1500);
+    },
+
+    updateThemeColor(colorHex) {
+        if (!this.scene) return;
+        const hex = parseInt(colorHex.replace('#', '0x'));
+        if (this.servoLight) this.servoLight.color.setHex(hex);
+    },
+};
+
 // ─── WebGL Module ─────────────────────────────────────────────────────────────
 
 const WebGLModule = {
@@ -455,6 +636,12 @@ const TimerModule = {
             timer.interval = setInterval(() => {
                 timer.secondsElapsed--;
                 timerEl.innerText = formatTime(timer.secondsElapsed);
+                
+                if (window.ServoModule) {
+                    const pct = ((timer.pomodoroDuration - timer.secondsElapsed) / timer.pomodoroDuration) * 100;
+                    ServoModule.setProgress(pct);
+                }
+
                 Storage.saveTimer();
                 if (timer.secondsElapsed <= 0) {
                     this.stop();
@@ -472,6 +659,13 @@ const TimerModule = {
             timer.interval = setInterval(() => {
                 timer.secondsElapsed++;
                 timerEl.innerText = formatTime(timer.secondsElapsed);
+                
+                if (window.ServoModule) {
+                    // For free mode, let's just loop the servo every minute to show it's active
+                    const pct = ((timer.secondsElapsed % 60) / 60) * 100;
+                    ServoModule.setProgress(pct);
+                }
+
                 Storage.saveTimer();
             }, 1000);
         }
@@ -511,6 +705,7 @@ const TimerModule = {
         const banner  = $('pomodoro-banner');
         if (banner) banner.classList.add('hidden');
         if (timerEl) timerEl.innerText = timer.pomodoroMode ? formatTime(timer.pomodoroDuration) : '00:00:00';
+        if (window.ServoModule) ServoModule.setProgress(0);
     },
 
     setMode(mode) {
@@ -1284,6 +1479,7 @@ const ThemeModule = {
         
         // Update WebGL Object color
         if (window.WebGLModule) WebGLModule.updateColor(theme.accent);
+        if (window.ServoModule) ServoModule.updateThemeColor(theme.accent);
     },
 };
 
@@ -1777,4 +1973,5 @@ document.addEventListener('DOMContentLoaded', () => {
     Terminal.log('SISTEMA OPERACIONAL INICIALIZADO', 'success');
     SoundModule.setupDelegation();
     WebGLModule.init();
+    if (window.ServoModule) ServoModule.init();
 });
