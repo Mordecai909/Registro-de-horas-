@@ -42,7 +42,6 @@
 </head>
 <body class="bg-black text-primary min-h-screen relative z-0">
     <!-- Cyber-Pulse Dynamic Background -->
-    <!-- Cyber-Pulse Dynamic Background -->
     <div class="cyber-pulse-bg">
         <!-- Theme-Responsive Black Hole -->
         <div class="bh-layer bh-image"></div>
@@ -51,6 +50,7 @@
         <div class="bg-circuit-texture"></div>
         <div class="bg-hex-grid"></div>
         <div class="bg-grid"></div>
+        <div class="bg-scanlines"></div>
     </div>
 
     <!-- Sidebar Overlay -->
@@ -70,28 +70,28 @@
 
         <!-- Sidebar Navigation Items -->
         <div class="flex-1 px-4 space-y-2">
-            <button onclick="toggleSidebar(false)" class="w-full text-left px-4 py-4 rounded-2xl flex items-center gap-4 text-sm font-bold text-accent/90 hover:bg-accent/10 hover:text-accent transition-all group border border-transparent hover:border-accent/10 btn-weight btn-3d-accent">
+            <button onclick="toggleSidebar(false)" class="btn-glitch-hover w-full text-left px-4 py-4 rounded-2xl flex items-center gap-4 text-sm font-bold text-accent/90 hover:bg-accent/10 hover:text-accent transition-all group border border-transparent hover:border-accent/10 btn-weight btn-3d-accent">
                 <div class="p-2 bg-accent/10 rounded-xl group-hover:scale-110 transition-transform">
                     <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
                 </div>
                 Início / Resumo
             </button>
 
-            <button id="theme-switch-btn" onclick="changeTheme()" class="w-full text-left px-4 py-4 rounded-2xl flex items-center gap-4 text-sm font-bold text-accent/90 hover:bg-accent/10 hover:text-accent transition-all group border border-transparent hover:border-accent/10 btn-weight btn-3d-accent">
+            <button id="theme-switch-btn" onclick="changeTheme()" class="btn-glitch-hover w-full text-left px-4 py-4 rounded-2xl flex items-center gap-4 text-sm font-bold text-accent/90 hover:bg-accent/10 hover:text-accent transition-all group border border-transparent hover:border-accent/10 btn-weight btn-3d-accent">
                 <div id="theme-icon-container" class="p-2 bg-accent/20 rounded-xl group-hover:scale-110 transition-transform border border-accent/20">
                     <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" /></svg>
                 </div>
                 Trocar Tema (Cores)
             </button>
 
-            <button id="pwa-install-btn" onclick="installApp()" class="hidden w-full text-left px-4 py-4 rounded-2xl flex items-center gap-4 text-sm font-bold text-accent/90 hover:bg-accent/10 hover:text-accent transition-all group border border-transparent hover:border-accent/10 btn-weight btn-3d-accent">
+            <button id="pwa-install-btn" onclick="installApp()" class="btn-glitch-hover hidden w-full text-left px-4 py-4 rounded-2xl flex items-center gap-4 text-sm font-bold text-accent/90 hover:bg-accent/10 hover:text-accent transition-all group border border-transparent hover:border-accent/10 btn-weight btn-3d-accent">
                 <div class="p-2 bg-accent/10 rounded-xl group-hover:scale-110 transition-transform">
                     <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
                 </div>
                 Baixar Aplicativo (PWA)
             </button>
 
-            <button onclick="confirmClearStorage()" class="w-full text-left px-4 py-4 rounded-2xl flex items-center gap-4 text-sm font-bold text-rose-400 hover:bg-rose-500/10 transition-all group border border-transparent hover:border-rose-500/10 btn-weight btn-3d-rose">
+            <button onclick="confirmClearStorage()" class="btn-glitch-hover w-full text-left px-4 py-4 rounded-2xl flex items-center gap-4 text-sm font-bold text-rose-400 hover:bg-rose-500/10 transition-all group border border-transparent hover:border-rose-500/10 btn-weight btn-3d-rose">
                 <div class="p-2 bg-rose-500/10 rounded-xl group-hover:scale-110 transition-transform">
                     <svg class="w-5 h-5 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                 </div>
@@ -158,7 +158,7 @@
                             </label>
                         </div>
                         <button type="submit"
-                            class="w-full py-2.5 bg-accent/15 hover:bg-accent text-accent hover:text-white rounded-xl text-xs font-bold transition-all border border-accent/30 flex items-center justify-center gap-2 btn-weight btn-3d-accent">
+                            class="btn-glitch-hover w-full py-2.5 bg-accent/15 hover:bg-accent text-accent hover:text-white rounded-xl text-xs font-bold transition-all border border-accent/30 flex items-center justify-center gap-2 btn-weight btn-3d-accent">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" /></svg>
                             Adicionar Tag
                         </button>
@@ -292,23 +292,23 @@
                 </div>
 
                 <!-- Pomodoro finished banner (hidden by default) -->
-                <div id="pomodoro-banner" class="hidden w-full py-3 px-4 rounded-2xl bg-orange-500/20 border border-orange-500/40 text-orange-300 text-sm font-bold text-center animate-pulse">
+                <div id="pomodoro-banner" class="hidden w-full py-3 px-4 rounded-2xl bg-orange-500/20 border border-orange-500/40 text-orange-300 text-sm font-bold text-center glitch-banner">
                     🍅 Sessão finalizada! Hora de descansar.
                 </div>
 
                 <div class="flex gap-3 w-full timer-buttons-row">
                     <button id="btn-timer-toggle" onclick="toggleTimer()"
-                        class="btn-weight flex-1 py-5 bg-accent hover:opacity-80 text-[#0f001c] rounded-2xl font-bold text-base border border-accent/50 shadow-[0_0_20px_accent_glow] hover:shadow-[0_0_30px_accent_glow] transition-all flex items-center justify-center gap-2 group relative btn-3d-accent">
+                        class="btn-glitch-hover btn-weight flex-1 py-5 bg-accent hover:opacity-80 text-[#0f001c] rounded-2xl font-bold text-base border border-accent/50 shadow-[0_0_20px_accent_glow] hover:shadow-[0_0_30px_accent_glow] transition-all flex items-center justify-center gap-2 group relative btn-3d-accent">
                         <svg id="timer-icon" class="w-5 h-5 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/></svg>
                         <span id="timer-btn-label">Iniciar</span>
                         <span class="absolute bottom-1.5 right-2.5 text-[9px] font-mono opacity-30 leading-none">Space</span>
                     </button>
                     <button id="btn-timer-save" onclick="saveTimerToForm()" title="Transferir tempo para o formulário"
-                        class="btn-weight py-5 px-6 bg-[rgba(16,185,129,0.1)] hover:bg-[rgba(16,185,129,0.2)] text-emerald-400 rounded-2xl transition-all border border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.1)] hover:shadow-[0_0_15px_rgba(16,185,129,0.3)] flex items-center justify-center btn-3d-emerald">
+                        class="btn-glitch-hover btn-weight py-5 px-6 bg-[rgba(16,185,129,0.1)] hover:bg-[rgba(16,185,129,0.2)] text-emerald-400 rounded-2xl transition-all border border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.1)] hover:shadow-[0_0_15px_rgba(16,185,129,0.3)] flex items-center justify-center btn-3d-emerald">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     </button>
                     <button id="btn-timer-reset" onclick="resetTimer()" title="Zerar timer"
-                        class="btn-weight py-5 px-6 bg-[rgba(239,68,68,0.1)] hover:bg-[rgba(239,68,68,0.2)] text-rose-400 rounded-2xl transition-all border border-rose-500/20 shadow-[0_0_10px_rgba(239,68,68,0.1)] hover:shadow-[0_0_15px_rgba(239,68,68,0.3)] flex items-center justify-center btn-3d-rose">
+                        class="btn-glitch-hover btn-weight py-5 px-6 bg-[rgba(239,68,68,0.1)] hover:bg-[rgba(239,68,68,0.2)] text-rose-400 rounded-2xl transition-all border border-rose-500/20 shadow-[0_0_10px_rgba(239,68,68,0.1)] hover:shadow-[0_0_15px_rgba(239,68,68,0.3)] flex items-center justify-center btn-3d-rose">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
                     </button>
                 </div>
