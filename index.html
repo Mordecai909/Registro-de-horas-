@@ -37,6 +37,9 @@
         }
     </script>
 
+    <!-- Three.js for 3D Cyberpunk Object -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
     <!-- Custom Style -->
     <link rel="stylesheet" href="style.css">
 </head>
@@ -245,8 +248,11 @@
         <!-- Controls Row: Timer + Form side by side -->
         <section class="lg:col-span-12 grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Active Timer -->
-            <div class="glass-card p-8 text-center relative flex flex-col items-center justify-center gap-6">
-                <div class="mode-pill" id="mode-pill-wrap">
+            <div class="glass-card p-8 text-center relative flex flex-col items-center justify-center gap-6 overflow-hidden">
+                <!-- WebGL 3D Object Container -->
+                <div id="webgl-container" class="absolute inset-0 z-0 opacity-40 mix-blend-screen pointer-events-none flex items-center justify-center"></div>
+
+                <div class="mode-pill relative z-10" id="mode-pill-wrap">
                     <div class="mode-pill-indicator is-free" id="mode-indicator"></div>
                     <button id="mode-free" onclick="setTimerMode('free')"
                         class="px-4 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-widest text-white">

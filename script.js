@@ -242,6 +242,88 @@ const SoundModule = {
     }
 };
 
+// ─── WebGL Module ─────────────────────────────────────────────────────────────
+
+const WebGLModule = {
+    scene: null, camera: null, renderer: null, mesh: null,
+    animationId: null,
+    baseSpeed: 0.001,
+    activeSpeed: 0.02,
+    currentSpeed: 0.001,
+    targetSpeed: 0.001,
+
+    init() {
+        if (!window.THREE) return;
+        const container = $('webgl-container');
+        if (!container) return;
+
+        this.scene = new THREE.Scene();
+        this.camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 1000);
+        this.camera.position.z = 4.5;
+
+        this.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        this.renderer.setSize(container.clientWidth, container.clientHeight);
+        this.renderer.setPixelRatio(window.devicePixelRatio);
+        container.appendChild(this.renderer.domElement);
+
+        // Cyberpunk floating object: Icosahedron with wireframe
+        const geometry = new THREE.IcosahedronGeometry(1.2, 0);
+        
+        // Inner solid core
+        const coreMat = new THREE.MeshBasicMaterial({ color: 0x0f001c });
+        const core = new THREE.Mesh(geometry, coreMat);
+        
+        // Outer neon wireframe
+        const wireMat = new THREE.LineBasicMaterial({ color: 0xc084fc, linewidth: 2 });
+        const wireframe = new THREE.LineSegments(new THREE.WireframeGeometry(geometry), wireMat);
+        
+        this.mesh = new THREE.Group();
+        this.mesh.add(core);
+        this.mesh.add(wireframe);
+        
+        this.scene.add(this.mesh);
+
+        window.addEventListener('resize', () => {
+            if (!container || !this.camera || !this.renderer) return;
+            this.camera.aspect = container.clientWidth / container.clientHeight;
+            this.camera.updateProjectionMatrix();
+            this.renderer.setSize(container.clientWidth, container.clientHeight);
+        });
+
+        this.animate();
+    },
+
+    animate() {
+        this.animationId = requestAnimationFrame(() => this.animate());
+        
+        // Smoothly interpolate speed
+        this.currentSpeed += (this.targetSpeed - this.currentSpeed) * 0.05;
+        
+        if (this.mesh) {
+            this.mesh.rotation.x += this.currentSpeed;
+            this.mesh.rotation.y += this.currentSpeed * 1.2;
+            
+            // Floating effect
+            this.mesh.position.y = Math.sin(Date.now() * 0.002) * 0.15;
+        }
+
+        this.renderer.render(this.scene, this.camera);
+    },
+
+    setSpeed(isActive) {
+        this.targetSpeed = isActive ? this.activeSpeed : this.baseSpeed;
+    },
+    
+    updateColor(colorHex) {
+        if (this.mesh) {
+            const wireframe = this.mesh.children[1];
+            if (wireframe && wireframe.material) {
+                wireframe.material.color.setHex(parseInt(colorHex.replace('#', '0x')));
+            }
+        }
+    }
+};
+
 // ─── Toast Module ─────────────────────────────────────────────────────────────
 
 const Toast = {
@@ -288,6 +370,7 @@ const TimerModule = {
     start() {
         const { timer } = AppState;
         timer.running = true;
+        WebGLModule.setSpeed(true);
 
         const timerEl   = $('timer-text');
         const btnLabel  = $('timer-btn-label');
@@ -334,8 +417,9 @@ const TimerModule = {
 
     stop() {
         const { timer } = AppState;
-        clearInterval(timer.interval);
         timer.running = false;
+        clearInterval(timer.interval);
+        WebGLModule.setSpeed(false);
 
         const btnLabel  = $('timer-btn-label');
         const btnIcon   = $('timer-icon');
@@ -1131,6 +1215,9 @@ const ThemeModule = {
             const hue = (AppState.ui.currentThemeIdx * 60) + 240;
             circuit.style.filter = `sepia(100%) hue-rotate(${hue}deg) brightness(0.7) contrast(1.3)`;
         }
+        
+        // Update WebGL Object color
+        if (window.WebGLModule) WebGLModule.updateColor(theme.accent);
     },
 };
 
@@ -1623,4 +1710,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
     Terminal.log('SISTEMA OPERACIONAL INICIALIZADO', 'success');
     SoundModule.setupDelegation();
+    WebGLModule.init();
 });
