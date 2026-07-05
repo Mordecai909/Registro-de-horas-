@@ -971,19 +971,34 @@ const UI = {
             const totalMin = weekEntries.reduce((sum, e) => sum + timeToMin(e.total), 0);
             const totalStr = minToTime(totalMin);
 
+            const isCurrentWeek = (sortedWeeks.indexOf(key) === 0); // First (most recent) week is expanded
+            const weekGoalMin = 30 * 60; // 30 hours weekly target
+            const weekPct = Math.min(Math.round((totalMin / weekGoalMin) * 100), 100);
+            const weekPctColor = weekPct >= 100 ? 'var(--success)' : weekPct >= 66 ? '#fb923c' : 'var(--accent)';
+            const cardId = `week-${key.replace(/[^a-z0-9]/gi,'_')}`;
+
             const weekCard = document.createElement('div');
-            weekCard.className = 'weekly-table-card border border-white/5 bg-black/20 rounded-2xl overflow-hidden shadow-lg mb-6';
+            weekCard.className = 'weekly-table-card border border-white/5 bg-black/20 rounded-2xl overflow-hidden shadow-lg';
             weekCard.innerHTML = `
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center px-6 py-4 bg-[rgba(15,0,28,0.85)] border-b border-white/5 gap-2">
+                <button type="button" class="w-full flex flex-col sm:flex-row justify-between items-start sm:items-center px-6 py-4 bg-[rgba(15,0,28,0.85)] border-b border-white/5 gap-2 hover:bg-[rgba(15,0,28,0.95)] transition-colors week-header-btn" onclick="this.closest('.weekly-table-card').classList.toggle('collapsed')" aria-expanded="${isCurrentWeek ? 'true' : 'false'}" aria-controls="${cardId}">
                     <div class="flex items-center gap-2.5">
-                        <span class="w-2.5 h-2.5 rounded-full bg-accent shadow-[0_0_8px_var(--accent-glow)]"></span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-accent shadow-[0_0_8px_var(--accent-glow)] flex-shrink-0"></span>
                         <h5 class="text-xs font-black uppercase tracking-[0.2em] text-white">Semana: <span class="text-accent">${startDisp} a ${endDisp}</span></h5>
                     </div>
-                    <div class="text-xs font-bold uppercase tracking-widest text-accent/80">
-                        Total: <span class="text-white font-extrabold text-sm drop-shadow-[0_0_6px_var(--accent-glow)]">${totalStr}h</span>
+                    <div class="flex items-center gap-4 ml-auto">
+                        <div class="flex flex-col items-end gap-1">
+                            <div class="flex items-center gap-2">
+                                <span class="text-[10px] font-bold uppercase tracking-widest text-accent/60">${weekPct}% da meta</span>
+                                <span class="text-xs font-bold uppercase tracking-widest text-accent/80">Total: <span class="text-white font-extrabold text-sm drop-shadow-[0_0_6px_var(--accent-glow)]">${totalStr}h</span></span>
+                            </div>
+                            <div class="w-32 h-1 rounded-full bg-white/10 overflow-hidden">
+                                <div class="h-full rounded-full transition-all duration-700" style="width:${weekPct}%;background:${weekPctColor};box-shadow:0 0 6px ${weekPctColor}80;"></div>
+                            </div>
+                        </div>
+                        <svg class="w-4 h-4 text-accent/40 week-chevron flex-shrink-0 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                     </div>
-                </div>
-                <div class="overflow-x-auto">
+                </button>
+                <div class="week-table-body overflow-x-auto" id="${cardId}">
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-black/40 uppercase tracking-widest text-[9px] border-b border-white/5">
@@ -999,12 +1014,25 @@ const UI = {
                 </div>
             `;
 
+            if (!isCurrentWeek) weekCard.classList.add('collapsed');
+
             const tbody = weekCard.querySelector('.weekly-table-body');
             weekEntries.forEach(entry => {
                 const row = document.createElement('tr');
                 row.className = 'table-row-hover transition-colors group';
+                const DOW_SHORT = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+                const [ey, em, ed] = entry.date.split('-').map(Number);
+                const entryDow = new Date(ey, em - 1, ed).getDay();
+                const dowLabel = DOW_SHORT[entryDow];
+                const timeRange = (entry.start && entry.end)
+                    ? `<div class="text-[10px] font-mono text-accent/50 mt-0.5 tracking-wider">${entry.start} → ${entry.end}</div>`
+                    : '';
                 row.innerHTML = `
-                    <td class="px-6 py-5 whitespace-nowrap text-sm font-medium text-accent/90">${formatDateBR(entry.date)}</td>
+                    <td class="px-6 py-5 whitespace-nowrap">
+                        <div class="text-sm font-medium text-accent/90">${formatDateBR(entry.date)}</div>
+                        <div class="text-[10px] font-black uppercase tracking-widest text-accent/40 mt-0.5">${dowLabel}</div>
+                        ${timeRange}
+                    </td>
                     <td class="px-6 py-5">
                         <div class="text-sm font-bold text-white mb-1.5">${entry.desc}</div>
                         ${this._getCategoryBadge(entry.category)}

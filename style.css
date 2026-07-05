@@ -1582,10 +1582,41 @@ input:focus, select:focus {
 /* Weekly Table Cards and Layout */
 .weekly-table-card {
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: 1.25rem;
 }
 .weekly-table-card:hover {
     border-color: rgba(192, 132, 252, 0.2);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+}
+
+/* Collapsible week body */
+.week-table-body {
+    max-height: 2000px;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.3s ease;
+    opacity: 1;
+}
+.weekly-table-card.collapsed .week-table-body {
+    max-height: 0;
+    opacity: 0;
+}
+
+/* Chevron rotation when collapsed */
+.weekly-table-card.collapsed .week-chevron {
+    transform: rotate(-90deg);
+}
+
+/* Week header button reset */
+.week-header-btn {
+    text-align: left;
+    cursor: pointer;
+    background: none;
+    border: none;
+}
+.week-header-btn:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
 }
 
 /* Success colors for Hour Converter Output 2 card */
