@@ -497,12 +497,14 @@ input:focus, select:focus {
     background: rgba(192, 132, 252, 0.03);
 }
 
-#activity-list tr {
+#activity-list tr,
+.weekly-table-body tr {
     border-bottom: 1px solid rgba(192, 132, 252, 0.05);
     transition: background 0.3s ease;
 }
 
-#activity-list tr:last-child {
+#activity-list tr:last-child,
+.weekly-table-body tr:last-child {
     border-bottom: none;
 }
 
@@ -1575,4 +1577,20 @@ input:focus, select:focus {
     color: rgba(192, 132, 252, 0.3) !important;
     font-weight: 400 !important;
     letter-spacing: 0.05em !important;
+}
+
+/* Weekly Table Cards and Layout */
+.weekly-table-card {
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.weekly-table-card:hover {
+    border-color: rgba(192, 132, 252, 0.2);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+}
+
+/* Success colors for Hour Converter Output 2 card */
+.border-success-glow {
+    border-color: rgba(52, 211, 153, 0.4) !important;
+    background: rgba(52, 211, 153, 0.08) !important;
+    box-shadow: 0 0 15px rgba(52, 211, 153, 0.2) !important;
 }

@@ -903,34 +903,129 @@ function deleteEntry(id)  { EntriesModule.delete(id); }
 // ─── UI Module ────────────────────────────────────────────────────────────────
 
 const UI = {
-    renderEntries(filteredEntries = AppState.entries) {
-        const list = $('activity-list');
-        if (!list) return;
-        list.innerHTML = '';
+    _getWeekRange(dateStr) {
+        const [y, m, d] = dateStr.split('-').map(Number);
+        const date = new Date(y, m - 1, d);
+        const dow = date.getDay();
+        const diffToMon = (dow === 0 ? -6 : 1 - dow);
+        const monday = new Date(date);
+        monday.setDate(date.getDate() + diffToMon);
+        
+        const sunday = new Date(monday);
+        sunday.setDate(monday.getDate() + 6);
+        
+        const format = (dt) => {
+            const yr = dt.getFullYear();
+            const mo = String(dt.getMonth() + 1).padStart(2, '0');
+            const dy = String(dt.getDate()).padStart(2, '0');
+            return `${yr}-${mo}-${dy}`;
+        };
+        
+        return {
+            startStr: format(monday),
+            endStr: format(sunday)
+        };
+    },
 
+    renderEntries(filteredEntries = AppState.entries) {
+        const container = $('activity-tables-container');
+        if (!container) return;
+        container.innerHTML = '';
+
+        if (filteredEntries.length === 0) {
+            container.innerHTML = `
+                <div class="flex flex-col items-center justify-center py-12 text-center text-accent/40 font-mono text-xs uppercase tracking-widest border border-dashed border-accent/20 rounded-2xl">
+                    <svg class="w-8 h-8 mb-3 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                    Nenhum bloco de tempo registrado
+                </div>
+            `;
+            DashboardModule.update();
+            return;
+        }
+
+        const weekGroups = {};
         filteredEntries.forEach(entry => {
-            const row = document.createElement('tr');
-            row.className = 'table-row-hover transition-colors group';
-            row.innerHTML = `
-                <td class="px-6 py-5 whitespace-nowrap text-sm font-medium text-accent/90">${formatDateBR(entry.date)}</td>
-                <td class="px-6 py-5">
-                    <div class="text-sm font-bold text-white mb-1.5">${entry.desc}</div>
-                    ${this._getCategoryBadge(entry.category)}
-                </td>
-                <td class="px-6 py-5 whitespace-nowrap text-right">
-                    <span class="text-sm font-bold text-accent drop-shadow-[0_0_8px_var(--accent-glow)]">${entry.total}h</span>
-                </td>
-                <td class="px-6 py-5 whitespace-nowrap text-center actions-cell">
-                    <div class="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onclick="editEntry(${entry.id})" class="btn-icon p-2 text-accent/80 hover:text-accent transition-all hover:drop-shadow-[0_0_8px_var(--accent-glow)]">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-                        </button>
-                        <button onclick="deleteEntry(${entry.id})" class="btn-icon p-2 text-accent/40 hover:text-danger transition-all hover:drop-shadow-[0_0_8px_rgba(251,113,133,0.8)]">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                        </button>
+            const range = this._getWeekRange(entry.date);
+            const key = `${range.startStr}|${range.endStr}`;
+            if (!weekGroups[key]) {
+                weekGroups[key] = [];
+            }
+            weekGroups[key].push(entry);
+        });
+
+        const sortedWeeks = Object.keys(weekGroups).sort().reverse();
+
+        sortedWeeks.forEach(key => {
+            const [startStr, endStr] = key.split('|');
+            const startDisp = formatDateBR(startStr);
+            const endDisp = formatDateBR(endStr);
+            const weekEntries = weekGroups[key];
+
+            weekEntries.sort((a, b) => {
+                if (a.date !== b.date) {
+                    return b.date.localeCompare(a.date);
+                }
+                return (b.start || '').localeCompare(a.start || '');
+            });
+
+            const totalMin = weekEntries.reduce((sum, e) => sum + timeToMin(e.total), 0);
+            const totalStr = minToTime(totalMin);
+
+            const weekCard = document.createElement('div');
+            weekCard.className = 'weekly-table-card border border-white/5 bg-black/20 rounded-2xl overflow-hidden shadow-lg mb-6';
+            weekCard.innerHTML = `
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center px-6 py-4 bg-[rgba(15,0,28,0.85)] border-b border-white/5 gap-2">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-2.5 h-2.5 rounded-full bg-accent shadow-[0_0_8px_var(--accent-glow)]"></span>
+                        <h5 class="text-xs font-black uppercase tracking-[0.2em] text-white">Semana: <span class="text-accent">${startDisp} a ${endDisp}</span></h5>
                     </div>
-                </td>`;
-            list.appendChild(row);
+                    <div class="text-xs font-bold uppercase tracking-widest text-accent/80">
+                        Total: <span class="text-white font-extrabold text-sm drop-shadow-[0_0_6px_var(--accent-glow)]">${totalStr}h</span>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-black/40 uppercase tracking-widest text-[9px] border-b border-white/5">
+                                <th class="px-6 py-3.5 font-bold text-accent/70 tracking-[0.15em] w-1/4">Carimbo</th>
+                                <th class="px-6 py-3.5 font-bold text-accent/70 tracking-[0.15em]">Carga</th>
+                                <th class="px-6 py-3.5 font-bold text-accent/70 tracking-[0.15em] text-right w-1/4">Ciclos</th>
+                                <th class="px-6 py-3.5 font-bold text-accent/70 tracking-[0.15em] text-center w-1/4">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody class="weekly-table-body">
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            const tbody = weekCard.querySelector('.weekly-table-body');
+            weekEntries.forEach(entry => {
+                const row = document.createElement('tr');
+                row.className = 'table-row-hover transition-colors group';
+                row.innerHTML = `
+                    <td class="px-6 py-5 whitespace-nowrap text-sm font-medium text-accent/90">${formatDateBR(entry.date)}</td>
+                    <td class="px-6 py-5">
+                        <div class="text-sm font-bold text-white mb-1.5">${entry.desc}</div>
+                        ${this._getCategoryBadge(entry.category)}
+                    </td>
+                    <td class="px-6 py-5 whitespace-nowrap text-right">
+                        <span class="text-sm font-bold text-accent drop-shadow-[0_0_8px_var(--accent-glow)]">${entry.total}h</span>
+                    </td>
+                    <td class="px-6 py-5 whitespace-nowrap text-center actions-cell">
+                        <div class="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button onclick="editEntry(${entry.id})" class="btn-icon p-2 text-accent/80 hover:text-accent transition-all hover:drop-shadow-[0_0_8px_var(--accent-glow)]">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                            </button>
+                            <button onclick="deleteEntry(${entry.id})" class="btn-icon p-2 text-accent/40 hover:text-danger transition-all hover:drop-shadow-[0_0_8px_rgba(251,113,133,0.8)]">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                            </button>
+                        </div>
+                    </td>`;
+                tbody.appendChild(row);
+            });
+
+            container.appendChild(weekCard);
         });
 
         DashboardModule.update();
@@ -1970,8 +2065,100 @@ document.addEventListener('DOMContentLoaded', () => {
         $('timer-text').innerText = formatTime(AppState.timer.secondsElapsed);
     }
 
+    initHourConverter();
+
     Terminal.log('SISTEMA OPERACIONAL INICIALIZADO', 'success');
     SoundModule.setupDelegation();
     WebGLModule.init();
     if (window.ServoModule) ServoModule.init();
 });
+
+function initHourConverter() {
+    const inputEl = $('converter-input');
+    const outputHhmm = $('output-hhmm');
+    const outputHhmmText = $('output-hhmm-text');
+    const outputGoal = $('output-goal');
+    const outputGoalCard = $('output-goal-card');
+    
+    if (!inputEl) return;
+    
+    inputEl.addEventListener('input', (e) => {
+        let cursorPosition = inputEl.selectionStart;
+        let originalLen = inputEl.value.length;
+        
+        let cleaned = inputEl.value.replace(/[^0-9.,]/g, '');
+        
+        // Handle multiple dots/commas
+        let firstSeparatorIdx = cleaned.search(/[.,]/);
+        if (firstSeparatorIdx !== -1) {
+            let before = cleaned.substring(0, firstSeparatorIdx + 1);
+            let after = cleaned.substring(firstSeparatorIdx + 1).replace(/[.,]/g, '');
+            cleaned = before + after;
+        }
+        
+        if (inputEl.value !== cleaned) {
+            inputEl.value = cleaned;
+            let newLen = cleaned.length;
+            inputEl.setSelectionRange(cursorPosition - (originalLen - newLen), cursorPosition - (originalLen - newLen));
+        }
+        
+        if (!cleaned) {
+            outputHhmm.textContent = '--:--';
+            outputHhmmText.textContent = '--';
+            outputHhmmText.classList.add('hidden');
+            outputGoal.textContent = '--';
+            outputGoalCard.className = 'bg-[rgba(15,0,28,0.3)] border border-accent/20 rounded-xl p-4 flex flex-col justify-center min-h-[76px] transition-all';
+            return;
+        }
+        
+        const num = parseFloat(cleaned.replace(',', '.'));
+        if (isNaN(num)) {
+            outputHhmm.textContent = '--:--';
+            outputHhmmText.textContent = '--';
+            outputHhmmText.classList.add('hidden');
+            outputGoal.textContent = '--';
+            outputGoalCard.className = 'bg-[rgba(15,0,28,0.3)] border border-accent/20 rounded-xl p-4 flex flex-col justify-center min-h-[76px] transition-all';
+            return;
+        }
+        
+        // Calculate Output 1 (HH:MM)
+        let hours = Math.floor(num);
+        let minutes = Math.round((num - hours) * 60);
+        if (minutes === 60) {
+            hours += 1;
+            minutes = 0;
+        }
+        
+        const formattedHhmm = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+        outputHhmm.textContent = `${hours}h ${minutes}m (${formattedHhmm})`;
+        
+        // Description
+        const hLabel = hours === 1 ? 'hora' : 'horas';
+        const mLabel = minutes === 1 ? 'minuto' : 'minutos';
+        outputHhmmText.textContent = `${hours} ${hLabel} e ${minutes} ${mLabel}`;
+        outputHhmmText.classList.remove('hidden');
+        
+        // Calculate Output 2 (Remaining or Met)
+        const totalMinutes = (hours * 60) + minutes;
+        const targetMinutes = 360; // 6 hours
+        
+        if (totalMinutes >= targetMinutes) {
+            outputGoal.textContent = 'Meta de 6 horas atingida!';
+            outputGoalCard.className = 'border-success-glow rounded-xl p-4 flex flex-col justify-center min-h-[76px] transition-all text-success';
+        } else {
+            const diffMin = targetMinutes - totalMinutes;
+            const diffH = Math.floor(diffMin / 60);
+            const diffM = diffMin % 60;
+            
+            if (diffH > 0) {
+                const diffHLabel = diffH === 1 ? 'hora' : 'horas';
+                const diffMLabel = diffM === 1 ? 'minuto' : 'minutos';
+                outputGoal.textContent = `Faltam ${diffH} ${diffHLabel} e ${diffM} ${diffMLabel} para as 6:00`;
+            } else {
+                const diffMLabel = diffM === 1 ? 'minuto' : 'minutos';
+                outputGoal.textContent = `Faltam ${diffM} ${diffMLabel} para as 6:00`;
+            }
+            outputGoalCard.className = 'bg-[rgba(15,0,28,0.3)] border border-accent/20 rounded-xl p-4 flex flex-col justify-center min-h-[76px] transition-all';
+        }
+    });
+}

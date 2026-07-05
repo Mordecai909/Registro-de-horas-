@@ -432,6 +432,39 @@
             </div>
         </section>
 
+        <!-- Hour Converter Row -->
+        <section class="lg:col-span-12">
+            <div class="glass-card p-6">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="p-2 bg-accent/15 rounded-xl text-accent shadow-[0_0_12px_var(--accent-glow)]">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                    </div>
+                    <h4 class="text-sm font-bold text-white uppercase tracking-widest">Conversor de Horas</h4>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+                    <!-- Input Column -->
+                    <div class="space-y-2">
+                        <label for="converter-input" class="block text-[10px] font-black text-accent uppercase tracking-widest ml-1">Horas Trabalhadas (Decimal)</label>
+                        <input type="text" id="converter-input" placeholder="Ex: 5,3 ou 5.3" class="w-full px-4 py-3 text-sm placeholder-accent/30 bg-[rgba(15,0,28,0.4)] border border-accent/30 text-white rounded-xl focus:outline-none focus:border-accent">
+                    </div>
+                    
+                    <!-- Output 1 Column -->
+                    <div class="bg-[rgba(15,0,28,0.3)] border border-accent/20 rounded-xl p-4 flex flex-col justify-center min-h-[76px] transition-all" id="output-hhmm-card">
+                        <span class="text-[9px] font-black text-accent/60 uppercase tracking-widest mb-1">Tempo Convertido (HH:MM)</span>
+                        <div class="text-lg font-display font-extrabold text-white" id="output-hhmm">--:--</div>
+                        <div class="text-[10px] text-accent font-medium mt-0.5 hidden" id="output-hhmm-text">--</div>
+                    </div>
+                    
+                    <!-- Output 2 Column -->
+                    <div class="bg-[rgba(15,0,28,0.3)] border border-accent/20 rounded-xl p-4 flex flex-col justify-center min-h-[76px] transition-all" id="output-goal-card">
+                        <span class="text-[9px] font-black text-accent/60 uppercase tracking-widest mb-1">Falta para 6:00</span>
+                        <div class="text-sm font-bold text-accent" id="output-goal">--</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Category Chart Row -->
         <section class="lg:col-span-12">
             <div class="glass-card p-6">
@@ -492,23 +525,9 @@
                 </div>
             </div>
 
-            <!-- Table Container -->
-            <div class="glass-card overflow-hidden">
-                <div class="overflow-auto max-h-[400px]">
-                    <table class="w-full text-left border-collapse">
-                        <thead class="sticky top-0 z-20 backdrop-blur-xl">
-                            <tr class="bg-[rgba(15,0,28,0.85)] uppercase tracking-widest text-[10px] shadow-[0_10px_20px_-10px_rgba(0,0,0,0.5)]">
-                                <th class="px-6 py-4 text-[10px] font-black text-accent uppercase tracking-[0.2em]">Carimbo</th>
-                                <th class="px-6 py-4 text-[10px] font-black text-accent uppercase tracking-[0.2em]">Carga</th>
-                                <th class="px-6 py-4 text-[10px] font-black text-accent uppercase tracking-[0.2em] text-right">Ciclos</th>
-                                <th class="px-6 py-4 text-[10px] font-black text-accent uppercase tracking-[0.2em] text-center">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="activity-list">
-                            <!-- JS Injection -->
-                        </tbody>
-                    </table>
-                </div>
+            <!-- Weekly Tables Container -->
+            <div id="activity-tables-container" class="space-y-6 max-h-[500px] overflow-y-auto pr-1">
+                <!-- Grouped weekly tables will be injected here -->
             </div>
         </section>
 
