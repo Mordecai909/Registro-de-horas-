@@ -968,6 +968,7 @@ const EntriesModule = {
             AppState.entries[idx] = { ...AppState.entries[idx], date: dateVal, category: catVal, desc: descVal, start: startVal, end: endVal, total };
             ui.editId = null;
             document.querySelector('button[type="submit"]').innerText = 'Gravar no Storage';
+            $('form-card')?.classList.remove('form-card-editing');
         } else {
             AppState.entries.unshift({ id: Date.now(), date: dateVal, category: catVal, desc: descVal, start: startVal, end: endVal, total });
         }
@@ -1011,6 +1012,7 @@ const EntriesModule = {
 
         AppState.ui.editId = id;
         document.querySelector('button[type="submit"]').innerText = 'Atualizar Storage';
+        $('form-card')?.classList.add('form-card-editing');
         $('entry-form').scrollIntoView({ behavior: 'smooth' });
     },
 

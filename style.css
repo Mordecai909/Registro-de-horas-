@@ -1703,6 +1703,34 @@ input:focus, select:focus {
     box-shadow: 0 0 20px rgba(251,113,133,0.4);
 }
 
+/* ─── Edit Mode Pulse on Form Card ───────────────────────────── */
+.form-card-editing {
+    border-color: rgba(251,191,36,0.45) !important;
+    box-shadow:
+        0 0 20px rgba(251,191,36,0.15),
+        inset 0 0 30px rgba(251,191,36,0.04);
+    animation: edit-pulse 2s cubic-bezier(0.4,0,0.6,1) infinite;
+}
+.form-card-editing::before {
+    border-color: #fbbf24 !important;
+}
+.form-card-editing::after {
+    border-color: #fbbf24 !important;
+}
+
+@keyframes edit-pulse {
+    0%, 100% {
+        box-shadow:
+            0 0 20px rgba(251,191,36,0.15),
+            inset 0 0 30px rgba(251,191,36,0.04);
+    }
+    50% {
+        box-shadow:
+            0 0 35px rgba(251,191,36,0.3),
+            inset 0 0 50px rgba(251,191,36,0.08);
+    }
+}
+
 /* ─── Confetti / Success Animation ───────────────────────────── */
 .confetti-container {
     position: fixed;
