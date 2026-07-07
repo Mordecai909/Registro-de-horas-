@@ -922,6 +922,11 @@ const CyberModal = {
         this._overlay.addEventListener('click', (e) => {
             if (e.target === this._overlay) this.close();
         });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && this._overlay.classList.contains('active')) {
+                this.close();
+            }
+        });
     },
 
     confirm(entryDesc, onConfirm) {
@@ -930,8 +935,9 @@ const CyberModal = {
         $('cyber-modal-entry').textContent = entryDesc;
         this._overlay.classList.add('active');
         $('cyber-modal-confirm').onclick = () => {
+            const cb = this._onConfirm;
             this.close();
-            if (this._onConfirm) this._onConfirm();
+            if (cb) cb();
         };
     },
 
@@ -1017,7 +1023,7 @@ const EntriesModule = {
             UI.renderEntries();
             UI.renderQuickFills();
             Terminal.log(`Registro REMOVIDO: ${entry ? entry.desc : 'ID ' + id}`, 'error');
-            Toast.show('Registro eliminado do storage.', 'warning');
+            Toast.show(`Registro "${entry.desc}" removido.`, 'error');
         });
     },
 };
