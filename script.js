@@ -603,6 +603,99 @@ const Toast = {
 // Legacy global alias
 function showToast(message, type, duration) { Toast.show(message, type, duration); }
 
+// ─── Success Animation Module ───────────────────────────────────────────────────
+
+const SuccessAnimation = {
+    _triggered: false,
+
+    trigger() {
+        if (this._triggered) return;
+        this._triggered = true;
+
+        // Play success sound
+        SoundModule.play('success');
+
+        // Screen pulse green
+        this._pulseScreen();
+
+        // Confetti burst
+        this._burstConfetti();
+
+        // Toast notification
+        Toast.show('Meta de 6 horas atingida! 🎉', 'success', 5000);
+
+        // Reset flag next day
+        const today = new Date().toISOString().split('T')[0];
+        const lastTrigger = localStorage.getItem('lastSuccessTrigger');
+        if (lastTrigger === today) {
+            this._triggered = true;
+        } else {
+            localStorage.setItem('lastSuccessTrigger', today);
+        }
+    },
+
+    _pulseScreen() {
+        const overlay = document.createElement('div');
+        overlay.style.cssText = `
+            position: fixed; inset: 0; z-index: 9999; pointer-events: none;
+            background: radial-gradient(circle at center, rgba(52,211,153,0.15) 0%, transparent 70%);
+            animation: success-pulse 1.2s ease-out forwards;
+        `;
+        document.body.appendChild(overlay);
+
+        // Add keyframes if not exists
+        if (!document.getElementById('success-anim-styles')) {
+            const style = document.createElement('style');
+            style.id = 'success-anim-styles';
+            style.textContent = `
+                @keyframes success-pulse {
+                    0% { opacity: 0; }
+                    20% { opacity: 1; }
+                    100% { opacity: 0; }
+                }
+                .confetti-container {
+                    position: fixed; inset: 0; z-index: 9998; pointer-events: none; overflow: hidden;
+                }
+                .confetti-piece {
+                    position: absolute; top: -20px; border-radius: 3px;
+                    animation: confetti-fall linear forwards;
+                    transform-origin: center;
+                }
+                @keyframes confetti-fall {
+                    to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        setTimeout(() => overlay.remove(), 1200);
+    },
+
+    _burstConfetti() {
+        const container = document.createElement('div');
+        container.className = 'confetti-container';
+        document.body.appendChild(container);
+
+        const colors = ['#34d399', '#10b981', '#059669', '#6ee7b7', '#a7f3d0', '#c084fc', '#22d3ee'];
+        const pieceCount = 60;
+
+        for (let i = 0; i < pieceCount; i++) {
+            const piece = document.createElement('div');
+            piece.className = 'confetti-piece';
+            piece.style.left = `${Math.random() * 100}%`;
+            piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+            piece.style.animationDelay = `${Math.random() * 0.3}s`;
+            piece.style.animationDuration = `${1.5 + Math.random() * 1.5}s`;
+            const size = 6 + Math.random() * 10;
+            piece.style.width = `${size}px`;
+            piece.style.height = `${size}px`;
+            container.appendChild(piece);
+        }
+
+        setTimeout(() => container.remove(), 3500);
+    },
+};
+
 // ─── Timer Module ─────────────────────────────────────────────────────────────
 
 const TimerModule = {
@@ -816,6 +909,38 @@ function updatePomodoroDuration()   { TimerModule.updatePomodoroDuration(); }
 function saveTimerToForm()          { TimerModule.saveToForm(); }
 function playPomodoroBeep()         { TimerModule._playBeep(); }
 
+// ─── Cyber Modal Module ────────────────────────────────────────────────────────
+
+const CyberModal = {
+    _overlay: null,
+    _onConfirm: null,
+
+    init() {
+        this._overlay = $('cyber-modal-overlay');
+        if (!this._overlay) return;
+        $('cyber-modal-cancel').addEventListener('click', () => this.close());
+        this._overlay.addEventListener('click', (e) => {
+            if (e.target === this._overlay) this.close();
+        });
+    },
+
+    confirm(entryDesc, onConfirm) {
+        if (!this._overlay) this.init();
+        this._onConfirm = onConfirm;
+        $('cyber-modal-entry').textContent = entryDesc;
+        this._overlay.classList.add('active');
+        $('cyber-modal-confirm').onclick = () => {
+            this.close();
+            if (this._onConfirm) this._onConfirm();
+        };
+    },
+
+    close() {
+        this._overlay.classList.remove('active');
+        this._onConfirm = null;
+    },
+};
+
 // ─── Entries Module ───────────────────────────────────────────────────────────
 
 const EntriesModule = {
@@ -884,14 +1009,16 @@ const EntriesModule = {
     },
 
     delete(id) {
-        if (!confirm('Tem certeza que deseja remover este registro?')) return;
         const entry = AppState.entries.find(e => e.id === id);
-        AppState.entries = AppState.entries.filter(e => e.id !== id);
-        Storage.saveEntries();
-        UI.renderEntries();
-        UI.renderQuickFills();
-        Terminal.log(`Registro REMOVIDO: ${entry ? entry.desc : 'ID ' + id}`, 'error');
-        Toast.show('Registro eliminado do storage.', 'warning');
+        const entryLabel = entry ? `${entry.desc} — ${entry.total}h` : `ID ${id}`;
+        CyberModal.confirm(entryLabel, () => {
+            AppState.entries = AppState.entries.filter(e => e.id !== id);
+            Storage.saveEntries();
+            UI.renderEntries();
+            UI.renderQuickFills();
+            Terminal.log(`Registro REMOVIDO: ${entry ? entry.desc : 'ID ' + id}`, 'error');
+            Toast.show('Registro eliminado do storage.', 'warning');
+        });
     },
 };
 
@@ -1196,8 +1323,6 @@ function syncCustomSelectDisplay(n, c) { UI.syncCustomSelectDisplay(n, c); }
 function selectCustomCategory(n, c)   { UI.selectCustomCategory(n, c); }
 function populateCustomSelect()    { UI._populateCustomSelect(); }
 
-// ─── Day Column Chart Tooltip ────────────────────────────────────────────────
-
 const DayColChart = {
     _tt: null,
     _get() {
@@ -1268,6 +1393,11 @@ const DashboardModule = {
         if (progressFill) progressFill.style.width = `${goalPercent}%`;
         if (percentLabel) percentLabel.innerText = `${goalPercent}%`;
         if (progressFill) progressFill.classList.toggle('glitch-text', goalPercent >= 100);
+
+        // Trigger success animation when daily goal is reached (once per day)
+        if (goalPercent >= 100 && dayTotal > 0) {
+            SuccessAnimation.trigger();
+        }
 
         this._renderDayColumns();
     },
@@ -2088,6 +2218,8 @@ document.addEventListener('DOMContentLoaded', () => {
     CyberTimePickers.end   = createTimePicker('form-end',   'time-end-btn',   'time-end-display',   'time-end-popup');
     CyberTimePickers.start.init();
     CyberTimePickers.end.init();
+
+    CyberModal.init();
 
     if (AppState.timer.secondsElapsed > 0) {
         $('timer-text').innerText = formatTime(AppState.timer.secondsElapsed);
