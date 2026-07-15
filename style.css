@@ -1387,7 +1387,7 @@ input:focus, select:focus {
 
 /* ─── Day Column Chart ──────────────────────────────────────── */
 .day-col-chart-outer {
-    min-height: 280px;
+    min-height: 340px;
     display: flex;
     flex-direction: column;
 }
@@ -1395,7 +1395,7 @@ input:focus, select:focus {
 .day-col-scroll-container {
     overflow-x: auto;
     overflow-y: hidden;
-    padding-bottom: 6px;
+    padding-bottom: 8px;
     flex: 1;
     /* Custom scrollbar */
     scrollbar-width: thin;
@@ -1412,25 +1412,31 @@ input:focus, select:focus {
 .day-col-track {
     display: flex;
     align-items: flex-end;
-    gap: 32px; /* Increased gap between weeks */
+    gap: 32px;
     min-width: max-content;
-    height: 260px; /* Increased height to accommodate the bracket */
-    padding: 12px 8px 0;
+    /* Total height: 240px bar + 20px label + 10px total + 32px bracket + 16px padding */
+    height: 320px;
+    padding: 12px 12px 0;
     position: relative;
+    box-sizing: border-box;
 }
 
 .week-group {
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    height: 100%;
+    /* Fixed height equals the track height minus top padding */
+    height: 308px;
+    flex-shrink: 0;
 }
 
 .week-cols {
     display: flex;
-    gap: 24px;
+    gap: 16px;
     align-items: flex-end;
-    flex: 1;
+    /* Fixed height for the bar area: 240px bar + 20px label + 12px total */
+    height: 272px;
+    flex-shrink: 0;
 }
 
 .week-bracket-wrap {
@@ -1438,31 +1444,39 @@ input:focus, select:focus {
     display: flex;
     flex-direction: column;
     align-items: center;
+    height: 28px;
+    flex-shrink: 0;
     margin-top: 4px;
-    padding-bottom: 2px;
+    padding: 2px 0;
+    box-sizing: border-box;
 }
 
 .week-bracket-svg {
     width: 100%;
-    height: 12px;
+    height: 18px;
     stroke: var(--accent);
     fill: none;
-    opacity: 0.5;
+    opacity: 0.55;
     overflow: visible;
+    display: block;
 }
 
 .day-col {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 56px;
+    width: 52px;
     flex-shrink: 0;
-    height: 100%;
+    /* height is exactly: 240px bar + 20px label + 12px total = 272px (matches .week-cols height) */
+    height: 272px;
+    box-sizing: border-box;
 }
 
 .day-col-bar-wrapper {
-    flex: 1;
+    /* Fixed height for the bar itself — always 240px */
     width: 100%;
+    height: 240px;
+    flex-shrink: 0;
     display: flex;
     flex-direction: column-reverse; /* segments stack bottom→top */
     border-radius: 6px 6px 2px 2px;
@@ -1470,6 +1484,7 @@ input:focus, select:focus {
     background: rgba(192, 132, 252, 0.05);
     border: 1px solid rgba(192, 132, 252, 0.1);
     transition: border-color 0.3s;
+    box-sizing: border-box;
 }
 .day-col-bar-wrapper:hover { border-color: rgba(192, 132, 252, 0.35); }
 
@@ -1479,6 +1494,7 @@ input:focus, select:focus {
     cursor: pointer;
     min-height: 2px;
     position: relative;
+    flex-shrink: 0;
 }
 .day-col-segment:hover {
     filter: brightness(1.45) saturate(1.2);
@@ -1492,16 +1508,24 @@ input:focus, select:focus {
     letter-spacing: 0.06em;
     color: var(--accent);
     opacity: 0.65;
-    margin-top: 5px;
+    margin-top: 6px;
     white-space: nowrap;
+    height: 14px;
+    line-height: 14px;
+    flex-shrink: 0;
+    text-align: center;
 }
 
 .day-col-total {
     font-size: 8px;
     font-weight: 700;
-    color: rgba(255, 255, 255, 0.38);
+    color: rgba(255, 255, 255, 0.5);
     white-space: nowrap;
-    margin-top: 1px;
+    margin-top: 2px;
+    height: 12px;
+    line-height: 12px;
+    flex-shrink: 0;
+    text-align: center;
 }
 
 /* Highlight today's column */
