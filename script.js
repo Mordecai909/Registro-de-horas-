@@ -114,10 +114,41 @@ function minToTime(min) {
 }
 
 function hexToRgb(hex) {
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
+    if (!hex || typeof hex !== 'string' || !hex.startsWith('#')) return { r: 192, g: 132, b: 252 };
+    const cleanHex = hex.length === 4 ? `#${hex[1]}${hex[1]}${hex[2]}${hex[2]}${hex[3]}${hex[3]}` : hex;
+    const r = parseInt(cleanHex.slice(1, 3), 16) || 192;
+    const g = parseInt(cleanHex.slice(3, 5), 16) || 132;
+    const b = parseInt(cleanHex.slice(5, 7), 16) || 252;
     return { r, g, b };
+}
+
+function parseCategoryList(catStr) {
+    if (!catStr) return [];
+    if (Array.isArray(catStr)) return catStr;
+    return String(catStr).split(/\s*[\/\,]\s*/).map(s => s.trim()).filter(Boolean);
+}
+
+function getMergedCategoryInfo(categoryStr) {
+    const list = parseCategoryList(categoryStr);
+    if (list.length === 0) {
+        return { list: [], cats: [{ name: 'Geral', color: '#c084fc' }], colors: ['#c084fc'], namesStr: 'Geral', isMerged: false };
+    }
+    
+    const cats = list.map(name => {
+        const found = (AppState.categories || []).find(c => c.name.toLowerCase() === name.toLowerCase());
+        return found || { name, color: '#c084fc' };
+    });
+    
+    const colors = cats.map(c => c.color || '#c084fc');
+    const namesStr = cats.map(c => c.name).join(' / ');
+    
+    return {
+        list,
+        cats,
+        colors,
+        namesStr,
+        isMerged: cats.length > 1
+    };
 }
 
 function triggerDownload(blob, filename) {
@@ -979,6 +1010,11 @@ const EntriesModule = {
         e.target.reset();
         setDefaultDate();
 
+        // Reset category selector display
+        const catInput = $('form-category');
+        if (catInput) catInput.value = '';
+        UI._populateCustomSelect('');
+
         const startDisp = $('time-start-display');
         const endDisp   = $('time-end-display');
         if (startDisp) startDisp.textContent = '--:--';
@@ -1004,11 +1040,7 @@ const EntriesModule = {
         const catName = entry.category || 'Atividades internas';
         const select  = $('form-category');
         if (select) select.value = catName;
-        const cat = AppState.categories.find(c => c.name === catName) || { name: catName, color: 'var(--accent)' };
-        UI.syncCustomSelectDisplay(cat.name, cat.color);
-        document.querySelectorAll('.custom-select-option').forEach(opt => {
-            opt.classList.toggle('is-active', opt.querySelector('span:last-child')?.textContent === catName);
-        });
+        UI._populateCustomSelect(catName);
 
         AppState.ui.editId = id;
         document.querySelector('button[type="submit"]').innerText = 'Atualizar Storage';
@@ -1213,12 +1245,14 @@ const UI = {
             container.appendChild(tag);
         });
 
-        select.innerHTML = '';
-        AppState.categories.forEach(cat => {
-            const opt = document.createElement('option');
-            opt.value = opt.textContent = cat.name;
-            select.appendChild(opt);
-        });
+        if (select.tagName === 'SELECT') {
+            select.innerHTML = '';
+            AppState.categories.forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = opt.textContent = cat.name;
+                select.appendChild(opt);
+            });
+        }
 
         this._populateCustomSelect();
     },
@@ -1251,10 +1285,13 @@ const UI = {
                 $('form-desc').value     = preset.desc;
                 $('form-start').value    = preset.start;
                 $('form-end').value      = preset.end;
+                UI._populateCustomSelect(preset.category);
                 ['form-category', 'form-desc', 'form-start', 'form-end'].forEach(id => {
                     const el = $(id);
-                    el.classList.add('bg-accent/20', 'border-accent');
-                    setTimeout(() => el.classList.remove('bg-accent/20', 'border-accent'), 300);
+                    if (el) {
+                        el.classList.add('bg-accent/20', 'border-accent');
+                        setTimeout(() => el.classList.remove('bg-accent/20', 'border-accent'), 300);
+                    }
                 });
             };
             container.appendChild(btn);
@@ -1263,62 +1300,136 @@ const UI = {
         container.classList.remove('hidden');
     },
 
-    // ── Custom Select ──
+    // ── Custom Select (Multi-Category Support) ──
 
-    _populateCustomSelect() {
+    _populateCustomSelect(selectedCategoriesStr) {
         const dropdown = $('category-select-dropdown');
         const select   = $('form-category');
         if (!dropdown || !select) return;
 
-        const currentValue = select.value || (AppState.categories[0]?.name);
+        const currentValue = selectedCategoriesStr !== undefined ? selectedCategoriesStr : (select.value || AppState.categories[0]?.name || '');
+        const selectedList = parseCategoryList(currentValue);
+
         dropdown.innerHTML = '';
 
+        // Dropdown Header with Clear Action
+        const header = document.createElement('div');
+        header.className = 'px-3 py-2 text-[10px] font-black uppercase tracking-wider text-accent/80 flex items-center justify-between border-b border-white/10 mb-1.5 select-none';
+        header.innerHTML = `
+            <span class="flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+                Categorias (Selecione 1+)
+            </span>
+            ${selectedList.length > 0 ? `<button type="button" class="text-rose-400 hover:text-rose-300 hover:underline transition-colors text-[9px] font-bold" onclick="UI.clearCategorySelection(event)">Limpar</button>` : ''}
+        `;
+        dropdown.appendChild(header);
+
         AppState.categories.forEach(cat => {
+            const isChecked = selectedList.some(name => name.toLowerCase() === cat.name.toLowerCase());
             const opt = document.createElement('div');
-            opt.className = 'custom-select-option' + (cat.name === currentValue ? ' is-active' : '');
+            opt.className = 'custom-select-option' + (isChecked ? ' is-active' : '');
             opt.setAttribute('role', 'option');
-            opt.setAttribute('aria-selected', cat.name === currentValue ? 'true' : 'false');
+            opt.setAttribute('aria-selected', isChecked ? 'true' : 'false');
             opt.style.setProperty('--cat-color', cat.color);
             opt.innerHTML = `
+                <div class="custom-chk-box ${isChecked ? 'is-checked' : ''}" style="${isChecked ? `background:${cat.color};border-color:${cat.color};box-shadow:0 0 8px ${cat.color}80;` : ''}">
+                    ${isChecked ? '<svg class="w-2.5 h-2.5 text-black font-extrabold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="M5 13l4 4L19 7"/></svg>' : ''}
+                </div>
                 <span class="cat-dot" style="background:${cat.color};box-shadow:0 0 8px ${cat.color}80;"></span>
-                <span>${cat.name}</span>`;
-            opt.addEventListener('click', () => this.selectCustomCategory(cat.name, cat.color));
+                <span class="flex-1 font-semibold">${cat.name}</span>`;
+            opt.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.toggleCustomCategory(cat.name);
+            });
             dropdown.appendChild(opt);
         });
 
-        const activeCat = AppState.categories.find(c => c.name === currentValue) || AppState.categories[0];
-        if (activeCat) this.syncCustomSelectDisplay(activeCat.name, activeCat.color);
+        this.syncCustomSelectDisplay(currentValue);
     },
 
-    syncCustomSelectDisplay(name, color) {
+    toggleCustomCategory(name) {
+        const select = $('form-category');
+        if (!select) return;
+
+        let selectedList = parseCategoryList(select.value);
+        const idx = selectedList.findIndex(n => n.toLowerCase() === name.toLowerCase());
+
+        if (idx >= 0) {
+            selectedList.splice(idx, 1);
+        } else {
+            selectedList.push(name);
+        }
+
+        const newValue = selectedList.join(' / ');
+        select.value = newValue;
+
+        this._populateCustomSelect(newValue);
+    },
+
+    clearCategorySelection(e) {
+        if (e) e.stopPropagation();
+        const select = $('form-category');
+        if (select) select.value = '';
+        this._populateCustomSelect('');
+    },
+
+    syncCustomSelectDisplay(categoryStr) {
         const label = $('category-select-label');
         const dot   = $('category-select-dot');
-        if (label) label.textContent = name;
+        const info  = getMergedCategoryInfo(categoryStr);
+
+        if (label) {
+            label.textContent = info.cats.length > 0 && info.namesStr ? info.namesStr : 'Selecionar categorias...';
+        }
+
         if (dot) {
-            dot.style.background = color;
-            dot.style.boxShadow  = `0 0 8px ${color}99`;
+            if (info.colors.length === 0) {
+                dot.style.background = 'var(--accent)';
+                dot.style.boxShadow  = '0 0 8px var(--accent-glow)';
+            } else if (info.colors.length === 1) {
+                dot.style.background = info.colors[0];
+                dot.style.boxShadow  = `0 0 8px ${info.colors[0]}99`;
+            } else {
+                dot.style.background = `linear-gradient(135deg, ${info.colors.join(', ')})`;
+                dot.style.boxShadow  = `0 0 10px ${info.colors[0]}80`;
+            }
         }
     },
 
     selectCustomCategory(name, color) {
         const select = $('form-category');
         if (select) select.value = name;
-        this.syncCustomSelectDisplay(name, color);
-        document.querySelectorAll('.custom-select-option').forEach(opt => {
-            const isActive = opt.querySelector('span:last-child')?.textContent === name;
-            opt.classList.toggle('is-active', isActive);
-            opt.setAttribute('aria-selected', isActive ? 'true' : 'false');
-        });
+        this._populateCustomSelect(name);
         closeCustomSelect();
     },
 
     _getCategoryBadge(categoryName) {
-        const cat = AppState.categories.find(c => c.name === categoryName);
-        const color = cat ? cat.color : '#c084fc';
-        const { r, g, b } = hexToRgb(color);
-        return `<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider border"
-            style="background:rgba(${r},${g},${b},0.12);color:rgb(${r},${g},${b});border-color:rgba(${r},${g},${b},0.3);box-shadow:0 0 6px rgba(${r},${g},${b},0.25);">
-            ${categoryName || 'Geral'}
+        const info = getMergedCategoryInfo(categoryName);
+        
+        if (info.cats.length <= 1) {
+            const cat = info.cats[0] || { name: categoryName || 'Geral', color: '#c084fc' };
+            const { r, g, b } = hexToRgb(cat.color.startsWith('#') ? cat.color : '#c084fc');
+            return `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border transition-all"
+                style="background:rgba(${r},${g},${b},0.12);color:rgb(${r},${g},${b});border-color:rgba(${r},${g},${b},0.35);box-shadow:0 0 8px rgba(${r},${g},${b},0.25);">
+                <span class="cat-dot-sm mr-1.5" style="background:${cat.color};box-shadow:0 0 6px ${cat.color};"></span>
+                ${cat.name}
+            </span>`;
+        }
+
+        // Multi-category merged badge with blended colors
+        const bgGrad = info.colors.map(c => {
+            const { r, g, b } = hexToRgb(c.startsWith('#') ? c : '#c084fc');
+            return `rgba(${r},${g},${b},0.2)`;
+        }).join(', ');
+
+        const dotsHtml = info.cats.map(c => 
+            `<span class="w-2 h-2 rounded-full inline-block mr-1 flex-shrink-0" style="background:${c.color};box-shadow:0 0 6px ${c.color};"></span>`
+        ).join('');
+
+        return `<span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border transition-all"
+            style="background:linear-gradient(135deg, ${bgGrad});color:#ffffff;border-color:rgba(255,255,255,0.3);box-shadow:0 0 10px ${info.colors[0]}40;">
+            <span class="flex items-center mr-1.5">${dotsHtml}</span>
+            ${info.namesStr}
         </span>`;
     },
 };
@@ -1327,9 +1438,9 @@ const UI = {
 function renderEntries(f)          { UI.renderEntries(f); }
 function renderCategoryManager()   { UI.renderCategoryManager(); }
 function renderQuickFills()        { UI.renderQuickFills(); }
-function syncCustomSelectDisplay(n, c) { UI.syncCustomSelectDisplay(n, c); }
+function syncCustomSelectDisplay(n, c) { UI.syncCustomSelectDisplay(n); }
 function selectCustomCategory(n, c)   { UI.selectCustomCategory(n, c); }
-function populateCustomSelect()    { UI._populateCustomSelect(); }
+function populateCustomSelect(v)      { UI._populateCustomSelect(v); }
 
 const DayColChart = {
     _tt: null,
@@ -1483,14 +1594,16 @@ _renderDayColumns() {
                 if (dateStr === today) col.classList.add('day-col-today');
 
                 Object.entries(catMap).forEach(([catName, mins]) => {
-                    const cat = AppState.categories.find(c => c.name === catName);
-                    const color = cat ? cat.color : '#c084fc';
+                    const info = getMergedCategoryInfo(catName);
+                    const colorStyle = info.colors.length > 1
+                        ? `linear-gradient(135deg, ${info.colors.join(', ')})`
+                        : info.colors[0];
                     const heightPx = mins * PIXEL_PER_MIN;
                     const seg = document.createElement('div');
                     seg.className = 'day-col-segment';
-                    seg.style.cssText = `height:${heightPx}px;background:${color};`;
+                    seg.style.cssText = `height:${heightPx}px;background:${colorStyle};`;
                     const hStr = minToTime(mins) + 'h';
-                    seg.addEventListener('mouseenter', ev => DayColChart.show(ev, catName, hStr, color));
+                    seg.addEventListener('mouseenter', ev => DayColChart.show(ev, info.namesStr, hStr, info.colors[0]));
                     seg.addEventListener('mousemove',  ev => DayColChart.move(ev));
                     seg.addEventListener('mouseleave', ()  => DayColChart.hide());
                     bar.appendChild(seg);

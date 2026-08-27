@@ -356,23 +356,23 @@
                             </div>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-black text-accent uppercase tracking-widest mb-1.5 ml-1">Categoria</label>
-                            <!-- Custom Cyber Dropdown -->
+                            <label class="block text-[10px] font-black text-accent uppercase tracking-widest mb-1.5 ml-1">Categoria <span class="text-accent/50 font-normal tracking-normal normal-case">(1 ou mais)</span></label>
+                            <!-- Custom Cyber Multi-Select Dropdown -->
                             <div class="custom-select-wrapper" id="category-select-wrapper">
-                                <!-- Hidden native select kept for form value -->
-                                <select id="form-category" required class="sr-only" aria-hidden="true" tabindex="-1"></select>
+                                <!-- Hidden input kept for form value -->
+                                <input type="text" id="form-category" required class="sr-only" aria-hidden="true" tabindex="-1">
                                 <!-- Visible trigger button -->
-                                <button type="button" id="category-select-btn" class="custom-select-btn" aria-haspopup="listbox" aria-expanded="false">
+                                <button type="button" id="category-select-btn" class="custom-select-btn" aria-haspopup="listbox" aria-expanded="false" aria-multiselectable="true">
                                     <span id="category-select-display" class="custom-select-display">
                                         <span class="cat-dot" id="category-select-dot"></span>
-                                        <span id="category-select-label">Selecionar...</span>
+                                        <span id="category-select-label">Selecionar categorias...</span>
                                     </span>
                                     <svg class="custom-select-chevron" id="category-select-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
                                     </svg>
                                 </button>
                                 <!-- Dropdown list -->
-                                <div class="custom-select-dropdown" id="category-select-dropdown" role="listbox" aria-label="Categorias">
+                                <div class="custom-select-dropdown" id="category-select-dropdown" role="listbox" aria-label="Categorias" aria-multiselectable="true">
                                     <!-- Injected by JS -->
                                 </div>
                             </div>
