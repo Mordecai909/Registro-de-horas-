@@ -1586,6 +1586,14 @@ _renderDayColumns() {
                 const col = document.createElement('div');
                 col.className = 'day-col';
 
+                const hideCheckbox = document.createElement('input');
+                hideCheckbox.type = 'checkbox';
+                hideCheckbox.className = 'day-col-hide-toggle';
+                hideCheckbox.title = 'Ocultar/Mostrar esta coluna';
+                hideCheckbox.addEventListener('change', (e) => {
+                    col.classList.toggle('day-col-hidden', e.target.checked);
+                });
+
                 const bar = document.createElement('div');
                 bar.className = 'day-col-bar-wrapper';
 
@@ -1618,6 +1626,7 @@ _renderDayColumns() {
                 tot.className = 'day-col-total';
                 tot.textContent = minToTime(totalMin) + 'h';
 
+                col.appendChild(hideCheckbox);
                 col.appendChild(bar);
                 col.appendChild(lbl);
                 col.appendChild(tot);
