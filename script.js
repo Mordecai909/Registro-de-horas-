@@ -1005,6 +1005,9 @@ const EntriesModule = {
         }
 
         Storage.saveEntries();
+        if (dateVal) {
+            UI._expandedMonths.add(dateVal.substring(0, 7));
+        }
         UI.renderEntries();
         UI.renderQuickFills();
         e.target.reset();
@@ -1069,7 +1072,17 @@ function deleteEntry(id)  { EntriesModule.delete(id); }
 
 // ─── UI Module ────────────────────────────────────────────────────────────────
 
+const MONTH_NAMES = [
+    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+];
+
 const UI = {
+    _expandedMonths: new Set(),
+    _expandedWeeks: new Set(),
+    _hasInitializedExpansion: false,
+    _hasInitializedWeeks: false,
+
     _getWeekRange(dateStr) {
         const [y, m, d] = dateStr.split('-').map(Number);
         const date = new Date(y, m - 1, d);
@@ -1094,12 +1107,70 @@ const UI = {
         };
     },
 
+    toggleMonth(monthKey) {
+        const card = document.querySelector(`.month-group-card[data-month-key="${monthKey}"]`);
+        if (!card) return;
+        const isCollapsed = card.classList.toggle('collapsed');
+        if (isCollapsed) {
+            this._expandedMonths.delete(monthKey);
+        } else {
+            this._expandedMonths.add(monthKey);
+        }
+        const btn = card.querySelector('.month-header-btn');
+        if (btn) btn.setAttribute('aria-expanded', (!isCollapsed).toString());
+    },
+
+    toggleWeek(weekId) {
+        const card = document.querySelector(`.weekly-table-card[data-week-id="${weekId}"]`);
+        if (!card) return;
+        const isCollapsed = card.classList.toggle('collapsed');
+        if (isCollapsed) {
+            this._expandedWeeks.delete(weekId);
+        } else {
+            this._expandedWeeks.add(weekId);
+        }
+        const btn = card.querySelector('.week-header-btn');
+        if (btn) btn.setAttribute('aria-expanded', (!isCollapsed).toString());
+    },
+
+    expandAll() {
+        document.querySelectorAll('.month-group-card').forEach(card => {
+            card.classList.remove('collapsed');
+            if (card.dataset.monthKey) this._expandedMonths.add(card.dataset.monthKey);
+            const btn = card.querySelector('.month-header-btn');
+            if (btn) btn.setAttribute('aria-expanded', 'true');
+        });
+        document.querySelectorAll('.weekly-table-card').forEach(card => {
+            card.classList.remove('collapsed');
+            if (card.dataset.weekId) this._expandedWeeks.add(card.dataset.weekId);
+            const btn = card.querySelector('.week-header-btn');
+            if (btn) btn.setAttribute('aria-expanded', 'true');
+        });
+    },
+
+    collapseAll() {
+        document.querySelectorAll('.month-group-card').forEach(card => {
+            card.classList.add('collapsed');
+            const btn = card.querySelector('.month-header-btn');
+            if (btn) btn.setAttribute('aria-expanded', 'false');
+        });
+        document.querySelectorAll('.weekly-table-card').forEach(card => {
+            card.classList.add('collapsed');
+            const btn = card.querySelector('.week-header-btn');
+            if (btn) btn.setAttribute('aria-expanded', 'false');
+        });
+        this._expandedMonths.clear();
+        this._expandedWeeks.clear();
+    },
+
     renderEntries(filteredEntries = AppState.entries) {
         const container = $('activity-tables-container');
+        const monthBadge = $('month-count-badge');
         if (!container) return;
         container.innerHTML = '';
 
         if (filteredEntries.length === 0) {
+            if (monthBadge) monthBadge.textContent = '0 MESES';
             container.innerHTML = `
                 <div class="flex flex-col items-center justify-center py-12 text-center text-accent/40 font-mono text-xs uppercase tracking-widest border border-dashed border-accent/20 rounded-2xl">
                     <svg class="w-8 h-8 mb-3 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
@@ -1110,119 +1181,211 @@ const UI = {
             return;
         }
 
-        const weekGroups = {};
+        // Group entries by Year-Month (YYYY-MM)
+        const monthGroups = {};
         filteredEntries.forEach(entry => {
-            const range = this._getWeekRange(entry.date);
-            const key = `${range.startStr}|${range.endStr}`;
-            if (!weekGroups[key]) {
-                weekGroups[key] = [];
+            const dateStr = entry.date || new Date().toISOString().split('T')[0];
+            const monthKey = dateStr.substring(0, 7);
+            if (!monthGroups[monthKey]) {
+                monthGroups[monthKey] = [];
             }
-            weekGroups[key].push(entry);
+            monthGroups[monthKey].push(entry);
         });
 
-        const sortedWeeks = Object.keys(weekGroups).sort().reverse();
+        const sortedMonths = Object.keys(monthGroups).sort().reverse();
 
-        sortedWeeks.forEach(key => {
-            const [startStr, endStr] = key.split('|');
-            const startDisp = formatDateBR(startStr);
-            const endDisp = formatDateBR(endStr);
-            const weekEntries = weekGroups[key];
+        if (monthBadge) {
+            const count = sortedMonths.length;
+            monthBadge.textContent = `${count} ${count === 1 ? 'MÊS' : 'MESES'}`;
+        }
 
-            weekEntries.sort((a, b) => {
-                if (a.date !== b.date) {
-                    return b.date.localeCompare(a.date);
+        const isSearching = Boolean($('search-input')?.value.trim());
+
+        // Default the first (most recent) month as open on initial load
+        if (!this._hasInitializedExpansion && sortedMonths.length > 0) {
+            this._expandedMonths.add(sortedMonths[0]);
+            this._hasInitializedExpansion = true;
+        }
+
+        sortedMonths.forEach((monthKey, mIdx) => {
+            const [yr, mo] = monthKey.split('-');
+            const monthNum = parseInt(mo, 10);
+            const monthName = (MONTH_NAMES[monthNum - 1] || mo).toUpperCase();
+            const monthEntries = monthGroups[monthKey];
+            const monthTotalMin = monthEntries.reduce((sum, e) => sum + timeToMin(e.total), 0);
+            const monthTotalStr = minToTime(monthTotalMin);
+
+            // Group month entries by week
+            const weekGroups = {};
+            monthEntries.forEach(entry => {
+                const range = this._getWeekRange(entry.date);
+                const key = `${range.startStr}|${range.endStr}`;
+                if (!weekGroups[key]) {
+                    weekGroups[key] = [];
                 }
-                return (b.start || '').localeCompare(a.start || '');
+                weekGroups[key].push(entry);
             });
 
-            const totalMin = weekEntries.reduce((sum, e) => sum + timeToMin(e.total), 0);
-            const totalStr = minToTime(totalMin);
+            const sortedWeeks = Object.keys(weekGroups).sort().reverse();
+            const numWeeks = sortedWeeks.length;
+            const numEntries = monthEntries.length;
 
-            const isCurrentWeek = (sortedWeeks.indexOf(key) === 0); // First (most recent) week is expanded
-            const weekGoalMin = 30 * 60; // 30 hours weekly target
-            const weekPct = Math.min(Math.round((totalMin / weekGoalMin) * 100), 100);
-            const weekPctColor = weekPct >= 100 ? 'var(--success)' : weekPct >= 66 ? '#fb923c' : 'var(--accent)';
-            const cardId = `week-${key.replace(/[^a-z0-9]/gi,'_')}`;
+            const isMonthExpanded = isSearching || this._expandedMonths.has(monthKey);
 
-            const weekCard = document.createElement('div');
-            weekCard.className = 'weekly-table-card border border-white/5 bg-black/20 rounded-2xl overflow-hidden shadow-lg';
-            weekCard.innerHTML = `
-                <button type="button" class="w-full flex flex-col sm:flex-row justify-between items-start sm:items-center px-6 py-4 bg-[rgba(15,0,28,0.85)] border-b border-white/5 gap-2 hover:bg-[rgba(15,0,28,0.95)] transition-colors week-header-btn" onclick="this.closest('.weekly-table-card').classList.toggle('collapsed')" aria-expanded="${isCurrentWeek ? 'true' : 'false'}" aria-controls="${cardId}">
-                    <div class="flex items-center gap-2.5">
-                        <span class="w-2.5 h-2.5 rounded-full bg-accent shadow-[0_0_8px_var(--accent-glow)] flex-shrink-0"></span>
-                        <h5 class="text-xs font-black uppercase tracking-[0.2em] text-white">Semana: <span class="text-accent">${startDisp} a ${endDisp}</span></h5>
+            const monthCard = document.createElement('div');
+            monthCard.className = `month-group-card ${isMonthExpanded ? '' : 'collapsed'}`;
+            monthCard.dataset.monthKey = monthKey;
+
+            const monthHeader = document.createElement('button');
+            monthHeader.type = 'button';
+            monthHeader.className = 'w-full flex flex-col sm:flex-row justify-between items-start sm:items-center px-6 py-4 gap-3 month-header-btn group';
+            monthHeader.setAttribute('aria-expanded', isMonthExpanded ? 'true' : 'false');
+            monthHeader.onclick = () => this.toggleMonth(monthKey);
+
+            monthHeader.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <div class="p-2.5 rounded-xl bg-accent/15 border border-accent/30 text-accent shadow-[0_0_12px_var(--accent-glow)] flex items-center justify-center group-hover:scale-105 transition-transform flex-shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3M3 9h18M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                     </div>
-                    <div class="flex items-center gap-4 ml-auto">
-                        <div class="flex flex-col items-end gap-1">
-                            <div class="flex items-center gap-2">
-                                <span class="text-[10px] font-bold uppercase tracking-widest text-accent/60">${weekPct}% da meta</span>
-                                <span class="text-xs font-bold uppercase tracking-widest text-accent/80">Total: <span class="text-white font-extrabold text-sm drop-shadow-[0_0_6px_var(--accent-glow)]">${totalStr}h</span></span>
-                            </div>
-                            <div class="w-32 h-1 rounded-full bg-white/10 overflow-hidden">
-                                <div class="h-full rounded-full transition-all duration-700" style="width:${weekPct}%;background:${weekPctColor};box-shadow:0 0 6px ${weekPctColor}80;"></div>
-                            </div>
+                    <div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <h4 class="text-base sm:text-lg font-display font-black uppercase tracking-[0.15em] text-white">
+                                ${monthName} <span class="text-accent">${yr}</span>
+                            </h4>
+                            <span class="px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest bg-accent/15 border border-accent/30 text-accent">${numWeeks} ${numWeeks === 1 ? 'SEMANA' : 'SEMANAS'}</span>
+                            <span class="hidden md:inline-block px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-widest bg-white/5 border border-white/10 text-white/60">${numEntries} ${numEntries === 1 ? 'REGISTRO' : 'REGISTROS'}</span>
                         </div>
-                        <svg class="w-4 h-4 text-accent/40 week-chevron flex-shrink-0 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                     </div>
-                </button>
-                <div class="week-table-body overflow-x-auto" id="${cardId}">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-black/40 uppercase tracking-widest text-[9px] border-b border-white/5">
-                                <th class="px-6 py-3.5 font-bold text-accent/70 tracking-[0.15em] w-1/4">Carimbo</th>
-                                <th class="px-6 py-3.5 font-bold text-accent/70 tracking-[0.15em]">Carga</th>
-                                <th class="px-6 py-3.5 font-bold text-accent/70 tracking-[0.15em] text-right w-1/4">Ciclos</th>
-                                <th class="px-6 py-3.5 font-bold text-accent/70 tracking-[0.15em] text-center w-1/4">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody class="weekly-table-body">
-                        </tbody>
-                    </table>
+                </div>
+                <div class="flex items-center gap-4 ml-auto w-full sm:w-auto justify-between sm:justify-end">
+                    <div class="text-left sm:text-right">
+                        <span class="text-[9px] font-black uppercase tracking-[0.2em] text-accent/60 block">Total do Mês</span>
+                        <span class="text-base sm:text-xl font-display font-black text-white drop-shadow-[0_0_8px_var(--accent-glow)]">${monthTotalStr}h</span>
+                    </div>
+                    <div class="p-1.5 rounded-lg bg-white/5 border border-white/10 text-accent/70 group-hover:text-accent transition-colors flex-shrink-0">
+                        <svg class="w-4 h-4 month-chevron transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                    </div>
                 </div>
             `;
 
-            if (!isCurrentWeek) weekCard.classList.add('collapsed');
+            const monthBody = document.createElement('div');
+            monthBody.className = 'month-body';
 
-            const tbody = weekCard.querySelector('.weekly-table-body');
-            weekEntries.forEach(entry => {
-                const row = document.createElement('tr');
-                row.className = 'table-row-hover transition-colors group';
-                const DOW_SHORT = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
-                const [ey, em, ed] = entry.date.split('-').map(Number);
-                const entryDow = new Date(ey, em - 1, ed).getDay();
-                const dowLabel = DOW_SHORT[entryDow];
-                const timeRange = (entry.start && entry.end)
-                    ? `<div class="text-[10px] font-mono text-accent/50 mt-0.5 tracking-wider">${entry.start} → ${entry.end}</div>`
-                    : '';
-                row.innerHTML = `
-                    <td class="px-6 py-5 whitespace-nowrap">
-                        <div class="text-sm font-medium text-accent/90">${formatDateBR(entry.date)}</div>
-                        <div class="text-[10px] font-black uppercase tracking-widest text-accent/40 mt-0.5">${dowLabel}</div>
-                        ${timeRange}
-                    </td>
-                    <td class="px-6 py-5">
-                        <div class="text-sm font-bold text-white mb-1.5">${entry.desc}</div>
-                        ${this._getCategoryBadge(entry.category)}
-                    </td>
-                    <td class="px-6 py-5 whitespace-nowrap text-right">
-                        <span class="text-sm font-bold text-accent drop-shadow-[0_0_8px_var(--accent-glow)]">${entry.total}h</span>
-                    </td>
-                    <td class="px-6 py-5 whitespace-nowrap text-center actions-cell">
-                        <div class="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onclick="editEntry(${entry.id})" class="btn-icon p-2 text-accent/80 hover:text-accent transition-all hover:drop-shadow-[0_0_8px_var(--accent-glow)]">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-                            </button>
-                            <button onclick="deleteEntry(${entry.id})" class="btn-icon p-2 text-accent/40 hover:text-danger transition-all hover:drop-shadow-[0_0_8px_rgba(251,113,133,0.8)]">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                            </button>
+            sortedWeeks.forEach((weekKey, wIdx) => {
+                const [startStr, endStr] = weekKey.split('|');
+                const startDisp = formatDateBR(startStr);
+                const endDisp = formatDateBR(endStr);
+                const weekEntries = weekGroups[weekKey];
+
+                weekEntries.sort((a, b) => {
+                    if (a.date !== b.date) {
+                        return b.date.localeCompare(a.date);
+                    }
+                    return (b.start || '').localeCompare(a.start || '');
+                });
+
+                const totalMin = weekEntries.reduce((sum, e) => sum + timeToMin(e.total), 0);
+                const totalStr = minToTime(totalMin);
+
+                const weekUniqueId = `${monthKey}_${weekKey.replace(/[^a-z0-9]/gi, '_')}`;
+                const cardTableId = `table_${weekUniqueId}`;
+
+                // First week of the first month open by default if not previously set
+                if (!this._hasInitializedWeeks && mIdx === 0 && wIdx === 0) {
+                    this._expandedWeeks.add(weekUniqueId);
+                }
+
+                const isWeekExpanded = isSearching || this._expandedWeeks.has(weekUniqueId);
+
+                const weekGoalMin = 30 * 60; // 30 hours weekly target
+                const weekPct = Math.min(Math.round((totalMin / weekGoalMin) * 100), 100);
+                const weekPctColor = weekPct >= 100 ? 'var(--success)' : weekPct >= 66 ? '#fb923c' : 'var(--accent)';
+
+                const weekCard = document.createElement('div');
+                weekCard.className = `weekly-table-card ${isWeekExpanded ? '' : 'collapsed'}`;
+                weekCard.dataset.weekId = weekUniqueId;
+
+                weekCard.innerHTML = `
+                    <button type="button" class="w-full flex flex-col sm:flex-row justify-between items-start sm:items-center px-5 py-3.5 bg-[rgba(15,0,28,0.75)] border-b border-white/5 gap-2 hover:bg-[rgba(15,0,28,0.9)] transition-colors week-header-btn" onclick="UI.toggleWeek('${weekUniqueId}')" aria-expanded="${isWeekExpanded ? 'true' : 'false'}" aria-controls="${cardTableId}">
+                        <div class="flex items-center gap-2.5">
+                            <span class="w-2.5 h-2.5 rounded-full bg-accent shadow-[0_0_8px_var(--accent-glow)] flex-shrink-0"></span>
+                            <h5 class="text-xs font-black uppercase tracking-[0.2em] text-white">Semana: <span class="text-accent">${startDisp} a ${endDisp}</span></h5>
                         </div>
-                    </td>`;
-                tbody.appendChild(row);
+                        <div class="flex items-center gap-4 ml-auto">
+                            <div class="flex flex-col items-end gap-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[10px] font-bold uppercase tracking-widest text-accent/60">${weekPct}% da meta</span>
+                                    <span class="text-xs font-bold uppercase tracking-widest text-accent/80">Total: <span class="text-white font-extrabold text-sm drop-shadow-[0_0_6px_var(--accent-glow)]">${totalStr}h</span></span>
+                                </div>
+                                <div class="w-28 sm:w-32 h-1 rounded-full bg-white/10 overflow-hidden">
+                                    <div class="h-full rounded-full transition-all duration-700" style="width:${weekPct}%;background:${weekPctColor};box-shadow:0 0 6px ${weekPctColor}80;"></div>
+                                </div>
+                            </div>
+                            <svg class="w-4 h-4 text-accent/40 week-chevron flex-shrink-0 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                        </div>
+                    </button>
+                    <div class="week-table-body overflow-x-auto" id="${cardTableId}">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-black/40 uppercase tracking-widest text-[9px] border-b border-white/5">
+                                    <th class="px-5 py-3 font-bold text-accent/70 tracking-[0.15em] w-1/4">Carimbo</th>
+                                    <th class="px-5 py-3 font-bold text-accent/70 tracking-[0.15em]">Carga</th>
+                                    <th class="px-5 py-3 font-bold text-accent/70 tracking-[0.15em] text-right w-1/4">Ciclos</th>
+                                    <th class="px-5 py-3 font-bold text-accent/70 tracking-[0.15em] text-center w-1/4">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody class="weekly-table-body">
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+
+                const tbody = weekCard.querySelector('.weekly-table-body');
+                weekEntries.forEach(entry => {
+                    const row = document.createElement('tr');
+                    row.className = 'table-row-hover transition-colors group';
+                    const DOW_SHORT = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+                    const [ey, em, ed] = entry.date.split('-').map(Number);
+                    const entryDow = new Date(ey, em - 1, ed).getDay();
+                    const dowLabel = DOW_SHORT[entryDow];
+                    const timeRange = (entry.start && entry.end)
+                        ? `<div class="text-[10px] font-mono text-accent/50 mt-0.5 tracking-wider">${entry.start} → ${entry.end}</div>`
+                        : '';
+                    row.innerHTML = `
+                        <td class="px-5 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-accent/90">${formatDateBR(entry.date)}</div>
+                            <div class="text-[10px] font-black uppercase tracking-widest text-accent/40 mt-0.5">${dowLabel}</div>
+                            ${timeRange}
+                        </td>
+                        <td class="px-5 py-4">
+                            <div class="text-sm font-bold text-white mb-1.5">${entry.desc}</div>
+                            ${this._getCategoryBadge(entry.category)}
+                        </td>
+                        <td class="px-5 py-4 whitespace-nowrap text-right">
+                            <span class="text-sm font-bold text-accent drop-shadow-[0_0_8px_var(--accent-glow)]">${entry.total}h</span>
+                        </td>
+                        <td class="px-5 py-4 whitespace-nowrap text-center actions-cell">
+                            <div class="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button onclick="editEntry(${entry.id})" class="btn-icon p-2 text-accent/80 hover:text-accent transition-all hover:drop-shadow-[0_0_8px_var(--accent-glow)]">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                                </button>
+                                <button onclick="deleteEntry(${entry.id})" class="btn-icon p-2 text-accent/40 hover:text-danger transition-all hover:drop-shadow-[0_0_8px_rgba(251,113,133,0.8)]">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                </button>
+                            </div>
+                        </td>`;
+                    tbody.appendChild(row);
+                });
+
+                monthBody.appendChild(weekCard);
             });
 
-            container.appendChild(weekCard);
+            monthCard.appendChild(monthHeader);
+            monthCard.appendChild(monthBody);
+            container.appendChild(monthCard);
         });
 
+        this._hasInitializedWeeks = true;
         DashboardModule.update();
     },
 
@@ -1441,6 +1604,10 @@ function renderQuickFills()        { UI.renderQuickFills(); }
 function syncCustomSelectDisplay(n, c) { UI.syncCustomSelectDisplay(n); }
 function selectCustomCategory(n, c)   { UI.selectCustomCategory(n, c); }
 function populateCustomSelect(v)      { UI._populateCustomSelect(v); }
+function expandAll()                  { UI.expandAll(); }
+function collapseAll()                { UI.collapseAll(); }
+function toggleMonth(k)               { UI.toggleMonth(k); }
+function toggleWeek(k)                { UI.toggleWeek(k); }
 
 const DayColChart = {
     _tt: null,

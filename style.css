@@ -1666,24 +1666,92 @@ input:focus, select:focus {
     letter-spacing: 0.05em !important;
 }
 
+/* ─── Month & Week Organization Styling ─────────────────────── */
+.month-group-card {
+    border: 1px solid rgba(192, 132, 252, 0.22);
+    background: linear-gradient(180deg, rgba(22, 5, 43, 0.75) 0%, rgba(12, 1, 24, 0.85) 100%);
+    backdrop-filter: blur(20px);
+    border-radius: 1.25rem;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 0 25px rgba(192, 132, 252, 0.03);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.month-group-card:hover {
+    border-color: rgba(192, 132, 252, 0.4);
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.65), 0 0 20px rgba(192, 132, 252, 0.15);
+}
+
+.month-header-btn {
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    background: linear-gradient(90deg, rgba(28, 7, 52, 0.95) 0%, rgba(18, 4, 34, 0.95) 100%);
+    border: none;
+    border-bottom: 1px solid rgba(192, 132, 252, 0.15);
+    transition: background 0.25s ease;
+}
+
+.month-header-btn:hover {
+    background: linear-gradient(90deg, rgba(38, 10, 68, 0.98) 0%, rgba(24, 6, 44, 0.98) 100%);
+}
+
+.month-chevron {
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.month-group-card.collapsed .month-chevron {
+    transform: rotate(-90deg);
+}
+
+.month-body {
+    max-height: 15000px;
+    overflow: hidden;
+    opacity: 1;
+    transition: max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.3s ease,
+                padding 0.3s ease;
+    padding: 1.25rem;
+}
+
+.month-group-card.collapsed .month-body {
+    max-height: 0;
+    opacity: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
 /* Weekly Table Cards and Layout */
 .weekly-table-card {
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    margin-bottom: 1.25rem;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(10, 0, 20, 0.65);
+    border-radius: 1rem;
+    overflow: hidden;
 }
+
+.weekly-table-card:last-child {
+    margin-bottom: 0;
+}
+
 .weekly-table-card:hover {
-    border-color: rgba(192, 132, 252, 0.2);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    border-color: rgba(192, 132, 252, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
 }
 
 /* Collapsible week body */
 .week-table-body {
-    max-height: 2000px;
+    max-height: 2500px;
     overflow: hidden;
     transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
                 opacity 0.3s ease;
     opacity: 1;
 }
+
 .weekly-table-card.collapsed .week-table-body {
     max-height: 0;
     opacity: 0;
@@ -1701,6 +1769,7 @@ input:focus, select:focus {
     background: none;
     border: none;
 }
+
 .week-header-btn:focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: -2px;
