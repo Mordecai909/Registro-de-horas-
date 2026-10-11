@@ -1107,6 +1107,19 @@ const UI = {
         };
     },
 
+    autoAdjustScroll(element, offset = 85) {
+        if (!element) return;
+        setTimeout(() => {
+            const rect = element.getBoundingClientRect();
+            const absoluteTop = window.pageYOffset + rect.top;
+            const targetY = Math.max(0, absoluteTop - offset);
+            window.scrollTo({
+                top: targetY,
+                behavior: 'smooth'
+            });
+        }, 60);
+    },
+
     toggleMonth(monthKey) {
         const card = document.querySelector(`.month-group-card[data-month-key="${monthKey}"]`);
         if (!card) return;
@@ -1115,6 +1128,7 @@ const UI = {
             this._expandedMonths.delete(monthKey);
         } else {
             this._expandedMonths.add(monthKey);
+            this.autoAdjustScroll(card, 85);
         }
         const btn = card.querySelector('.month-header-btn');
         if (btn) btn.setAttribute('aria-expanded', (!isCollapsed).toString());
@@ -1128,9 +1142,58 @@ const UI = {
             this._expandedWeeks.delete(weekId);
         } else {
             this._expandedWeeks.add(weekId);
+            this.autoAdjustScroll(card, 85);
         }
         const btn = card.querySelector('.week-header-btn');
         if (btn) btn.setAttribute('aria-expanded', (!isCollapsed).toString());
+    },
+
+    selectDayAndScrollToTable(dateStr) {
+        if (!dateStr) return;
+
+        // Destaque visual na coluna correspondente do gráfico
+        document.querySelectorAll('.day-col').forEach(c => {
+            c.classList.toggle('day-col-selected', c.dataset.date === dateStr);
+        });
+
+        // 1. Abrir o mês se estiver fechado
+        const monthKey = dateStr.substring(0, 7);
+        const monthCard = document.querySelector(`.month-group-card[data-month-key="${monthKey}"]`);
+        if (monthCard && monthCard.classList.contains('collapsed')) {
+            monthCard.classList.remove('collapsed');
+            this._expandedMonths.add(monthKey);
+            const mBtn = monthCard.querySelector('.month-header-btn');
+            if (mBtn) mBtn.setAttribute('aria-expanded', 'true');
+        }
+
+        // 2. Abrir a semana correspondente se estiver fechada
+        const range = this._getWeekRange(dateStr);
+        const weekKey = `${range.startStr}|${range.endStr}`;
+        const weekUniqueId = `${monthKey}_${weekKey.replace(/[^a-z0-9]/gi, '_')}`;
+        const weekCard = document.querySelector(`.weekly-table-card[data-week-id="${weekUniqueId}"]`);
+
+        if (weekCard) {
+            if (weekCard.classList.contains('collapsed')) {
+                weekCard.classList.remove('collapsed');
+                this._expandedWeeks.add(weekUniqueId);
+                const wBtn = weekCard.querySelector('.week-header-btn');
+                if (wBtn) wBtn.setAttribute('aria-expanded', 'true');
+            }
+
+            // Realçar linhas da data correspondente
+            document.querySelectorAll('.day-row-highlight').forEach(el => el.classList.remove('day-row-highlight'));
+            const matchingRows = weekCard.querySelectorAll(`tr[data-date="${dateStr}"]`);
+            matchingRows.forEach(r => r.classList.add('day-row-highlight'));
+
+            // Feedback luminoso na semana
+            weekCard.classList.add('week-selected-pulse');
+            setTimeout(() => weekCard.classList.remove('week-selected-pulse'), 2500);
+
+            // Auto-ajustar a tela perfeitamente para a tabela da semana
+            this.autoAdjustScroll(weekCard, 85);
+        } else if (monthCard) {
+            this.autoAdjustScroll(monthCard, 85);
+        }
     },
 
     expandAll() {
@@ -1344,6 +1407,7 @@ const UI = {
                 weekEntries.forEach(entry => {
                     const row = document.createElement('tr');
                     row.className = 'table-row-hover transition-colors group';
+                    row.dataset.date = entry.date;
                     const DOW_SHORT = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
                     const [ey, em, ed] = entry.date.split('-').map(Number);
                     const entryDow = new Date(ey, em - 1, ed).getDay();
@@ -1642,6 +1706,8 @@ const DayColChart = {
 // ─── Dashboard Module ─────────────────────────────────────────────────────────
 
 const DashboardModule = {
+    _hasInitializedDayScroll: false,
+
     update() {
         const now          = new Date();
         const todayStr     = now.toISOString().split('T')[0];
@@ -1690,12 +1756,33 @@ const DashboardModule = {
 
     initChart() {
         // Replaced by custom day-column chart — rendered via _renderDayColumns
+        this.initWheelScroll();
     },
 
-_renderDayColumns() {
+    initWheelScroll() {
+        const wrap = $('day-column-chart-container');
+        const card = wrap?.closest('.glass-card') || wrap;
+        if (!card || !wrap || card._hasWheelListener) return;
+
+        card._hasWheelListener = true;
+        card.addEventListener('wheel', (e) => {
+            if (wrap.scrollWidth > wrap.clientWidth) {
+                const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+                if (delta !== 0) {
+                    e.preventDefault();
+                    wrap.scrollLeft += delta;
+                }
+            }
+        }, { passive: false });
+    },
+
+    _renderDayColumns() {
         const container = $('day-column-chart');
         const empty = $('day-col-empty');
         if (!container) return;
+
+        const wrap = $('day-column-chart-container');
+        const prevScrollLeft = (wrap && this._hasInitializedDayScroll) ? wrap.scrollLeft : null;
 
         const dateMap = {};
         AppState.entries.forEach(e => {
@@ -1750,13 +1837,25 @@ _renderDayColumns() {
                 });
                 const totalMin = Object.values(catMap).reduce((a, b) => a + b, 0);
 
+                const [, mo, d] = dateStr.split('-');
                 const col = document.createElement('div');
                 col.className = 'day-col';
+                col.dataset.date = dateStr;
+                col.setAttribute('title', `Clique para ir à tabela do dia ${d}/${mo}`);
+
+                // Hitbox click: seleciona a coluna e abre a tabela correspondente com auto-ajuste de tela
+                col.addEventListener('click', (ev) => {
+                    if (ev.target.classList.contains('day-col-hide-toggle')) return;
+                    UI.selectDayAndScrollToTable(dateStr);
+                });
 
                 const hideCheckbox = document.createElement('input');
                 hideCheckbox.type = 'checkbox';
                 hideCheckbox.className = 'day-col-hide-toggle';
                 hideCheckbox.title = 'Ocultar/Mostrar esta coluna';
+                hideCheckbox.addEventListener('click', (ev) => {
+                    ev.stopPropagation();
+                });
                 hideCheckbox.addEventListener('change', (e) => {
                     col.classList.toggle('day-col-hidden', e.target.checked);
                 });
@@ -1784,7 +1883,6 @@ _renderDayColumns() {
                     bar.appendChild(seg);
                 });
 
-                const [, mo, d] = dateStr.split('-');
                 const lbl = document.createElement('div');
                 lbl.className = 'day-col-label';
                 lbl.textContent = `${d}/${mo}`;
@@ -1813,7 +1911,10 @@ _renderDayColumns() {
             container.appendChild(weekWrap);
         });
 
-        // Add 6-hour limit line
+        // Add 6-hour limit line (remove duplicatas prévias)
+        const existingLimit = container.parentNode.querySelector('.six-hour-limit-line');
+        if (existingLimit) existingLimit.remove();
+
         const limitLine = document.createElement('div');
         limitLine.className = 'six-hour-limit-line';
         limitLine.style.cssText = `
@@ -1829,9 +1930,19 @@ _renderDayColumns() {
         container.parentNode.style.position = 'relative';
         container.parentNode.appendChild(limitLine);
 
-        // Scroll to most recent (right)
-        const wrap = $('day-column-chart-container');
-        if (wrap) requestAnimationFrame(() => { wrap.scrollLeft = wrap.scrollWidth; });
+        // Scroll preservation: mantém posição ao gravar atividade / atualizar
+        if (wrap) {
+            requestAnimationFrame(() => {
+                if (this._hasInitializedDayScroll && prevScrollLeft !== null) {
+                    wrap.scrollLeft = prevScrollLeft;
+                } else {
+                    wrap.scrollLeft = wrap.scrollWidth;
+                    this._hasInitializedDayScroll = true;
+                }
+            });
+        }
+
+        this.initWheelScroll();
     },
 };
 

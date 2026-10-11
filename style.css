@@ -1496,6 +1496,49 @@ input:focus, select:focus {
     /* height is exactly: 240px bar + 20px label + 12px total = 272px (matches .week-cols height) */
     height: 272px;
     box-sizing: border-box;
+    cursor: pointer;
+    position: relative;
+    border-radius: 8px;
+    padding: 2px 2px 0 2px;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s ease;
+}
+
+.day-col:hover {
+    transform: translateY(-4px);
+    background-color: rgba(192, 132, 252, 0.08);
+}
+
+.day-col:hover .day-col-bar-wrapper {
+    border-color: var(--accent);
+    box-shadow: 0 0 14px var(--accent-glow);
+}
+
+.day-col:hover .day-col-label {
+    color: #ffffff;
+    opacity: 1;
+}
+
+/* Coluna selecionada / ativa */
+.day-col.day-col-selected {
+    transform: translateY(-4px);
+    background-color: rgba(192, 132, 252, 0.12);
+}
+
+.day-col.day-col-selected .day-col-bar-wrapper {
+    border-color: #ffffff !important;
+    box-shadow: 0 0 16px var(--accent), 0 0 28px var(--accent-glow), inset 0 0 10px var(--accent-glow) !important;
+}
+
+.day-col.day-col-selected .day-col-label {
+    color: #ffffff !important;
+    opacity: 1;
+    font-weight: 900;
+    text-shadow: 0 0 10px var(--accent);
+}
+
+.day-col.day-col-selected .day-col-total {
+    color: var(--accent) !important;
+    font-weight: 800;
 }
 
 .day-col-bar-wrapper {
@@ -1509,7 +1552,7 @@ input:focus, select:focus {
     overflow: hidden;
     background: rgba(192, 132, 252, 0.05);
     border: 1px solid rgba(192, 132, 252, 0.1);
-    transition: border-color 0.3s;
+    transition: border-color 0.3s, box-shadow 0.3s;
     box-sizing: border-box;
 }
 .day-col-bar-wrapper:hover { border-color: rgba(192, 132, 252, 0.35); }
@@ -1540,6 +1583,7 @@ input:focus, select:focus {
     line-height: 14px;
     flex-shrink: 0;
     text-align: center;
+    transition: color 0.2s ease, opacity 0.2s ease;
 }
 
 .day-col-total {
@@ -1552,15 +1596,13 @@ input:focus, select:focus {
     line-height: 12px;
     flex-shrink: 0;
     text-align: center;
+    transition: color 0.2s ease;
 }
 
 /* Hide checkbox at top of column */
-.day-col {
-    position: relative;
-}
 .day-col-hide-toggle {
     position: absolute;
-    top: 2px;
+    top: 4px;
     left: 50%;
     transform: translateX(-50%);
     width: 16px;
@@ -1599,6 +1641,32 @@ input:focus, select:focus {
 .day-col-today .day-col-label {
     color: #fff;
     opacity: 1;
+}
+
+/* Destaque e pulso para linhas e tabela selecionada */
+@keyframes dayRowPulse {
+    0% {
+        background-color: rgba(192, 132, 252, 0.4);
+        box-shadow: inset 0 0 18px rgba(192, 132, 252, 0.6);
+    }
+    45% {
+        background-color: rgba(192, 132, 252, 0.22);
+        box-shadow: inset 0 0 10px rgba(192, 132, 252, 0.35);
+    }
+    100% {
+        background-color: transparent;
+        box-shadow: none;
+    }
+}
+
+.day-row-highlight {
+    animation: dayRowPulse 2.8s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+}
+
+.weekly-table-card.week-selected-pulse {
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 25px var(--accent-glow), 0 10px 30px rgba(0, 0, 0, 0.7) !important;
+    transition: border-color 0.4s ease, box-shadow 0.4s ease;
 }
 
 /* Floating tooltip */
